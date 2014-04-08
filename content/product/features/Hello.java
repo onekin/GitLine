@@ -1,22 +1,8 @@
-public   class  Hello {
-	
-
-	private void  print__wrappee__master  () {
-		System.out.print("Hello");
-	}
-
-	
-
-	private void  print__wrappee__beautiful  () {
-		print__wrappee__master();
-		System.out.print("beutiful");
-	}
-
+public  class  Hello {
 	
 
 	protected void print() {
-		print__wrappee__beautiful();
-		System.out.print(" world");
+		System.out.print("Hello");
 	}
 
 	

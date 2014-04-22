@@ -63,9 +63,9 @@ runFHComposition: function(configFileContent){
 		var fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
 		var fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
 		var configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
-		var configPath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		//var configPath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 
-		var parameters =[configFile, fhHome, fhJar, configPath];//project home
+		var parameters =[configFile, fhHome, fhJar];//project home
 		//alert (parameters);
 		
 		proc.run(true, parameters, parameters.length);
@@ -265,13 +265,16 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 },
 
 
-writeToDisk: function(content, theFile){ //contentString and path
-	//create proper path for file
-	//var theFile = '/Users/Onekin/Desktop/saludi.txt';
-	//create component for file writing
-	console.log("Hola Leti.Estas en wiriting files!");
+writeToDisk: function(content, path, fileName){ 
+
+	
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-	file.initWithPath( theFile );
+    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/" + path + fileName;
+
+	//alert("theFilePath: "+theFilePath+"\ncontent: "+content);
+
+	file.initWithPath( theFilePath );
 	if(file.exists() == false) //check to see if file exists
 	{
 	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
@@ -474,6 +477,9 @@ injectScript: function(script, url, unsafeContentWin) {
 	//mi variable para descargarme los archivos de los branches
 	sandbox.SaveToDisk=githubdeltas_gmCompiler.hitch(this, "saveToDisk");
 
+	//mi variable para grabar archivos en disco
+	sandbox.WriteToDisk=githubdeltas_gmCompiler.hitch(this, "writeToDisk");
+
 
 	sandbox.SearchFilesInLocalFolder=githubdeltas_gmCompiler.hitch(this, "searchFilesInLocalFolder");
 	sandbox.ReadFilesFromLocal=githubdeltas_gmCompiler.hitch(this, "readFilesFromLocal");
@@ -502,7 +508,7 @@ injectScript: function(script, url, unsafeContentWin) {
 		e2.fileName=script.filename;
 		e2.lineNumber=0;
 		//GM_logError(e2);
-		console.log(e2);
+		//console.log(e2);
 	}
 },
 

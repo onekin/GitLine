@@ -323,29 +323,33 @@ readFromFile: function(){
 },
 
 searchFilesInLocalFolder: function(pathToTheFolder){
-	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-			
-    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
+	try{
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+				
+	    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
 
 
-	var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-     folder.initWithPath(folderPath);
+		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	     folder.initWithPath(folderPath);
 
-     var entries = folder.directoryEntries;
-	 var array = [];
-	 var listNames=[];
-	 var i=0;
-		while(entries.hasMoreElements())
-		{
-		  var entry = entries.getNext();
-		  entry.QueryInterface(Components.interfaces.nsIFile);
-		  array.push(entry);
-		  listNames[i]=array[i].leafName;
-		  i++;
-		}
-		//alert(array[0].leafName);
-		//alert(listNames);
-		return listNames;
+	     var entries = folder.directoryEntries;
+		 var array = [];
+		 var listNames=[];
+		 var i=0;
+			while(entries.hasMoreElements())
+			{
+			  var entry = entries.getNext();
+			  entry.QueryInterface(Components.interfaces.nsIFile);
+			  array.push(entry);
+			  listNames[i]=array[i].leafName;
+			  i++;
+			}
+			//alert(array[0].leafName);
+			//alert(listNames);
+			return listNames;
+	}catch(e){
+		return null;
+	}
 },
 
 readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles[i]

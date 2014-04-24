@@ -13,4 +13,5 @@ public class Stack {
 		return data.removeFirst();
 	}
 	//PRUEBA;  
+
 }

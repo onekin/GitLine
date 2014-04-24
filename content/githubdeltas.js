@@ -2397,13 +2397,12 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 				if(ghBranch!=null){
 					productConfig+=ghBranch.name+" "+ghBranch.sha+"\n";
 					configFileContent+=ghBranch.name+"\n";
-					//descargarme el branch content ??
 				}
 				else{ 
 					window.alert("No such feature in the repository: '"+listBranches[i]+"'");
 					error=true;
+					return;
 				}
-
 			}
 			console.log("Despues del FORK:\n"+configFileContent);
 			RunFHComposition(configFileContent);	//compose product
@@ -2435,7 +2434,6 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 										Utils.XHR("/"+user+"/"+repo+ "/edit/master/"+listFiles[i],function(res){
 											commit = jQuery(res).find("input[name='commit']").attr("value");
 											Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productBranch+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-													window.location.href="/"+user+"/"+repo;
 													//delete all branches except the master
 													var ghUser = new Gh3.User(user);
 													var ghUserRepo = new Gh3.Repository(repo, ghUser);
@@ -2450,7 +2448,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 									        					console.log("To Delete: "+branch.name);
 									        					if(branch.name!="master")
 									        					Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(){
-																   window.location.href="/"+user+"/"+repo;
+																   window.location.href="/"+user+"/"+repo+"/tree/master";
 															    },"DELETE",token);
 									    					})
 														});

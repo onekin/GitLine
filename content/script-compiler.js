@@ -37,6 +37,7 @@ runFHComposition: function(configFileContent){
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ "features.config";
 
+		//write the config file for FeatureHouse
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -45,7 +46,6 @@ runFHComposition: function(configFileContent){
 		var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
 		
 		foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
-		
 
 		var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
 		converter.init(foStream, "UTF-8", 0, 0);
@@ -54,25 +54,23 @@ runFHComposition: function(configFileContent){
 		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/product/runFH.sh");
+		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/scripts/fhComposition.sh");
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-
-		var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		//var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 		var fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
 		var fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
 		var configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
-		var configPath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		//var configPath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 
-		var parameters =[configFile, fhHome, fhJar, configPath];//project home
+		var parameters =[configFile, fhHome, fhJar];//project home
 		//alert (parameters);
-		
 		proc.run(true, parameters, parameters.length);
+		//alert ("Product Composed!");
 		
 	}catch (err){
-		console.log("ERROR:"+err.message);
-		alert("ERROR in Running FH composition!:"+err.message);
+		alert("ERROR in Running FeatureHouse composition!:"+err.message);
 		}
 
 
@@ -265,13 +263,16 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 },
 
 
-writeToDisk: function(content, theFile){ //contentString and path
-	//create proper path for file
-	//var theFile = '/Users/Onekin/Desktop/saludi.txt';
-	//create component for file writing
-	console.log("Hola Leti.Estas en wiriting files!");
+writeToDisk: function(content, path, fileName){ 
+
+	
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-	file.initWithPath( theFile );
+    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/" + path + fileName;
+
+	//alert("theFilePath: "+theFilePath+"\ncontent: "+content);
+
+	file.initWithPath( theFilePath );
 	if(file.exists() == false) //check to see if file exists
 	{
 	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
@@ -322,29 +323,33 @@ readFromFile: function(){
 },
 
 searchFilesInLocalFolder: function(pathToTheFolder){
-	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-			
-    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
+	try{
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+				
+	    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
 
 
-	var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-     folder.initWithPath(folderPath);
+		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	     folder.initWithPath(folderPath);
 
-     var entries = folder.directoryEntries;
-	 var array = [];
-	 var listNames=[];
-	 var i=0;
-		while(entries.hasMoreElements())
-		{
-		  var entry = entries.getNext();
-		  entry.QueryInterface(Components.interfaces.nsIFile);
-		  array.push(entry);
-		  listNames[i]=array[i].leafName;
-		  i++;
-		}
-		//alert(array[0].leafName);
-		//alert(listNames);
-		return listNames;
+	     var entries = folder.directoryEntries;
+		 var array = [];
+		 var listNames=[];
+		 var i=0;
+			while(entries.hasMoreElements())
+			{
+			  var entry = entries.getNext();
+			  entry.QueryInterface(Components.interfaces.nsIFile);
+			  array.push(entry);
+			  listNames[i]=array[i].leafName;
+			  i++;
+			}
+			//alert(array[0].leafName);
+			//alert(listNames);
+			return listNames;
+	}catch(e){
+		return null;
+	}
 },
 
 readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles[i]
@@ -474,6 +479,9 @@ injectScript: function(script, url, unsafeContentWin) {
 	//mi variable para descargarme los archivos de los branches
 	sandbox.SaveToDisk=githubdeltas_gmCompiler.hitch(this, "saveToDisk");
 
+	//mi variable para grabar archivos en disco
+	sandbox.WriteToDisk=githubdeltas_gmCompiler.hitch(this, "writeToDisk");
+
 
 	sandbox.SearchFilesInLocalFolder=githubdeltas_gmCompiler.hitch(this, "searchFilesInLocalFolder");
 	sandbox.ReadFilesFromLocal=githubdeltas_gmCompiler.hitch(this, "readFilesFromLocal");
@@ -502,7 +510,7 @@ injectScript: function(script, url, unsafeContentWin) {
 		e2.fileName=script.filename;
 		e2.lineNumber=0;
 		//GM_logError(e2);
-		console.log(e2);
+		//console.log(e2);
 	}
 },
 

@@ -37,6 +37,7 @@ runFHComposition: function(configFileContent){
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ "features.config";
 
+		//write the config file for FeatureHouse
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -45,7 +46,6 @@ runFHComposition: function(configFileContent){
 		var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
 		
 		foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
-		
 
 		var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
 		converter.init(foStream, "UTF-8", 0, 0);
@@ -54,12 +54,11 @@ runFHComposition: function(configFileContent){
 		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/product/runFH.sh");
+		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/scripts/fhComposition.sh");
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-
-		var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		//var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 		var fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
 		var fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
 		var configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
@@ -67,12 +66,11 @@ runFHComposition: function(configFileContent){
 
 		var parameters =[configFile, fhHome, fhJar];//project home
 		//alert (parameters);
-		
 		proc.run(true, parameters, parameters.length);
+		//alert ("Product Composed!");
 		
 	}catch (err){
-		console.log("ERROR:"+err.message);
-		alert("ERROR in Running FH composition!:"+err.message);
+		alert("ERROR in Running FeatureHouse composition!:"+err.message);
 		}
 
 

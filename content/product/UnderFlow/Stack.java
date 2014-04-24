@@ -1,5 +1,6 @@
 package util;
 
+//UnderFlow Feature
 public class Stack {
 	private int count = 0;
 
@@ -7,11 +8,10 @@ public class Stack {
 		original(obj);
 		count++;
 	}
-
 	public Object pop() {
 		if(count > 0) {
-			count--;//bug created
-			return original(); // calling the overriden method
+			count--;
+			return original(); 
 		}
 		else
 			return null;

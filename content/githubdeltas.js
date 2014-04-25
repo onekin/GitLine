@@ -1845,31 +1845,36 @@ var GitHubWrapper=function(){
 
  this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary']",supplements:[]}; 												//node.value
  this.nodes.diffCode={nodes:[],values:[],listeners:{},xpath:"//*[contains(@class,'file-diff-line js-file-line')]//*[@class='diff-line-code']",supplements:[],regexp:function(node){return node.textContent.trim();}}; 
+
  
- /*this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
-                     template: function(){
-                         var object={};
-object.executeTemplate=function(parameter){
-                             var tabTemplate=document.createElement("template");
-                             tabTemplate.innerHTML='<li><div><a rel="nofollow"  title="Compose branch" class="minibutton" href=""><span class="text">Compose</span></a></div></li>';
-                             var newTab=tabTemplate.content.cloneNode(true);
-                             return newTab.querySelector("li");
-                         };
-                         return object;
- 						}
-                         }; */
 this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
                          var object={};
-object.executeTemplate=function(parameter){
-                             var tabTemplate=document.createElement("template");
-                             tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></div></li>';
-                             var newTab=tabTemplate.content.cloneNode(true);
-                             return newTab.querySelector("li");
-                         };
-                         return object;
- 						}
-                         }; 
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></div></li>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("li");
+						     };
+						   return object;
+						 	}
+						   }; 
+				
+this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//ul[@class='numbers-summary']/li",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Fordward Propagation</span></a></div></li>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("li");
+						     };
+						   return object;
+						 	}
+						   }; 
+
+              
+
 };
 
 
@@ -1990,6 +1995,21 @@ GitHubWrapper.prototype.getActionTemplate=function(){
  return this.nodes.actions.template();
 };
 
+
+GitHubWrapper.prototype.injectIntoCompareSummary=function(node,position){
+this._addSibling(this.nodes.compareSummary,node,position);
+};
+
+GitHubWrapper.prototype.getCompareSummary=function(){
+ return this.nodes.compareSummary.nodes;
+};
+
+GitHubWrapper.prototype.getCompareSummaryTemplate=function(){
+ return this.nodes.compareSummary.template();
+};
+
+
+
 GitHubWrapper.prototype.getUserName=function(){
  return this.nodes.userName.value;
 };
@@ -2107,6 +2127,27 @@ tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
 return tab;
 };
 
+
+var CompareSummaryView=function(){
+this.click=null;
+};
+CompareSummaryView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+CompareSummaryView.prototype.render=function(){
+var obj=this;
+var tabTemplate=GitHub.getCompareSummaryTemplate();
+var tab=GitHub.applyTemplate(tabTemplate,null);
+tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+ ev.preventDefault();
+ ev.stopPropagation();
+ obj.click(ev);
+},true);
+return tab;
+};
+
+
+
 var LoadEController=function(){
  if (LoadEController.prototype._singletonInstance) {
   return LoadEController.prototype._singletonInstance;
@@ -2127,11 +2168,9 @@ LoadEController.prototype.execute=function(){
  var repo=GitHub.getCurrentRepository(); 
  var button=GitHub.getForkButton(); 
 
- /*hacer un listener para que cada vez que cambie el branch se actualice*/
+ 
  var currentBranch=GitHub.getCurrentBranch();
- //console.log("current branch "+currentBranch); 
 
- //console.log("Fork: "+button);
  if(user!=null&&token!=null&&author!=null&&repo!=null&&button!=null){
   var fork=new ForkEController();
   GitHub.listenToForkButton("click",function(ev){ev.preventDefault();ev.stopPropagation();fork.execute();});
@@ -2150,6 +2189,14 @@ LoadEController.prototype.execute=function(){
   var install=new InstallEController();
   install.execute("add");
  }
+
+var compareSummary=GitHub.getCompareSummary();  
+ if(user!=null&&repo!=null&&compareSummary!=null){
+ 	//if()
+  var forwardPropagation=new ForwardPropagationEController();
+  forwardPropagation.execute("add");
+ }
+
 
 /* De momento no uso la semantica del branching
 ///branch semantics
@@ -2318,6 +2365,72 @@ PullRequestEController.prototype.execute=function(){
 		}
 }; 
 
+var ForwardPropagationEController=function(){ 
+	if (InstallEController.prototype._singletonInstance) {
+  		return ForwardPropagationEController.prototype._singletonInstance;
+ }
+ ForwardPropagationEController.prototype._singletonInstance = this;        
+};
+
+ForwardPropagationEController.prototype.execute=function(act){
+	if(act=="add"){
+		var obj=this;
+		var forward=new CompareSummaryView();
+		forward.setViewData({click:function(){obj.execute("run");}});
+		var render=forward.render();
+		GitHub.injectIntoCompareSummary(render);
+		console.log("Fordwar propagation en add");
+	}else if(act=="run"){
+		console.log("Fordwar propagation en run");
+		var user=GitHub.getUserName(); 
+		var author=GitHub.getCurrentAuthor(); 
+		var repo=GitHub.getCurrentRepository();
+		var token=GitHub.getAuthenticityToken(); 
+
+		var ghUser = new Gh3.User(user);
+    	var ghRepo = new Gh3.Repository(repo, ghUser);
+
+    	
+
+
+		//step 1: Comprobar que existe el product.config
+		ghRepo.fetch(function (err, res) {
+          if(err) { console.log("ERROR ghRepo.fetch"); }
+			ghRepo.fetchBranches(function (err, res) {
+				var master=ghRepo.getBranchByName("master");
+				master.fetchContents(function (err, res) {
+		          if(err) { throw "outch ..." }
+		          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
+		      	  if(productConfigFile==null){
+		      	  	window.alert("There is no "+DeltaUtils.getProductConfigName()+" file in master branch!\nPropagation aborted.");
+		      	  	return;
+		      	  }
+		      	  else{
+		      	  	console.log(ghRepo);
+		      	  	console.log("Raw content: "+productConfigFile.name);
+		      	  	//Step 2: 
+		      	  	productConfigFile.fetchContent(function (err, res) {
+            			if(err) { throw "outch ..." }
+           				 console.log(productConfigFile.getRawContent());
+           				Utils.XHR("/"+user+"/"+repo,function(res){
+           					//https://github.com/letimome/stack/archive/master.zip
+           					Utils.XHR("/"+user+"/"+repo+"/archive/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81.zip",function(res){
+           						console.log("res");
+           						console.log(res);
+           					},"GET");
+        				},"GET");
+
+
+          			});
+		      	  }
+		      	});
+		   	});
+		});
+
+	}
+
+};
+
 var InstallEController=function(){
  if (InstallEController.prototype._singletonInstance) {
   return InstallEController.prototype._singletonInstance;
@@ -2350,7 +2463,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		var branch=currentBranch;//DeltaUtils.currentBranch;	
 		var configFileContent="";
 		var error=false;
-		var productConfigName="product.config";
+		
 		var editOrNew="";
 		var repoApi=github.getRepo("letimome","stack");
 		console.log("RepoApi");
@@ -2368,7 +2481,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
     	var productConfig="";
     	console.log("bajarme todas las branches");
-		//step 0.1: descargame todas las branches
+		//step 1: descargame todas las branches (para tenerlas listas a la hora de componer)
 		ghRepo.fetch(function (err, res) {
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
@@ -2378,7 +2491,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		   	});
 		});
 
-		/*step 0.2: Ask for product configuration equation*/
+		/*step 2: Ask for product configuration equation*/
 		console.log("ask config equation");
 		var productBranches=window.prompt("Please enter the configuration equation","master");
 		var listBranches=productBranches.split(" ");
@@ -2386,8 +2499,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 			console.log("Config: "+productBranches);
 		else return;
 
-		 //Step 1: check configuration equation correspond to branch names
-    	
+		//Step 3: Precondition, check configuration equation correspond to branch names
     	ghRepo.fetch(function (err, res) {
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
@@ -2404,11 +2516,13 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 					return;
 				}
 			}
-			console.log("Despues del FORK:\n"+configFileContent);
+			//step 4: compose branches content with the config file (branch names)
 			RunFHComposition(configFileContent);	//compose product
 
 			var listFiles=SearchFilesInLocalFolder("content/product/features");
 			if(listFiles==null) return;
+
+			//Step5: create a fork
 			Utils.XHR("/"+author+"/"+repo+"/fork",function(){//FORK & delete all branches + post the product
 				//step 5 post the new product in the master branch
 				console.log("step 5");
@@ -2417,35 +2531,31 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 				var len= listFiles.length;
 				var productBranch="master";
 		    	var commit;
-				//Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//
-					//create the product configuration file
+					//Step 6: create the product.config  file
 					Utils.XHR("/"+user+"/"+repo+"/new/master",function(res){
 					commit = jQuery(res).find("input[name='commit']").attr("value");
 						Utils.XHR("/"+user+"/"+repo+"/create/master",function(res){
 							console.log("aqui");
-							//upload  other files		
+							//Step 7:upload  other files		
 							for (var i=0; i<len; i++){
 								var file=listFiles[i];
 								console.log("ahora: "+file);
-								//console.log("ahora");
 								var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
 								console.log("file content encodedURI:"+encodeURIComponent(fileContent));
 									fileContent=fileContent.trim();
 										Utils.XHR("/"+user+"/"+repo+ "/edit/master/"+listFiles[i],function(res){
 											commit = jQuery(res).find("input[name='commit']").attr("value");
 											Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productBranch+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-													//delete all branches except the master
+													//Step 8: delete all branches except the master
 													var ghUser = new Gh3.User(user);
 													var ghUserRepo = new Gh3.Repository(repo, ghUser);
 													ghRepo.fetch(function (err, res) {
 													  console.log(ghRepo);
 											          if(err) { console.log("ERROR ghRepo.fetch"); }
-														//repoTitle.html(k33gBlog.full_name);
 														ghRepo.fetchBranches(function (err, res) {
 															var branches= ghRepo.getBranches();
 															console.log(branches);
 															ghRepo.eachBranch(function (branch) {
-									        					console.log("To Delete: "+branch.name);
 									        					if(branch.name!="master")
 									        					Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(){
 																   window.location.href="/"+user+"/"+repo+"/tree/master";
@@ -2456,26 +2566,13 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact"+"&content_changed=true");					
 										},"POST","authenticity_token="+encodeURIComponent(token));	
 							}
-						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+productConfigName+"&new_filename="+productConfigName+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
+						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+productConfigName+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
 					},"POST","authenticity_token="+encodeURIComponent(token));
-				//},"GET");
 			},"POST","authenticity_token="+encodeURIComponent(token));	
 
           });
 
         });
-        if(!error){
-	      console.log("step 3");
-			//Step 3: download branch content
-			/*for (j=0; j<listBranches.length;j++){
-			        DeltaUtils.getBranchFiles(author,repo,listBranches[j]);		        
-			}*/
-			//Step 4: compose with FeatureHouse
-			//RunFHComposition(configFileContent);	//compose product
-			//Step 4: crete a new repository for the user
-			console.log("STEP 4");
-			
-  		}
   }
 };
 
@@ -2484,19 +2581,16 @@ new LoadEController().init();
 var DeltaUtils={};
 DeltaUtils.currentBranch="master";
 
-var github = new Github({
-  username: "lemome88",
-  password: "Florentina88",
-  auth: "basic"
-});
-
-DeltaUtils.timeVar;
-
 DeltaUtils.sleep=function(millis){
   var date = new Date();
   var curDate = null;
   do { curDate = new Date(); }
   while(curDate-date < millis);
+}
+
+DeltaUtils.getProductConfigName=function(){
+	var name="product.config"
+	return name;
 }
 
 DeltaUtils.createDeltaXML=function(author,repo){
@@ -2564,7 +2658,8 @@ Utils.XHR=function(url,f,method,params){
  xhr.onerror = function (e) {
      debugger;
   f(null,xhr);
-  console.log("XHR on error: "+e);
+  console.log("XHR on error:\n");
+  console.log(e);
   console.error(xhr.statusText);
  };
  xhr.send(params);       

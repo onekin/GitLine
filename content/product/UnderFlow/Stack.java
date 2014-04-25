@@ -16,4 +16,13 @@ public class Stack {
 		else
 			return null;
 	}
+
+	public Object newMethod() {
+		if(count > 0) {
+			count--;
+			return original(); 
+		}
+		else
+			return null;
+	}
 }

@@ -1,20 +1,28 @@
-package util;
+package util; 
 
-import java.util.LinkedList;
+import java.util.LinkedList; 
 //Base feature
-public class Stack {
+public  class  Stack {
+	
 	private LinkedList<Object> data = 
 			new LinkedList<Object>();
+
+	
 
 	public void push(Object obj) {
 		data.addFirst(obj);
 	}
+
+	
 	public Object pop() {
 		return data.removeFirst();
 	}
 
+	
+
 	public Object newMethod() {
 		return data.removeFirst();
 	}
+
 
 }

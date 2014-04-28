@@ -25,4 +25,18 @@ public class Stack {
 		else
 			return null;
 	}
+
+	public Object newMethod2() {
+		if(count > 0) {
+			count--;
+			return original(); 
+		}
+		else{
+			count--;count--;
+				return null;
+		}
+
+		}
+
+	}
 }

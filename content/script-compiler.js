@@ -58,13 +58,14 @@ runFHComposition: function(configFileContent){
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-		//var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		
 		var fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
 		var fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
 		var configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
-		//var configPath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		
 
-		var parameters =[configFile, fhHome, fhJar];//project home
+		var parameters =[configFile, fhHome, fhJar,productHome];//project home
 		//alert (parameters);
 		proc.run(true, parameters, parameters.length);
 		//alert ("Product Composed!");
@@ -352,6 +353,13 @@ searchFilesInLocalFolder: function(pathToTheFolder){
 	}
 },
 
+getLogFileContent:function(){
+
+
+	var logContent=githubdeltas_gmCompiler.readFilesFromLocal("content/product/log.txt");
+	return logContent;
+},
+
 readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles[i]
 	try{
 			var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
@@ -509,7 +517,10 @@ injectScript: function(script, url, unsafeContentWin) {
 	//mi variable para grabar archivos en disco
 	sandbox.WriteToDisk=githubdeltas_gmCompiler.hitch(this, "writeToDisk");
 	
+	//clean project folder
 	sandbox.CleanProjectFolder=githubdeltas_gmCompiler.hitch(this, "cleanProjectFolder");
+	//get Log 
+	sandbox.GetLogFileContent=githubdeltas_gmCompiler.hitch(this, "getLogFileContent");
 
 	sandbox.SearchFilesInLocalFolder=githubdeltas_gmCompiler.hitch(this, "searchFilesInLocalFolder");
 	sandbox.ReadFilesFromLocal=githubdeltas_gmCompiler.hitch(this, "readFilesFromLocal");

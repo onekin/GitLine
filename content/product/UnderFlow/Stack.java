@@ -16,12 +16,4 @@ public class Stack {
 		else
 			return null;
 	}
-	public Object rePop() {
-		if(count > 0) {
-			count--;
-			return original(); 
-		}
-		else
-			return null;
-	}
 }

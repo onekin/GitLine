@@ -2672,7 +2672,10 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 			console.log("step 4.1");
 			var listFiles=SearchFilesInLocalFolder("content/product/features");
 			console.log(listFiles);
-			if(listFiles==null) return;
+			if(listFiles==null) {
+				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
+				return;
+			}
 
 			console.log("step 5");
 			//Step5: create a fork
@@ -2784,6 +2787,14 @@ DeltaUtils.getBranchFiles=function(user,repo,branch,branchName){
 	}catch(e){
 		console.log("ERROR in getBranchFiles:"+e);
 	}
+}
+
+DeltaUtils.getErrorLog=function(){
+	
+	var log=GetLogFileContent();
+	console.log("LOG CONTENT:\n"+log);
+	return log;
+
 }
 
 

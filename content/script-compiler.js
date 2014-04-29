@@ -381,6 +381,33 @@ readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles
 		}
 },
 
+cleanProjectFolder: function(){
+	try{
+
+		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+		shell.initWithPath(ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh");
+		//console.log ("Shell: "+shell);
+		
+		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
+		proc.init(shell);
+
+		var projectHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		
+		var parameters =[projectHome];//project home
+
+		
+		proc.run(true, parameters, parameters.length);
+
+		//alert(parameters);
+
+	}catch(err){
+
+	}
+
+},
+
+
 //////End of my scripts
 
 getUrlContents: function(aUrl){
@@ -481,7 +508,8 @@ injectScript: function(script, url, unsafeContentWin) {
 
 	//mi variable para grabar archivos en disco
 	sandbox.WriteToDisk=githubdeltas_gmCompiler.hitch(this, "writeToDisk");
-
+	
+	sandbox.CleanProjectFolder=githubdeltas_gmCompiler.hitch(this, "cleanProjectFolder");
 
 	sandbox.SearchFilesInLocalFolder=githubdeltas_gmCompiler.hitch(this, "searchFilesInLocalFolder");
 	sandbox.ReadFilesFromLocal=githubdeltas_gmCompiler.hitch(this, "readFilesFromLocal");

@@ -2399,6 +2399,10 @@ ForwardPropagationEController.prototype.execute=function(act){
 		console.log("Fordwar propagation en add");
 	}else if(act=="run"){
 		console.log("Fordwar propagation en run");
+
+		//clean projetc folder
+		CleanProjectFolder();
+
 		var user=GitHub.getUserName(); 
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
@@ -2443,9 +2447,8 @@ ForwardPropagationEController.prototype.execute=function(act){
            				for (i=0; i<lines.length-1; i++){
            					colums=lines[i].split(" ");
            					branches.push(colums[0]);//branch-feature
-           					 //commit sha
-           					//step 3: descargarse los branches con el commit adecuado y el updated branch actual
-           					//https://github.com/lemome88/stack/tree/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81
+           					 
+           					//step 3: descargarse los branches con el commit adecuado y el updated branch actual //https://github.com/lemome88/stack/tree/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81
            					configFileContent+=branches[i]+"\n";
            					if(featureSplit!=branches[i]){//si no es la feature to update
            					  commits.push(colums[1]);
@@ -2458,7 +2461,7 @@ ForwardPropagationEController.prototype.execute=function(act){
            					  //update new commit for updated feature
            					 var ghAuthor= new Gh3.User(author);
 					    	 var authorRepo = new Gh3.Repository(repo, ghAuthor);
-					    	 //var newSha;
+					    	 
 							 authorRepo.fetch(function (err, res) {
 					          if(err) { console.log("ERROR authorRepo.fetch"); }
 								authorRepo.fetchBranches(function (err, res) {
@@ -2467,10 +2470,8 @@ ForwardPropagationEController.prototype.execute=function(act){
 		           					  console.log(newSha);
 		           					  commits.push(newSha);
 		           					   newConfig+=colums[0]+" "+newSha+"\n";
-		           					   console.log("Log:\n"+newConfig);
 								});
            					  });
-							 //commits[i]=newSha;
            					}
            				}//end for
            				console.log(newConfig);
@@ -2482,54 +2483,50 @@ ForwardPropagationEController.prototype.execute=function(act){
            				if(!ok){
            					return;
            				}
-           				
-           					//example https://github.com/letimome/stack/compare/lemome88:master...underFlow
-
+           				//example https://github.com/letimome/stack-spl/compare/lemome88:master...underFlow
            				//step 5: compose branches content with the config file (branch names)
 						RunFHComposition(configFileContent);	//compose product
 						var listFiles=SearchFilesInLocalFolder("content/product/features");
-						console.log("listFiles");
-						console.log(listFiles);
 						var branch= ghRepo.default_branch;
 						var productB=DeltaUtils.getProductShadowBranchName();
 						//Step 6_ create a new branch with the new product and new product config file
            				Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//post a new branch
-           						/*var newProductConfig="";
-								for(i=0;i<branches.length;i++)
-									newProductConfig+=branches[i]+" "+commits[i]+"\n";
-								*/
-								//update product config File!!
 								var commit;
 								console.log("new config:\n"+newConfig);
 								var blob=DeltaUtils.getProductConfigName();
-								console.log(blob);
+								//console.log(blob);
 								Utils.XHR("/"+user+"/"+repo+"/edit/"+productB+"/"+blob,function(res){
-									console.log(11111);
+									//console.log(11111);
 									commit = jQuery(res).find("input[name='commit']").attr("value");
-									console.log(commit);
-									console.log(newProductConfig);
-									console.log("/"+user+"/"+repo+"/tree-save/"+productB+"/"+blob);
+									//console.log("before");
+									//console.log("/"+user+"/"+repo+"/tree-save/"+productB+"/"+blob);
 									Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productB+"/"+blob,function(res){
 										console.log("BIEN");		
-									},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+blob+"&new_filename="+blob+"&commit="+commit+"&value="+encodeURIComponent(newConfig)+"&placeholder_message=updated Product Configuration&pr=&content_changed=true");//+"&content_changed=true");					
+										//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
+									},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+blob+"&new_filename="+blob+"&commit="+commit+"&value="+newConfig+"&placeholder_message=updated Product Configuration&pr=&content_changed=true");//+"&content_changed=true");					
 								},"POST","authenticity_token="+encodeURIComponent(token));	
 
 	           					for (i=0; i<listFiles.length; i++){
 									var file=listFiles[i];
 									console.log("ahora: "+file);
 									var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
-									console.log("file content encodedURI:"+encodeURIComponent(fileContent));
+									//console.log("file content encodedURI:"+encodeURIComponent(fileContent));
 									fileContent=fileContent.trim();
 									Utils.XHR("/"+user+"/"+repo+"/edit/"+productB+"/"+file,function(res){
 										commit = jQuery(res).find("input[name='commit']").attr("value");
 										Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productB+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-											window.location.href="/"+user+"/"+repo+"/tree/"+productB;
+											//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
 										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact&pr=&content_changed=true");//+"&content_changed=true");					
 									},"POST","authenticity_token="+encodeURIComponent(token));	
 								}//end for
-								
-								
-								//Step7: create a pull request to merge defaultbranch and shadow product branch            	         		
+								//Step7: create a pull request to merge defaultbranch and shadow product branch            	 
+								console.log("PULL REQUEST");
+								//https://github.com/letimome/stack-SPL/compare/lemome88:master...underFlow
+								Utils.XHR("/"+user+"/"+repo+"/compare/"+user+":"+branch+"..."+productB,function(res){//https://github.com/letimome/stack-SPL/pull/create     
+									Utils.XHR("/"+user+"/"+repo+"/pull/create",function(res){
+										window.location.href="/"+user+"/"+repo+"/pulls/";
+									},"POST","authenticity_token="+encodeURIComponent(token)+"&pull_request[title]=Update Feature "+featureSplit+"&repo="+user+"/"+repo+"&base="+user+":"+branch+"&head="+user+":"+productB);   		
+								},"GET");
            				},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+branch+"&name="+productB+"&path=");	
 						
           			});
@@ -2618,7 +2615,8 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		var error=false;
 		
 		var editOrNew="";
-	
+		//clean projetc folder
+		CleanProjectFolder();
 
 		/* Algorithm steps
 			1. Check config features correspond to branches 
@@ -2651,6 +2649,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		else return;
 
 		//Step 3: Precondition, check configuration equation correspond to branch names
+		console.log("step 3");
     	ghRepo.fetch(function (err, res) {
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
@@ -2668,11 +2667,14 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 				}
 			}
 			//step 4: compose branches content with the config file (branch names)
+			console.log("step 4");
 			RunFHComposition(configFileContent);	//compose product
-
+			console.log("step 4.1");
 			var listFiles=SearchFilesInLocalFolder("content/product/features");
+			console.log(listFiles);
 			if(listFiles==null) return;
 
+			console.log("step 5");
 			//Step5: create a fork
 			Utils.XHR("/"+author+"/"+repo+"/fork",function(){//FORK & delete all branches + post the product
 				//step 5 post the new product in the master branch
@@ -2683,6 +2685,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 				var productBranch="master";
 		    	var commit;
 					//Step 6: create the product.config  file
+					console.log("step 6");
 					Utils.XHR("/"+user+"/"+repo+"/new/master",function(res){
 						console.log("here");
 					commit = jQuery(res).find("input[name='commit']").attr("value");
@@ -2719,8 +2722,10 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact"+"&content_changed=true");					
 										},"POST","authenticity_token="+encodeURIComponent(token));	
 							}
+
 						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
 					},"POST","authenticity_token="+encodeURIComponent(token));
+					
 			},"POST","authenticity_token="+encodeURIComponent(token));	
 
           });

@@ -1876,7 +1876,21 @@ this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//ul[@class='numbers-sum
 						     };
 						   return object;
 						 	}
-						   }; 
+						   };	
+						   
+	  /*					 
+this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='range']/li",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Fordward Propagation</span></a></div></li>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("li");
+						     };
+						   return object;
+						 	}
+						   };		*/			   
 
               
 
@@ -2755,7 +2769,7 @@ DeltaUtils.getProductConfigName=function(){
 }
 
 DeltaUtils.getProductShadowBranchName=function(){
-	var name="shadowProduct"
+	var name="shadowProduct";
 	return name;
 }
 
@@ -2783,7 +2797,6 @@ DeltaUtils.getBranchFiles=function(user,repo,branch,branchName){
 					},"GET");
 		 	}
 		 },"GET");
-		 console
 	}catch(e){
 		console.log("ERROR in getBranchFiles:"+e);
 	}

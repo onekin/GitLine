@@ -39,5 +39,15 @@ public   class  Stack {
 	
 	private int count = 0;
 
+	
+	public Object rePop() {
+		if(count > 0) {
+			count--;
+			return original(); 
+		}
+		else
+			return null;
+	}
+
 
 }

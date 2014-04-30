@@ -10,19 +10,19 @@ public   class  Stack {
 
 	
 
-	private void  push__wrappee__master  (Object obj) {
+	private void  push__wrappee__base  (Object obj) {
 		data.addFirst(obj);
 	}
 
 	
 
 	public void push(Object obj) {
-		push__wrappee__master(obj);
+		push__wrappee__base(obj);
 		count++;
 	}
 
 	
-	private Object  pop__wrappee__master  () {
+	private Object  pop__wrappee__base  () {
 		return data.removeFirst();
 	}
 
@@ -30,7 +30,7 @@ public   class  Stack {
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return pop__wrappee__master(); 
+			return pop__wrappee__base(); 
 		}
 		else
 			return null;
@@ -38,16 +38,6 @@ public   class  Stack {
 
 	
 	private int count = 0;
-
-	
-	public Object rePop() {
-		if(count > 0) {
-			count--;
-			return original(); 
-		}
-		else
-			return null;
-	}
 
 
 }

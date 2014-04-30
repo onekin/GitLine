@@ -2671,6 +2671,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 			for (i=0; i<listBranches.length;i++){
 				ghBranch=ghRepo.getBranchByName(listBranches[i]);
 				if(ghBranch!=null){
+					//step3.1: fill in the configFile
 					productConfig+=ghBranch.name+" "+ghBranch.sha+"\n";
 					configFileContent+=ghBranch.name+"\n";
 				}
@@ -2699,15 +2700,15 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 				console.log("the files: "+listFiles);
 				console.log("product config:"+productConfig);
 				var len= listFiles.length;
-				var productBranch="master";
+				var productBranch=ghRepo.default_branch;
 		    	var commit;
 					//Step 6: create the product.config  file
 					console.log("step 6");
-					Utils.XHR("/"+user+"/"+repo+"/new/master",function(res){
+					Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
 						console.log("here");
 					commit = jQuery(res).find("input[name='commit']").attr("value");
 					console.log(DeltaUtils.getProductConfigName());
-						Utils.XHR("/"+user+"/"+repo+"/create/master",function(res){
+						Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
 							console.log("aqui");
 							//Step 7:upload  other files		
 							for (var i=0; i<len; i++){
@@ -2716,7 +2717,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 								var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
 								console.log("file content encodedURI:"+encodeURIComponent(fileContent));
 									fileContent=fileContent.trim();
-										Utils.XHR("/"+user+"/"+repo+ "/edit/master/"+listFiles[i],function(res){
+										Utils.XHR("/"+user+"/"+repo+ "/edit/"+productBranch+"/"+listFiles[i],function(res){
 											commit = jQuery(res).find("input[name='commit']").attr("value");
 											Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productBranch+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
 													//Step 8: delete all branches except the master
@@ -2729,14 +2730,14 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 															var branches= ghRepo.getBranches();
 															console.log(branches);
 															ghRepo.eachBranch(function (branch) {
-									        					if(branch.name!="master")
+									        					if(branch.name!=productBranch) //we cannot delete default_branch
 									        					Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(){
-																   window.location.href="/"+user+"/"+repo+"/tree/master";
+																   window.location.href="/"+user+"/"+repo+"/tree/"+productBranch;
 															    },"DELETE",token);
 									    					})
 														});
 													});
-											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact"+"&content_changed=true");					
+											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=New Product"+"&content_changed=true");					
 										},"POST","authenticity_token="+encodeURIComponent(token));	
 							}
 

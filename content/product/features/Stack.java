@@ -10,19 +10,19 @@ public   class  Stack {
 
 	
 
-	private void  push__wrappee__base  (Object obj) {
+	private void  push__wrappee__master  (Object obj) {
 		data.addFirst(obj);
 	}
 
 	
 
 	public void push(Object obj) {
-		push__wrappee__base(obj);
+		push__wrappee__master(obj);
 		count++;
 	}
 
 	
-	private Object  pop__wrappee__base  () {
+	private Object  pop__wrappee__master  () {
 		return data.removeFirst();
 	}
 
@@ -30,7 +30,8 @@ public   class  Stack {
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return pop__wrappee__base(); 
+			System.out.println("poping");
+			return pop__wrappee__master(); 
 		}
 		else
 			return null;

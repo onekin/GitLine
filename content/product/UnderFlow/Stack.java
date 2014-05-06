@@ -11,11 +11,10 @@ public class Stack {
 	public Object pop() {
 		if(count > 0) {
 			count--;
+			System.out.println("poping");
 			return original(); 
 		}
 		else
 			return null;
 	}
-
-
 }

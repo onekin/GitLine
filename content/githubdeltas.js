@@ -1845,10 +1845,11 @@ var GitHubWrapper=function(){
  this.nodes.compareBase={node:null, listeners:{},xpath:"/html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span/span[2]",supplements:[], regexp:/([^ \n]+)/};
  ///
  this.nodes.compareHead={node:null, listeners:{},xpath:"/html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span[3]/span[2]",supplements:[],regexp:/([^ \n]+)/};
-
+ //forked from <meta name="octolytics-dimension-repository_parent_nwo"
+ this.nodes.forkedFrom={node:null, listeners:{},xpath:"//meta[@name='octolytics-dimension-repository_parent_nwo']/@content",supplements:[],regexp:/([^ \n]+)/};
 
  //this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary']",supplements:[]}; 												//node.value
-  this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary left js-details-target']",supplements:[]}; 	
+ this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary left js-details-target']",supplements:[]}; 	
  this.nodes.diffCode={nodes:[],values:[],listeners:{},xpath:"//*[contains(@class,'file-diff-line js-file-line')]//*[@class='diff-line-code']",supplements:[],regexp:function(node){return node.textContent.trim();}}; 
 
  
@@ -1864,35 +1865,47 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						   return object;
 						 	}
 						   }; 
-				
+			/*
 this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//ul[@class='numbers-summary']/li",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Fordward Propagation</span></a></div></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Forward Propagation</span></a></div></li>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("li");
+						     };
+						   return object;
+						 	}
+						   };	*/
+	  
+	  
+	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
+this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-details-container compare-pr ']/*",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left js-details-target" type="button">Forward Propagation</button><p> Propagate changes to your repository. </p><div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("div");
+						     };
+						   return object;
+						 	}
+						   };
+
+this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<li><div><a rel="backward"  title="Backwards" class="minibutton" href=""><span class="text">Backward Propagation</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("li");
 						     };
 						   return object;
 						 	}
 						   };	
-						   
-	  /*					 
-this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='range']/li",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Fordward Propagation</span></a></div></li>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-						    return newTab.querySelector("li");
-						     };
-						   return object;
-						 	}
-						   };		*/			   
-
-              
 
 };
 
@@ -1961,12 +1974,13 @@ GitHubWrapper.prototype._addChild=function(node,toAdd){
   n.appendChild(toAdd);
   node.supplements[node.supplements.length]=toAdd;
  }
-};
+};													//node= compararesumarry, to add=render
 GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  var n=node.nodes;
  if(position==null){position=n.length;} 
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
+  	console.log("N: "+n);
    var last=n[position-1];
    last.parentNode.appendChild(toAdd);          
   }else{
@@ -2014,9 +2028,10 @@ GitHubWrapper.prototype.getActionTemplate=function(){
  return this.nodes.actions.template();
 };
 
-
+													//node =render (DIV)
 GitHubWrapper.prototype.injectIntoCompareSummary=function(node,position){
 this._addSibling(this.nodes.compareSummary,node,position);
+
 };
 
 GitHubWrapper.prototype.getCompareSummary=function(){
@@ -2027,6 +2042,24 @@ GitHubWrapper.prototype.getCompareSummaryTemplate=function(){
  return this.nodes.compareSummary.template();
 };
 
+//backward propagation
+GitHubWrapper.prototype.injectIntoBrackward=function(node,position){
+this._addSibling(this.nodes.backward,node,position);
+
+};
+
+GitHubWrapper.prototype.getBrackward=function(){
+ return this.nodes.backward.nodes;
+};
+
+GitHubWrapper.prototype.getBrackwardTemplate=function(){
+ return this.nodes.backward.template();
+};
+
+
+GitHubWrapper.prototype.getForkedFrom=function(){
+ return this.nodes.forkedFrom.value;
+};
 
 GitHubWrapper.prototype.getCompareBase=function(){
  return this.nodes.compareBase.value;
@@ -2164,7 +2197,29 @@ CompareSummaryView.prototype.render=function(){
 var obj=this;
 var tabTemplate=GitHub.getCompareSummaryTemplate();
 var tab=GitHub.applyTemplate(tabTemplate,null);
+
+tab.getElementsByTagName("button")[0].addEventListener("click",function(ev){
+	
+ ev.preventDefault();
+ ev.stopPropagation();
+ obj.click(ev);
+},true);
+return tab;
+};
+
+var CompareBackwardView=function(){
+this.click=null;
+};
+CompareBackwardView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+CompareBackwardView.prototype.render=function(){
+var obj=this;
+var tabTemplate=GitHub.getBrackwardTemplate();
+var tab=GitHub.applyTemplate(tabTemplate,null);
+
 tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+	
  ev.preventDefault();
  ev.stopPropagation();
  obj.click(ev);
@@ -2211,22 +2266,41 @@ LoadEController.prototype.execute=function(){
   GitHub.listenToPullRequestButton("click",function(ev){ev.preventDefault();ev.stopPropagation();pull.execute();});
  }*/
 
- var actions=GitHub.getActions();  
- if(user!=null&&repo!=null&&actions!=null){
-  var install=new InstallEController();
-  install.execute("add");
+var fo=GitHub.getForkedFrom().split("/")[0];
+console.log("Fo: "+fo);
+ var actions=GitHub.getActions();  //product fork
+ if(user!=null&&repo!=null&&actions!=null&&fo!=user){
+ 	if(user!=author){
+		var install=new InstallEController();
+  		install.execute("add");
+	}
  }
 
 var compareSummary=GitHub.getCompareSummary();  
- var pullId=GitHub.getPullId();  
- var diff=GitHub.getDiffCode();  
- var button2=GitHub.getPullRequestButton(); 
- if(user!=null&&token!=null&&repo!=null&&button2!=null){
- 	//if()
-  var forwardPropagation=new ForwardPropagationEController();
+var button2=GitHub.getPullRequestButton(); 
+ if(compareSummary!=null&&button2!=null){
+ 	  var forwardPropagation=new ForwardPropagationEController();
   forwardPropagation.execute("add");
+
+
  }
 
+ var brackwardProp=GitHub.getBrackward();
+ var actual=user+"/"+repo;
+  console.log("author: "+author);
+ console.log("user: "+user);
+  console.log("actual: "+actual);
+
+ if(brackwardProp!=null){
+ 	if(GitHub.getForkedFrom()==actual){
+ 	  var  backwardPropagation=new BackwardPropagationEController();
+  	  backwardPropagation.execute("add");
+	}
+
+
+ }
+
+console.log("FORKED FROM: "+GitHub.getForkedFrom());
 
 /* De momento no uso la semantica del branching
 ///branch semantics
@@ -2395,8 +2469,33 @@ PullRequestEController.prototype.execute=function(){
 		}
 }; 
 
+//backward propagation
+var BackwardPropagationEController=function(){ 
+	if (BackwardPropagationEController.prototype._singletonInstance) {
+  		return BackwardPropagationEController.prototype._singletonInstance;
+ }
+ BackwardPropagationEController.prototype._singletonInstance = this;        
+};
+
+BackwardPropagationEController.prototype.execute=function(act){
+	//example https://github.com/letimome/stack/compare/lemome88:master...underFlow
+	if(act=="add"){
+		var obj=this;
+		var backward=new CompareBackwardView();
+		backward.setViewData({click:function(){obj.execute("run");}});
+		var render=backward.render();
+		GitHub.injectIntoBrackward(render);
+	}else if(act=="run"){
+
+	}
+;}
+
+
+
+
+
 var ForwardPropagationEController=function(){ 
-	if (InstallEController.prototype._singletonInstance) {
+	if (ForwardPropagationEController.prototype._singletonInstance) {
   		return ForwardPropagationEController.prototype._singletonInstance;
  }
  ForwardPropagationEController.prototype._singletonInstance = this;        
@@ -2410,7 +2509,6 @@ ForwardPropagationEController.prototype.execute=function(act){
 		forward.setViewData({click:function(){obj.execute("run");}});
 		var render=forward.render();
 		GitHub.injectIntoCompareSummary(render);
-		console.log("Fordwar propagation en add");
 	}else if(act=="run"){
 		console.log("Fordwar propagation en run");
 

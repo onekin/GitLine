@@ -3162,7 +3162,7 @@ DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 			         					branch=ghAuthorRepo.getBranchByName(branches);
 			         					console.log("branch " +branch);
 			         					if(branch!=null){
-			         						console.log(branch.sha +"equals "+commits);
+			         						console.log(branch.sha+"equals "+commits);
 			         					 	if(branch.sha!=commits){
 			         					 	  	featuresChanged+=branches+"\n";
 			         					 	}
@@ -3171,6 +3171,7 @@ DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 			         				}
 			         				console.log("featuresChanged 0: "+featuresChanged);
 			         				if(featuresChanged=="") featuresChanged=null;
+			         				//add panel to github
 			         				return featuresChanged;
          					 	});
          					 }
@@ -3183,8 +3184,11 @@ DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 }
 
 
+DeltaUtils.constructFeaturesUpdated=function(features){
+	var template="";
 
-
+	return template;
+}
 
 
 

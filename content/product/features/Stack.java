@@ -2,7 +2,6 @@ package util;
 
 import java.util.LinkedList; 
 
-//UnderFlow Feature
 public   class  Stack {
 	
 	private LinkedList<Object> data = 
@@ -34,11 +33,9 @@ public   class  Stack {
 
 		}
 		else{
-			System.out.prinln("stack is empty");
 			return null;
 
 		}
-
 	}
 
 	

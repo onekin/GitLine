@@ -1864,21 +1864,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						     };
 						   return object;
 						 	}
-						   }; 
-			/*
-this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//ul[@class='numbers-summary']/li",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="propagation"  title="propagation" class="minibutton" href=""><span class="text">Forward Propagation</span></a></div></li>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-						    return newTab.querySelector("li");
-						     };
-						   return object;
-						 	}
-						   };	*/
-	  
+						   }; 	  
 	  
 	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
 this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-details-container compare-pr ']/*",supplements:[],                 
@@ -1886,7 +1872,7 @@ this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-details
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left js-details-target" type="button">Forward Propagation</button><p> Propagate changes to your repository. </p><div>';
+						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left js-details-target" type="button">Forward Propagation</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> Propagate changes to your repository.</p><div>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
@@ -1906,6 +1892,24 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
 						   return object;
 						 	}
 						   };	
+						   					//issues-list-options
+this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues-list-options']/*",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("div");
+						     };
+						   return object;
+						 	}
+						   };	
+//chromed-list-browser pulls-list
+this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']",supplements:[]};	
+this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
+
+
 
 };
 
@@ -2026,6 +2030,28 @@ GitHubWrapper.prototype.getActions=function(){
 
 GitHubWrapper.prototype.getActionTemplate=function(){
  return this.nodes.actions.template();
+};
+
+//new showFeatureUpdates
+GitHubWrapper.prototype.injectIntoShowFeatureUpdates=function(node,position){
+this._addSibling(this.nodes.showFeatureUpdates,node,position);
+};
+
+GitHubWrapper.prototype.getShowFeatureUpdates=function(){
+ return this.nodes.showFeatureUpdates.nodes;
+};
+
+GitHubWrapper.prototype.getShowFeatureUpdatesTemplate=function(){
+ return this.nodes.showFeatureUpdates.template();
+};
+
+//pullRequestList
+GitHubWrapper.prototype.getPullRequestList=function(){
+ return this.nodes.pullRequestList.node;
+};
+//newPullRequestButton
+GitHubWrapper.prototype.getNewPullRequestButton=function(){
+ return this.nodes.newPullRequestButton.node;
 };
 
 													//node =render (DIV)
@@ -2204,6 +2230,17 @@ tab.getElementsByTagName("button")[0].addEventListener("click",function(ev){
  ev.stopPropagation();
  obj.click(ev);
 },true);
+
+tab.getElementsByTagName("a")[0].addEventListener("mouseover",function(ev){//on mouseOver
+	 console.log("event a");
+	 console.log(ev);
+	 var forwardPropagation=new ForwardPropagationEController();
+  	 forwardPropagation.execute("help");
+	 ev.preventDefault();
+	 ev.stopPropagation();
+	 obj.click(ev);
+},true);
+
 return tab;
 };
 
@@ -2219,13 +2256,33 @@ var tabTemplate=GitHub.getBrackwardTemplate();
 var tab=GitHub.applyTemplate(tabTemplate,null);
 
 tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
-	
  ev.preventDefault();
  ev.stopPropagation();
  obj.click(ev);
 },true);
 return tab;
 };
+
+
+var ShowFeatureUpdatesView=function(){
+this.click=null;
+};
+ShowFeatureUpdatesView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+ShowFeatureUpdatesView.prototype.render=function(){
+var obj=this;
+var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
+var tab=GitHub.applyTemplate(tabTemplate,null);
+ tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+ ev.preventDefault();
+ ev.stopPropagation();
+ obj.click(ev);
+},true);
+return tab;
+};
+
+
 
 
 
@@ -2283,8 +2340,6 @@ var button2=GitHub.getPullRequestButton();
  if(compareSummary!=null&&button2!=null){
  	  var forwardPropagation=new ForwardPropagationEController();
   forwardPropagation.execute("add");
-
-
  }
 
  var brackwardProp=GitHub.getBrackward();
@@ -2299,10 +2354,22 @@ var button2=GitHub.getPullRequestButton();
   	  backwardPropagation.execute("add");
 	}
 
+ }
 
+
+var showFeatureUpdate=GitHub.getShowFeatureUpdates();
+
+ if(showFeatureUpdate!=null){
+ 	  var  featureButton=new ShowFeatureUpdatesEController();
+  	  featureButton.execute("add");
  }
 
 console.log("FORKED FROM: "+GitHub.getForkedFrom());
+console.log(GitHub.getPullRequestList());
+console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
+console.log(GitHub.getNewPullRequestButton());
+
+}; 
 
 /* De momento no uso la semantica del branching
 ///branch semantics
@@ -2334,9 +2401,6 @@ if(user!=null&&token!=null&&repo!=null&&button4!=null){
   });
  }
 */
-}; 
-
-
 
 var BranchEController=function(){
  if (BranchEController.prototype._singletonInstance) {
@@ -2490,9 +2554,35 @@ BackwardPropagationEController.prototype.execute=function(act){
 	}else if(act=="run"){
 
 	}
-;}
+};
+
+//feature updates button
 
 
+var ShowFeatureUpdatesEController=function(){ 
+	if (ShowFeatureUpdatesEController.prototype._singletonInstance) {
+  		return ShowFeatureUpdatesEController.prototype._singletonInstance;
+ }
+ ShowFeatureUpdatesEController.prototype._singletonInstance = this;        
+};
+
+ShowFeatureUpdatesEController.prototype.execute=function(act){
+	//example https://github.com/letimome/stack/compare/lemome88:master...underFlow
+	if(act=="add"){
+		var obj=this;
+		var featureUp=new ShowFeatureUpdatesView();
+		featureUp.setViewData({click:function(){obj.execute("run");}});
+		var render=featureUp.render();
+		GitHub.injectIntoShowFeatureUpdates(render);
+	}else if(act=="run"){
+		console.log("BUTTON CLICK!");
+		var user=GitHub.getUserName(); 
+		var forked=GitHub.getForkedFrom().split("/");
+		var author=forked[0];
+		var repo=GitHub.getCurrentRepository();
+		var features=DeltaUtils.searchUpdatedFeatures(repo, user, author);
+	}
+};
 
 
 
@@ -2505,13 +2595,24 @@ var ForwardPropagationEController=function(){
 
 ForwardPropagationEController.prototype.execute=function(act){
 	//example https://github.com/letimome/stack/compare/lemome88:master...underFlow
-	if(act=="add"){
+	if(act=="help"){
+		var user=GitHub.getUserName(); 
+		var author=GitHub.getCurrentAuthor(); 
+		var repo=GitHub.getCurrentRepository();
+		console.log("HELP");
+		window.alert("Updated Feature list:\n" + DeltaUtils.searchUpdatedFeatures());//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
+	}
+
+	else{
+		if(act=="add"){
 		var obj=this;
 		var forward=new CompareSummaryView();
 		forward.setViewData({click:function(){obj.execute("run");}});
+		forward.setViewData({mouseover:function(){obj.execute("help");}});
 		var render=forward.render();
 		GitHub.injectIntoCompareSummary(render);
-	}else if(act=="run"){
+		}
+	else if(act=="run"){
 		console.log("Fordwar propagation en run");
 
 		//clean projetc folder
@@ -2650,6 +2751,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		      	});
 		   	});
 		});
+	}
 	}
 };
 
@@ -2859,6 +2961,49 @@ new LoadEController().init();
 var DeltaUtils={};
 DeltaUtils.currentBranch="master";
 
+//Capturing event for compare range change
+//Ajax deletes "Fordward Propagation button"
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+  var list = document.querySelector('#js-repo-pjax-container');
+  
+  var observer = new MutationObserver(function(mutations) {  
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        var list_values = [].slice.call(list.children)
+            .map( function(node) { return node.innerHTML; })
+            .filter( function(s) {
+              if (s === '<br>') {
+                return false;
+              }
+              else {
+                return true;
+              }
+         });
+        console.log(list_values);
+        var back=GitHub.getBrackward();
+        console.log("back: "+back);
+        var pullReq=GitHub.getPullRequestButton();
+        console.log("pull: "+pullReq);
+        if( back!=null ){
+        	console.log("dentro");
+        	window.location.reload();
+        }
+      }
+    });
+  });
+  
+  observer.observe(list, {
+  	attributes: true, 
+  	childList: true, 
+  	characterData: true
+  });
+
+
+
+
+
+
+
 DeltaUtils.sleep=function(millis){
   var date = new Date();
   var curDate = null;
@@ -2913,46 +3058,6 @@ DeltaUtils.getErrorLog=function(){
 
 }
 
-//Capturing event for compare range change
-//Ajax deletes "Fordward Propagation button"
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-  var list = document.querySelector('#js-repo-pjax-container');
-  
-  var observer = new MutationObserver(function(mutations) {  
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'childList') {
-        var list_values = [].slice.call(list.children)
-            .map( function(node) { return node.innerHTML; })
-            .filter( function(s) {
-              if (s === '<br>') {
-                return false;
-              }
-              else {
-                return true;
-              }
-         });
-        console.log(list_values);
-        var back=GitHub.getBrackward();
-        console.log("back: "+back);
-        var pullReq=GitHub.getPullRequestButton();
-        console.log("pull: "+pullReq);
-        if( back!=null ){
-        	console.log("dentro");
-        	window.location.reload();
-        }
-      }
-    });
-  });
-  
-  observer.observe(list, {
-  	attributes: true, 
-  	childList: true, 
-  	characterData: true
-  });
-
-
-
-
 Utils={};
 
 Utils.XHR=function(url,f,method,params){
@@ -3001,6 +3106,85 @@ Utils.XHR=function(url,f,method,params){
  xhr.send(params);     
 
 }
+
+
+DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
+	//1. get product config file: feauture-sha
+	//2. check which features has been aupdated (diffetent sha)
+	//3. return list of features which changed
+	console.log("INN");
+	console.log(repo);
+	console.log(user);
+	console.log(author);
+
+	var featuresChanged=" ";
+		var ghAuthor= new Gh3.User(author);
+		var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
+
+		var ghUser = new Gh3.User(user);
+    	var ghRepo = new Gh3.Repository(repo, ghUser);
+	
+		ghRepo.fetch(function (err, res) {
+          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+			ghRepo.fetchBranches(function (err, res) {
+				console.log(ghRepo);
+				var master=ghRepo.getBranchByName("master");
+				master.fetchContents(function (err, res) {
+		          if(err) { throw "outch ..." }
+		          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
+		      	  if(productConfigFile==null){
+		      	  	window.alert("Could not reach "+DeltaUtils.getProductConfigName()+" file in master branch!\n.");
+		      	  	return;
+		      	  }
+		      	  else{
+		      	  	
+		      	  	//Step 2: leer contenido del product config
+		      	  	productConfigFile.fetchContent(function (err, res) {
+            			if(err) { throw "outch ..." }
+           				 console.log("Content: "+productConfigFile.getRawContent());
+           				//Step 2.1 parse productConfig File
+           				var lines=productConfigFile.getRawContent().split("\n");
+           				console.log("Lines: "+lines);
+           				var colums;
+           				var branch;
+           				var i;
+           				var branches,commits;
+           					ghAuthorRepo.fetch(function (err, res) {
+         					 if(err) { console.log("ERROR ghRepo.fetch"); }
+         					 else{
+         					 	ghAuthorRepo.fetchBranches(function (err, res) {
+         					 		for(i=0;i<lines.length;i++){
+			           					colums=lines[i].split(" ");
+			         					console.log(lines[i]);
+			         					branches=colums[0];
+			         					commits=colums[1];
+			         					console.log("branches: "+branches);
+			         					branch=ghAuthorRepo.getBranchByName(branches);
+			         					console.log("branch " +branch);
+			         					if(branch!=null){
+			         						console.log(branch.sha +"equals "+commits);
+			         					 	if(branch.sha!=commits){
+			         					 	  	featuresChanged+=branches+"\n";
+			         					 	}
+			         					 	else console.log(commits+"  NO");
+			         					}
+			         				}
+			         				console.log("featuresChanged 0: "+featuresChanged);
+			         				if(featuresChanged=="") featuresChanged=null;
+			         				return featuresChanged;
+         					 	});
+         					 }
+         					});
+           			});
+		      	  }
+		      	});
+  			});
+		});
+}
+
+
+
+
 
 
 

@@ -1,6 +1,5 @@
 package util;
 
-//UnderFlow Feature
 public class Stack {
 	private int count = 0;
 
@@ -15,12 +14,8 @@ public class Stack {
 
 		}
 		else{
-			System.out.prinln("stack is empty");
 			return null;
 
 		}
-
 	}
-
-
 }

@@ -2266,7 +2266,9 @@ LoadEController.prototype.execute=function(){
   GitHub.listenToPullRequestButton("click",function(ev){ev.preventDefault();ev.stopPropagation();pull.execute();});
  }*/
 
-var fo=GitHub.getForkedFrom().split("/")[0];
+var fo;
+if (GitHub.getForkedFrom()!=null)
+ fo=GitHub.getForkedFrom().split("/")[0];
 console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
  if(user!=null&&repo!=null&&actions!=null&&fo!=user){
@@ -2908,6 +2910,46 @@ DeltaUtils.getErrorLog=function(){
 	return log;
 
 }
+
+
+//Capturing event for compare range change
+//Ajax deletes "Fordward Propagation button"
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+  var list = document.querySelector('#js-repo-pjax-container');
+  
+  var observer = new MutationObserver(function(mutations) {  
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        var list_values = [].slice.call(list.children)
+            .map( function(node) { return node.innerHTML; })
+            .filter( function(s) {
+              if (s === '<br>') {
+                return false;
+              }
+              else {
+                return true;
+              }
+         });
+        console.log(list_values);
+        var back=GitHub.getBrackward();
+        console.log("back: "+back);
+        var pullReq=GitHub.getPullRequestButton();
+        console.log("pull: "+pullReq);
+        if( back!=null ){
+        	console.log("dentro");
+        	window.location.reload();
+        }
+      }
+    });
+  });
+  
+  observer.observe(list, {
+  	attributes: true, 
+  	childList: true, 
+  	characterData: true
+  });
+
+
 
 
 Utils={};

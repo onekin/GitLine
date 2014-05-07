@@ -11,10 +11,16 @@ public class Stack {
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			System.out.println("poping");
 			return original(); 
+
 		}
-		else
+		else{
+			System.out.prinln("stack is empty");
 			return null;
+
+		}
+
 	}
+
+
 }

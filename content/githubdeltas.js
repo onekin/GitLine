@@ -2632,9 +2632,11 @@ ForwardPropagationEController.prototype.execute=function(act){
 											//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
 										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact&pr=&content_changed=true");//+"&content_changed=true");					
 									},"POST","authenticity_token="+encodeURIComponent(token));	
+									
 								}//end for
 								//Step7: create a pull request to merge defaultbranch and shadow product branch            	 
 								console.log("PULL REQUEST");
+								token=GitHub.getAuthenticityToken();
 								//https://github.com/letimome/stack-SPL/compare/lemome88:master...underFlow
 								Utils.XHR("/"+user+"/"+repo+"/compare/"+user+":"+branch+"..."+productB,function(res){//https://github.com/letimome/stack-SPL/pull/create     
 									Utils.XHR("/"+user+"/"+repo+"/pull/create",function(res){
@@ -2910,7 +2912,6 @@ DeltaUtils.getErrorLog=function(){
 	return log;
 
 }
-
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"

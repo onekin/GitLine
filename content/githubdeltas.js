@@ -1848,7 +1848,7 @@ var GitHubWrapper=function(){
  this.nodes.parentBranchValue;
 
  this.nodes.compareBase={node:null, listeners:{},xpath:"/html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span/span[2]",supplements:[], regexp:/([^ \n]+)/};
- ///
+												 ///     html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span[3]/span[2]
  this.nodes.compareHead={node:null, listeners:{},xpath:"/html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span[3]/span[2]",supplements:[],regexp:/([^ \n]+)/};
  //forked from <meta name="octolytics-dimension-repository_parent_nwo"
  this.nodes.forkedFrom={node:null, listeners:{},xpath:"//meta[@name='octolytics-dimension-repository_parent_nwo']/@content",supplements:[],regexp:/([^ \n]+)/};
@@ -1872,7 +1872,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						   }; 	  
 	  
 	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
-this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-details-container compare-pr ']/*",supplements:[],                 
+this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-range-editor is-collapsed is-cross-repo']/*",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
@@ -1925,16 +1925,18 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 							console.log("Executing template with config:"+parameter[0]);
 						   // var features= DeltaUtils.getUpdatedFeatures();
 						    var list=parameter[0].split("\n");
-						    var author=parameter[1];
-						    var user=parameter[2];
-						    console.log(list,user,author);
+						    var user=parameter[1];
+						    var author=parameter[2];
+						    console.log("Lista: "+list+user+author);
 						    var line;
 						    console.log("list: "+list);
 						    console.log("feature lengh:"+list.length);
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':"'+line[0]+'...'+author+'...'+line[1]+'>Evolved Feature</a></h4><a class="minibutton primary add-button" href="">'+line[0]+'</a></div></li>';
+						    	console.log("line: "+line);
+						    	console.log("compare/"+user+':'+line[1]+'...'+author+'...'+line[0]);
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+user+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' is not up to date</a></h4><a class="minibutton primary add-button" href="compare/'+user+':'+line[1]+'...'+author+':'+line[0]+'">'+'Check changes'+'</a></div></li>';
 						    }
 						    html+="</div></ul>";
 						    tabTemplate.innerHTML=html;//'<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
@@ -2236,19 +2238,6 @@ GitHubWrapper.prototype.getUpdatedFeatures=function(){
 	return this.nodes.updatedFeatures;
 }
 
-GitHubWrapper.prototype.searchUpdatedFeatures=function(repo,user,author){
-	//1. get product config file: feauture-sha
-	//2. check which features has been aupdated (diffetent sha)
-	//3. return list of features which changed
-
-}
-
-
-
-
-
-
-
 
 
 var GitHub=new GitHubWrapper(); // NOTE that github api variable is Github! (minorcase H)
@@ -2291,6 +2280,7 @@ tab.getElementsByTagName("button")[0].addEventListener("click",function(ev){
  obj.click(ev);
 },true);
 
+/*
 tab.getElementsByTagName("a")[0].addEventListener("mouseover",function(ev){//on mouseOver
 	 console.log("event a");
 	 console.log(ev);
@@ -2299,7 +2289,7 @@ tab.getElementsByTagName("a")[0].addEventListener("mouseover",function(ev){//on 
 	 ev.preventDefault();
 	 ev.stopPropagation();
 	 obj.click(ev);
-},true);
+},true);*/
 
 return tab;
 };
@@ -2336,16 +2326,13 @@ var obj=this;
 var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
 
 var tab=GitHub.applyTemplate(tabTemplate,features);//get updated Features
- tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+ tab.getElementsByTagName("a")[1].addEventListener("click",function(ev){
  ev.preventDefault();
  ev.stopPropagation();
  obj.click(ev);
 },true);
 return tab;
 };
-
-
-
 
 
 var LoadEController=function(){
@@ -2378,14 +2365,6 @@ LoadEController.prototype.execute=function(){
   GitHub.listenToForkButton("click",function(ev){ev.preventDefault();ev.stopPropagation();fork.execute();});
  }
  
- /*Listen to pull request button
- var pullId=GitHub.getPullId();  
- var diff=GitHub.getDiffCode();  
- var button2=GitHub.getPullRequestButton(); 
- if(user!=null&&token!=null&&repo!=null&&pullId!=null&&diff!=null&&button2!=null){
-  var pull=new PullRequestEController();
-  GitHub.listenToPullRequestButton("click",function(ev){ev.preventDefault();ev.stopPropagation();pull.execute();});
- }*/
 
 var fo;
 if (GitHub.getForkedFrom()!=null)
@@ -2399,11 +2378,14 @@ console.log("Fo: "+fo);
 	}
  }
 
+try{
 var compareSummary=GitHub.getCompareSummary();  
 var button2=GitHub.getPullRequestButton(); 
- if(compareSummary!=null&&button2!=null){
+ if(compareSummary!=null){//&&button2!=null){
  	  var forwardPropagation=new ForwardPropagationEController();
   forwardPropagation.execute("add");
+ }}catch(e){
+ 	console.log("error compare summary");
  }
 
  var brackwardProp=GitHub.getBrackward();
@@ -2643,7 +2625,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 		 var author=forked[0]; 
 		 var obj=this;
 
-			var featuresChanged=" ";
+			var featuresChanged="";
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 			var ghUser = new Gh3.User(user);
@@ -2688,7 +2670,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         					if(branch!=null){
 				         						//console.log(branch.sha+"equals "+commits);
 				         					 	if(branch.sha!=commits){
-				         					 	  	featuresChanged+=branches+"\n";
+				         					 	  	featuresChanged+=branches+" "+commits+"\n";
 				         					 	}
 				         					 	//else console.log(commits+"  NO");
 				         					}
@@ -2699,10 +2681,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         			
 										var featureUp=new ShowFeatureUpdatesView();
 										featureUp.setViewData({click:function(){obj.execute("run");}});
-										var params[];
-										params[0]=featuresChanged;
-										params[1]=user;
-										params[2]=author;
+										var params=[featuresChanged,user,author];
 										var render=featureUp.render(params);//pasarle parametros al render
 										GitHub.injectIntoShowFeatureUpdates(render);
 	         					 	});
@@ -2735,7 +2714,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
 		console.log("HELPi");
-		DeltaUtils.searchUpdatedFeatures(repo, user, author);//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
+		//DeltaUtils.searchUpdatedFeatures(repo, user, author);//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
 	}
 
 	else{
@@ -2757,7 +2736,6 @@ ForwardPropagationEController.prototype.execute=function(act){
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
 		var token=GitHub.getAuthenticityToken(); 
-
 		var ghUser = new Gh3.User(user);
     	var ghRepo = new Gh3.Repository(repo, ghUser);
 
@@ -2769,14 +2747,16 @@ ForwardPropagationEController.prototype.execute=function(act){
 				var master=ghRepo.getBranchByName("master");
 				master.fetchContents(function (err, res) {
 		          if(err) { throw "outch ..." }
-		          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
+		          console.log("master");
+		          var productConfigFile = master.getFileByName("product.config");//DeltaUtils.getProductConfigName()
+		      	  console.log("productConfigFile");
 		      	  if(productConfigFile==null){
 		      	  	window.alert("There is no "+DeltaUtils.getProductConfigName()+" file in master branch!\nPropagation aborted.");
 		      	  	return;
 		      	  }
 		      	  else{
-		      	  	//console.log(ghRepo.default_branch);
-		      	  	console.log("Raw content: "+productConfigFile.name);
+		      	  	console.log(222);
+		      	  	//console.log("Raw content: "+productConfigFile.name);
 		      	  	//Step 2: leer contenido del product config
 		      	  	productConfigFile.fetchContent(function (err, res) {
             			if(err) { throw "outch ..." }
@@ -2789,24 +2769,32 @@ ForwardPropagationEController.prototype.execute=function(act){
            				var commits=[];
            				console.log(lines.length);
            				var i;
+           				console.log(444);
            				var fordwardFeature=GitHub.getCompareHead();
+           				console.log(fordwardFeature);
            				var featureSplit=fordwardFeature.split(":")[1];
            				var configFileContent="";
            				var newConfig="";
-
+           				//console.log("brf");
            				for (i=0; i<lines.length-1; i++){
-           					colums=lines[i].split(" ");
+           					var l=lines[i];
+           					console.log("line: "+l);
+           					colums=l.split(" ");
+           					console.log("columns:"+colums);
            					branches.push(colums[0]);//branch-feature
-           					 
+           					console.log(branches);
            					//step 3: descargarse los branches con el commit adecuado y el updated branch actual //https://github.com/lemome88/stack/tree/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81
+           					console.log("set3");
            					configFileContent+=branches[i]+"\n";
            					if(featureSplit!=branches[i]){//si no es la feature to update
+           					  console.log("inside");
            					  commits.push(colums[1]);
            					  newConfig+=colums[0]+" "+colums[1]+"\n";
            					  DeltaUtils.getBranchFiles(author,repo,commits[i],branches[i]);
            					}
            					else{ 	
            					  //get updated files!!
+           					  console.log("get updated files"+ featureSplit);
            					  DeltaUtils.getBranchFiles(author,repo,featureSplit,featureSplit);
            					  //update new commit for updated feature
            					 var ghAuthor= new Gh3.User(author);
@@ -3091,51 +3079,11 @@ InstallEController.prototype.execute=function(act){//compose product and create 
   }
 };
 
-new LoadEController().init();
+
 
 var DeltaUtils={};
+
 DeltaUtils.currentBranch="master";
-
-//Capturing event for compare range change
-//Ajax deletes "Fordward Propagation button"
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-  var list = document.querySelector('#js-repo-pjax-container');
-  
-  var observer = new MutationObserver(function(mutations) {  
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'childList') {
-        var list_values = [].slice.call(list.children)
-            .map( function(node) { return node.innerHTML; })
-            .filter( function(s) {
-              if (s === '<br>') {
-                return false;
-              }
-              else {
-                return true;
-              }
-         });
-        console.log(list_values);
-        var back=GitHub.getBrackward();
-        console.log("back: "+back);
-        var pullReq=GitHub.getPullRequestButton();
-        console.log("pull: "+pullReq);
-        if( back!=null ){
-        	console.log("dentro");
-        	window.location.reload();
-        }
-      }
-    });
-  });
-  
-  observer.observe(list, {
-  	attributes: true, 
-  	childList: true, 
-  	characterData: true
-  });
-
-
-
-
 
 
 
@@ -3242,91 +3190,43 @@ Utils.XHR=function(url,f,method,params){
 
 }
 
-DeltaUtils.updatedFeatures="";
-
-DeltaUtils.getUpdatedFeatures=function(){
-	console.log("Returning updated features: "+updatedFeatures);
-	return updatedFeatures;
-}
-
-DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
-	//1. get product config file: feauture-sha
-	//2. check which features has been aupdated (diffetent sha)
-	//3. return list of features which changed
-	console.log("INN");
-	console.log(repo);
-	console.log(user);
-	console.log(author);
-
-	var featuresChanged=" ";
-		var ghAuthor= new Gh3.User(author);
-		var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
-
-		var ghUser = new Gh3.User(user);
-    	var ghRepo = new Gh3.Repository(repo, ghUser);
-	
-		ghRepo.fetch(function (err, res) {
-          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
-			ghRepo.fetchBranches(function (err, res) {
-				console.log(ghRepo);
-				var master=ghRepo.getBranchByName("master");
-				master.fetchContents(function (err, res) {
-		          if(err) { throw "outch ..." }
-		          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
-		      	  if(productConfigFile==null){
-		      	  	window.alert("Could not reach "+DeltaUtils.getProductConfigName()+" file in master branch!\n.");
-		      	  	return;
-		      	  }
-		      	  else{
-		      	  	
-		      	  	//Step 2: leer contenido del product config
-		      	  	productConfigFile.fetchContent(function (err, res) {
-            			if(err) { throw "outch ..." }
-           				 console.log("Content: "+productConfigFile.getRawContent());
-           				//Step 2.1 parse productConfig File
-           				var lines=productConfigFile.getRawContent().split("\n");
-           				console.log("Lines: "+lines);
-           				var colums;
-           				var branch;
-           				var i;
-           				var branches,commits;
-           					ghAuthorRepo.fetch(function (err, res) {
-         					 if(err) { console.log("ERROR ghRepo.fetch"); }
-         					 else{
-         					 	ghAuthorRepo.fetchBranches(function (err, res) {
-         					 		for(i=0;i<lines.length;i++){
-			           					colums=lines[i].split(" ");
-			         					console.log(lines[i]);
-			         					branches=colums[0];
-			         					commits=colums[1];
-			         					//console.log("branches: "+branches);
-			         					branch=ghAuthorRepo.getBranchByName(branches);
-			         					//console.log("branch " +branch);
-			         					if(branch!=null){
-			         						//console.log(branch.sha+"equals "+commits);
-			         					 	if(branch.sha!=commits){
-			         					 	  	featuresChanged+=branches+"\n";
-			         					 	}
-			         					 	//else console.log(commits+"  NO");
-			         					}
-			         				}
-			         				console.log("featuresChanged 0: "+featuresChanged);
-			         				if(featuresChanged=="") featuresChanged=null;
-			         				//add panel to github
-			         				//window.alert("Features changed: \n"+featuresChanged);
-			         				DeltaUtils.updatedFeatures=featuresChanged;
-			         				GitHub.setUpdatedFeatures(featuresChanged);
-			         				return featuresChanged;
-         					 	});
-         					 }
-         					});
-           			});
-		      	  }
-		      	});
-  			});
-		});
-}
+//Capturing event for compare range change
+//Ajax deletes "Fordward Propagation button"
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+  var list = document.querySelector('#js-repo-pjax-container');
+  
+  var observer = new MutationObserver(function(mutations) {  
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        var list_values = [].slice.call(list.children)
+            .map( function(node) { return node.innerHTML; })
+            .filter( function(s) {
+              if (s === '<br>') {
+                return false;
+              }
+              else {
+                return true;
+              }
+         });
+        console.log(list_values);
+        var back=GitHub.getBrackward();
+        console.log("back: "+back);
+        var pullReq=GitHub.getPullRequestButton();
+        console.log("pull: "+pullReq);
+        if( back!=null ){
+        	console.log("dentro");
+        	window.location.reload();
+        }
+      }
+    });
+  });
+  
+  observer.observe(list, {
+  	attributes: true, 
+  	childList: true, 
+  	characterData: true
+  });
 
 
-
+new LoadEController().init();
 

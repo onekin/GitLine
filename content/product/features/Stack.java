@@ -33,15 +33,10 @@ public   class  Stack {
 
 		}
 		else{
+			System.out.println("stack is empty");		
 			return null;
 
 		}
-	}
-
-	
-
-	public Object rePop() {
-		return data.removeFirst();
 	}
 
 	

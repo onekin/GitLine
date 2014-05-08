@@ -1877,7 +1877,7 @@ this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-range-e
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left js-details-target" type="button">Forward Propagation</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> Propagate changes to your repository.</p><div>';
+						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Forward Propagation</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> Propagate changes to your repository.</p><div>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
@@ -2694,6 +2694,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 			});
 	}else if(act=="run"){
 		console.log("BUTTON CLICK!");
+
 		
 	}
 };
@@ -2841,32 +2842,36 @@ ForwardPropagationEController.prototype.execute=function(act){
 									Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productB+"/"+blob,function(res){
 										console.log("BIEN");		
 										//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
+										for (i=0; i<listFiles.length; i++){
+										var file=listFiles[i];
+										console.log("ahora: "+file);
+										var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+										//console.log("file content encodedURI:"+encodeURIComponent(fileContent));
+										fileContent=fileContent.trim();
+										Utils.XHR("/"+user+"/"+repo+"/edit/"+productB+"/"+file,function(res){
+											commit = jQuery(res).find("input[name='commit']").attr("value");
+											Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productB+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
+												//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
+											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact&pr=&content_changed=true");//+"&content_changed=true");					
+										},"POST","authenticity_token="+encodeURIComponent(token));	
+										
+									}//end for
+									//Step7: create a pull request to merge defaultbranch and shadow product branch            	 
+									console.log("PULL REQUEST");
+									token=GitHub.getAuthenticityToken();
+									//https://github.com/letimome/stack-SPL/compare/lemome88:master...underFlow
+									Utils.XHR("/"+user+"/"+repo+"/compare/"+user+":"+branch+"..."+productB,function(res){//https://github.com/letimome/stack-SPL/pull/create     
+										Utils.XHR("/"+user+"/"+repo+"/pull/create",function(res){
+											window.location.href="/"+user+"/"+repo+"/pulls/";
+										},"POST","authenticity_token="+encodeURIComponent(token)+"&pull_request[title]=Update Feature "+featureSplit+"&repo="+user+"/"+repo+"&base="+user+":"+branch+"&head="+user+":"+productB);   		
+									},"GET");
+
 									},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+blob+"&new_filename="+blob+"&commit="+commit+"&value="+newConfig+"&placeholder_message=updated Product Configuration&pr=&content_changed=true");//+"&content_changed=true");					
+								
+									
 								},"POST","authenticity_token="+encodeURIComponent(token));	
 
-	           					for (i=0; i<listFiles.length; i++){
-									var file=listFiles[i];
-									console.log("ahora: "+file);
-									var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
-									//console.log("file content encodedURI:"+encodeURIComponent(fileContent));
-									fileContent=fileContent.trim();
-									Utils.XHR("/"+user+"/"+repo+"/edit/"+productB+"/"+file,function(res){
-										commit = jQuery(res).find("input[name='commit']").attr("value");
-										Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productB+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-											//window.location.href="/"+user+"/"+repo+"/tree/"+productB;
-										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=updated Artefact&pr=&content_changed=true");//+"&content_changed=true");					
-									},"POST","authenticity_token="+encodeURIComponent(token));	
-									
-								}//end for
-								//Step7: create a pull request to merge defaultbranch and shadow product branch            	 
-								console.log("PULL REQUEST");
-								token=GitHub.getAuthenticityToken();
-								//https://github.com/letimome/stack-SPL/compare/lemome88:master...underFlow
-								Utils.XHR("/"+user+"/"+repo+"/compare/"+user+":"+branch+"..."+productB,function(res){//https://github.com/letimome/stack-SPL/pull/create     
-									Utils.XHR("/"+user+"/"+repo+"/pull/create",function(res){
-										window.location.href="/"+user+"/"+repo+"/pulls/";
-									},"POST","authenticity_token="+encodeURIComponent(token)+"&pull_request[title]=Update Feature "+featureSplit+"&repo="+user+"/"+repo+"&base="+user+":"+branch+"&head="+user+":"+productB);   		
-								},"GET");
+	           					
            				},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+branch+"&name="+productB+"&path=");	
 						
           			});

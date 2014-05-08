@@ -11,13 +11,4 @@ public class Stack {
 	public Object pop() {
 		return data.removeFirst();
 	}
-
-	public Object rePop() {
-		return data.removeFirst();
-	}
-
-
-
-
-
 }

@@ -14,7 +14,7 @@ public class Stack {
 
 		}
 		else{
-			System.out.println("stack is empty");		
+			System.out.println("dadasdad");
 			return null;
 
 		}

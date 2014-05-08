@@ -1817,8 +1817,13 @@ jQuery.noConflict();
 /*************************************//*************************************//*************************************/
 
 
+
 var GitHubWrapper=function(){
+
  this.nodes={};
+ this.nodes.updatedFeatures="";
+
+
  //added by me:Leti 					//*[@class='minibutton select-menu-button js-menu-target']//*[@class='js-select-button']	
  this.nodes.currentBranch={node:null,listeners:{},xpath:"/html/body/div/div[2]/div[2]/div/div[2]/div[4]/div/span/span[2]", supplements:[],regexp:/([^ \n]+)/};
  
@@ -1892,7 +1897,7 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
 						   return object;
 						 	}
 						   };	
-						   					//issues-list-options
+/*						   					//issues-list-options
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues-list-options']/*",supplements:[],                 
                      template: function(){
                          var object={};
@@ -1904,11 +1909,41 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues
 						     };
 						   return object;
 						 	}
-						   };	
+						   };	*/
+
 //chromed-list-browser pulls-list
 this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']",supplements:[]};	
 this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
 
+
+
+this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']/*",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){//parameter es feature list!!
+						    var tabTemplate=document.createElement("template");
+							console.log("Executing template with config:"+parameter[0]);
+						   // var features= DeltaUtils.getUpdatedFeatures();
+						    var list=parameter[0].split("\n");
+						    var author=parameter[1];
+						    var user=parameter[2];
+						    console.log(list,user,author);
+						    var line;
+						    console.log("list: "+list);
+						    console.log("feature lengh:"+list.length);
+						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
+						    for(var i=0;i<list.length-1;i++){
+						    	line=list[i].split(" ");
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':"'+line[0]+'...'+author+'...'+line[1]+'>Evolved Feature</a></h4><a class="minibutton primary add-button" href="">'+line[0]+'</a></div></li>';
+						    }
+						    html+="</div></ul>";
+						    tabTemplate.innerHTML=html;//'<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("div");
+						     };
+						   return object;
+						 	}
+						   };
 
 
 };
@@ -2191,6 +2226,31 @@ GitHubWrapper.prototype.applyTemplate=function(template,params){
 return template.executeTemplate(params);
 };
 
+GitHubWrapper.prototype.setUpdatedFeatures=function(value){
+	this.nodes.updatedFeatures=value;
+}
+
+
+GitHubWrapper.prototype.getUpdatedFeatures=function(){
+	console.log("Returning updated features");
+	return this.nodes.updatedFeatures;
+}
+
+GitHubWrapper.prototype.searchUpdatedFeatures=function(repo,user,author){
+	//1. get product config file: feauture-sha
+	//2. check which features has been aupdated (diffetent sha)
+	//3. return list of features which changed
+
+}
+
+
+
+
+
+
+
+
+
 var GitHub=new GitHubWrapper(); // NOTE that github api variable is Github! (minorcase H)
 GitHub.init();
 
@@ -2270,10 +2330,12 @@ this.click=null;
 ShowFeatureUpdatesView.prototype.setViewData=function(params){
 this.click=params.click;
 };
-ShowFeatureUpdatesView.prototype.render=function(){
+ShowFeatureUpdatesView.prototype.render=function(features){
+console.log("En render ShowFeatureUpdatesView: "+features);
 var obj=this;
 var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
-var tab=GitHub.applyTemplate(tabTemplate,null);
+
+var tab=GitHub.applyTemplate(tabTemplate,features);//get updated Features
  tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
  ev.preventDefault();
  ev.stopPropagation();
@@ -2300,11 +2362,13 @@ LoadEController.prototype.init=function(func){
 LoadEController.prototype.execute=function(){       
 
 //console.log("EN LOAD") ;
+
  var user=GitHub.getUserName(); 
  var token=GitHub.getAuthenticityToken(); 
  var author=GitHub.getCurrentAuthor(); 
  var repo=GitHub.getCurrentRepository(); 
  var button=GitHub.getForkButton(); 
+
 
  
  var currentBranch=GitHub.getCurrentBranch();
@@ -2360,9 +2424,10 @@ var button2=GitHub.getPullRequestButton();
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
 
  if(showFeatureUpdate!=null){
+ 	  console.log("showFeatureUpdates en ADD");
  	  var  featureButton=new ShowFeatureUpdatesEController();
   	  featureButton.execute("add");
- }
+ }else console.log("showFeatureUpdates en NO ADD");
 
 console.log("FORKED FROM: "+GitHub.getForkedFrom());
 console.log(GitHub.getPullRequestList());
@@ -2569,18 +2634,88 @@ var ShowFeatureUpdatesEController=function(){
 ShowFeatureUpdatesEController.prototype.execute=function(act){
 	//example https://github.com/letimome/stack/compare/lemome88:master...underFlow
 	if(act=="add"){
-		var obj=this;
-		var featureUp=new ShowFeatureUpdatesView();
-		featureUp.setViewData({click:function(){obj.execute("run");}});
-		var render=featureUp.render();
-		GitHub.injectIntoShowFeatureUpdates(render);
+		console.log("ADD ShowFeatureUpdatesEController");
+		//incluir function entera 
+		console.log("INN");
+		 var user=GitHub.getUserName(); 
+		 var repo=GitHub.getCurrentRepository();  
+		 var forked=GitHub.getForkedFrom().split("/");
+		 var author=forked[0]; 
+		 var obj=this;
+
+			var featuresChanged=" ";
+			var ghAuthor= new Gh3.User(author);
+			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
+			var ghUser = new Gh3.User(user);
+	    	var ghRepo = new Gh3.Repository(repo, ghUser);
+			ghRepo.fetch(function (err, res) {
+	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+				ghRepo.fetchBranches(function (err, res) {
+					//console.log(ghRepo);
+					var master=ghRepo.getBranchByName("master");
+					master.fetchContents(function (err, res) {
+			          if(err) { throw "outch ..." }
+			          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
+			      	  if(productConfigFile==null){
+			      	  	window.alert("Could not reach "+DeltaUtils.getProductConfigName()+" file in master branch!\n.");
+			      	  	return;
+			      	  }
+			      	  else{
+			      	  	
+			      	  	//Step 2: leer contenido del product config
+			      	  	productConfigFile.fetchContent(function (err, res) {
+	            			if(err) { throw "outch ..." }
+	           				 //console.log("Content: "+productConfigFile.getRawContent());
+	           				//Step 2.1 parse productConfig File
+	           				var lines=productConfigFile.getRawContent().split("\n");
+	           		//		console.log("Lines: "+lines);
+	           				var colums;
+	           				var branch;
+	           				var i;
+	           				var branches,commits;
+	           					ghAuthorRepo.fetch(function (err, res) {
+	         					 if(err) { console.log("ERROR ghRepo.fetch"); }
+	         					 else{
+	         					 	ghAuthorRepo.fetchBranches(function (err, res) {
+	         					 		for(i=0;i<lines.length;i++){
+				           					colums=lines[i].split(" ");
+				         					//console.log(lines[i]);
+				         					branches=colums[0];
+				         					commits=colums[1];
+				         					//console.log("branches: "+branches);
+				         					branch=ghAuthorRepo.getBranchByName(branches);
+				         					//console.log("branch " +branch);
+				         					if(branch!=null){
+				         						//console.log(branch.sha+"equals "+commits);
+				         					 	if(branch.sha!=commits){
+				         					 	  	featuresChanged+=branches+"\n";
+				         					 	}
+				         					 	//else console.log(commits+"  NO");
+				         					}
+				         				}
+				         				console.log("featuresChanged 0: "+featuresChanged);
+				         				if(featuresChanged=="") return;//featuresChanged=null;
+				         				//add panel to github
+				         			
+										var featureUp=new ShowFeatureUpdatesView();
+										featureUp.setViewData({click:function(){obj.execute("run");}});
+										var params[];
+										params[0]=featuresChanged;
+										params[1]=user;
+										params[2]=author;
+										var render=featureUp.render(params);//pasarle parametros al render
+										GitHub.injectIntoShowFeatureUpdates(render);
+	         					 	});
+	         					 }
+	         					});
+	           			});
+			      	  }
+			      	});
+	  			});
+			});
 	}else if(act=="run"){
 		console.log("BUTTON CLICK!");
-		var user=GitHub.getUserName(); 
-		var forked=GitHub.getForkedFrom().split("/");
-		var author=forked[0];
-		var repo=GitHub.getCurrentRepository();
-		var features=DeltaUtils.searchUpdatedFeatures(repo, user, author);
+		
 	}
 };
 
@@ -2599,8 +2734,8 @@ ForwardPropagationEController.prototype.execute=function(act){
 		var user=GitHub.getUserName(); 
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
-		console.log("HELP");
-		window.alert("Updated Feature list:\n" + DeltaUtils.searchUpdatedFeatures());//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
+		console.log("HELPi");
+		DeltaUtils.searchUpdatedFeatures(repo, user, author);//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
 	}
 
 	else{
@@ -2608,7 +2743,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		var obj=this;
 		var forward=new CompareSummaryView();
 		forward.setViewData({click:function(){obj.execute("run");}});
-		forward.setViewData({mouseover:function(){obj.execute("help");}});
+		//forward.setViewData({mouseover:function(){obj.execute("help");}});
 		var render=forward.render();
 		GitHub.injectIntoCompareSummary(render);
 		}
@@ -3107,6 +3242,12 @@ Utils.XHR=function(url,f,method,params){
 
 }
 
+DeltaUtils.updatedFeatures="";
+
+DeltaUtils.getUpdatedFeatures=function(){
+	console.log("Returning updated features: "+updatedFeatures);
+	return updatedFeatures;
+}
 
 DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 	//1. get product config file: feauture-sha
@@ -3158,20 +3299,23 @@ DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 			         					console.log(lines[i]);
 			         					branches=colums[0];
 			         					commits=colums[1];
-			         					console.log("branches: "+branches);
+			         					//console.log("branches: "+branches);
 			         					branch=ghAuthorRepo.getBranchByName(branches);
-			         					console.log("branch " +branch);
+			         					//console.log("branch " +branch);
 			         					if(branch!=null){
-			         						console.log(branch.sha+"equals "+commits);
+			         						//console.log(branch.sha+"equals "+commits);
 			         					 	if(branch.sha!=commits){
 			         					 	  	featuresChanged+=branches+"\n";
 			         					 	}
-			         					 	else console.log(commits+"  NO");
+			         					 	//else console.log(commits+"  NO");
 			         					}
 			         				}
 			         				console.log("featuresChanged 0: "+featuresChanged);
 			         				if(featuresChanged=="") featuresChanged=null;
 			         				//add panel to github
+			         				//window.alert("Features changed: \n"+featuresChanged);
+			         				DeltaUtils.updatedFeatures=featuresChanged;
+			         				GitHub.setUpdatedFeatures(featuresChanged);
 			         				return featuresChanged;
          					 	});
          					 }
@@ -3183,12 +3327,6 @@ DeltaUtils.searchUpdatedFeatures=function(repo,user,author){
 		});
 }
 
-
-DeltaUtils.constructFeaturesUpdated=function(features){
-	var template="";
-
-	return template;
-}
 
 
 

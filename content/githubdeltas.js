@@ -468,7 +468,8 @@ jQuery.noConflict();
       // --------
 
       this.contents = function(branch, path, cb, sync) {
-        return _request("GET", repoPath + "/contents?ref=" + branch + (path ? "&path=" + path : ""), null, cb, 'raw', sync);
+     //   return _request("GET", repoPath + "/contents?ref=" + branch + (path ? "&path=" + path : ""), null, cb, 'raw', sync); v 0.9
+         return _request("GET", (repoPath + "/contents/"+(typeof path === 'string' ? path : '/')+"?ref=" + branch).replace('//','/'), null, cb, 'raw', sync);
       };
 
       // Fork repository

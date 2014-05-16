@@ -33,7 +33,7 @@ public   class  Stack {
 
 		}
 		else{
-			System.out.println("Is empty");
+			System.out.println("Stack is empty");
 			return null;
 
 		}

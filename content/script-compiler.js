@@ -360,7 +360,7 @@ getLogFileContent:function(){
 	return logContent;
 },
 
-readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles[i]
+readFilesFromLocal: function (pathToFile){
 	try{
 			var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 			
@@ -391,7 +391,7 @@ readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles
 
 cleanProjectFolder: function(){
 	try{
-
+		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		shell.initWithPath(ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh");
@@ -399,15 +399,12 @@ cleanProjectFolder: function(){
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-
 		var projectHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 		
 		var parameters =[projectHome];//project home
-
-		
 		proc.run(true, parameters, parameters.length);
 
-		//alert(parameters);
+
 
 	}catch(err){
 

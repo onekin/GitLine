@@ -1081,7 +1081,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						   }; 	  
 	  
 	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
-this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[@class='js-range-editor is-collapsed is-cross-repo']/*",supplements:[],                 
+this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[contains(@class,'js-range-editor is-collapsed ')]/*",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
@@ -1144,8 +1144,8 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
 						    	console.log("line: "+line);
-						    	console.log("compare/"+user+':'+line[1]+'...'+author+'...'+line[0]);
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+user+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' is not up to date</a></h4><a class="minibutton primary add-button" href="compare/'+user+':'+line[1]+'...'+author+':'+line[0]+'">'+'Check changes'+'</a></div></li>';
+						    	console.log("compare/"+author+':'+line[1]+'...'+author+'...'+line[0]);
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' is not up to date</a></h4><a class="minibutton primary add-button" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">'+'Check changes'+'</a></div></li>';
 						    }
 						    html+="</div></ul>";
 						    tabTemplate.innerHTML=html;//'<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
@@ -1589,10 +1589,12 @@ try{
 var compareSummary=GitHub.getCompareSummary();  
 var button2=GitHub.getPullRequestButton(); 
  if(compareSummary!=null){//&&button2!=null){
+ 	  console.log("dentro");
  	  var forwardPropagation=new ForwardPropagationEController();
-  forwardPropagation.execute("add");
+      forwardPropagation.execute("add");
  }}catch(e){
  	console.log("error compare summary");
+ 	console.log(e);
  }
 
  var brackwardProp=GitHub.getBrackward();
@@ -1927,16 +1929,17 @@ ForwardPropagationEController.prototype.execute=function(act){
 
 	else{
 		if(act=="add"){
+		console.log("adding fordward propagation button");
 		var obj=this;
 		var forward=new CompareSummaryView();
 		forward.setViewData({click:function(){obj.execute("run");}});
 		//forward.setViewData({mouseover:function(){obj.execute("help");}});
 		var render=forward.render();
+		console.log(render);
 		GitHub.injectIntoCompareSummary(render);
 		}
 	else if(act=="run"){
 		console.log("Fordwar propagation en run");
-
 		//clean projetc folder
 		CleanProjectFolder();
 

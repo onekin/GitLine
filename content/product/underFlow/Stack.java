@@ -7,16 +7,13 @@ public class Stack {
 		original(obj);
 		count++;
 	}
+
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return original(); 
-
+			return original();
 		}
-		else{
-			System.out.println("Stack is empty");
+		else
 			return null;
-
-		}
 	}
 }

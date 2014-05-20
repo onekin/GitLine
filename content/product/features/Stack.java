@@ -26,17 +26,14 @@ public   class  Stack {
 	}
 
 	
+
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return pop__wrappee__master(); 
-
+			return pop__wrappee__master();
 		}
-		else{
-			System.out.println("Stack is empty");
+		else
 			return null;
-
-		}
 	}
 
 	

@@ -476,6 +476,11 @@ jQuery.noConflict();
 			this.message = commitInfos.commit.message;
 			this.sha = commitInfos.sha;
 			this.url = commitInfos.url;
+			//añadido por leti
+			//console.log("COMMIT CONS. ");
+			//console.log(commitInfos);
+			this.parents=commitInfos.parents;
+
 		}
 	},{});
 
@@ -617,11 +622,11 @@ jQuery.noConflict();
 	},{});
 
 	Gh3.Branch = Kind.extend({
-		constructor : function (name, sha, url, ghUser, repositoryName) {
+		constructor : function (name, sha, message, url, ghUser, repositoryName) {
 			if (name) this.name = name;
 			if (sha) this.sha = sha;
 			if (url) this.url = url;
-
+			if (message) this.message=message;
 			if (ghUser) this.user = ghUser;
 			if (repositoryName) this.repositoryName = repositoryName;
 
@@ -648,6 +653,27 @@ jQuery.noConflict();
 			});
 
 		},
+
+		fetchCommits : function (callback) {//http://developer.github.com/v3/repos/commits/
+			var that = this;
+			that.commits = [];
+
+			Gh3.Helper.callHttpApi({
+				service : "repos/"+that.user.login+"/"+that.repositoryName+"/commits", //start from  a sha
+				data : {path: that.path },
+				success : function(res) {
+					_.each(res.data, function (commit) {
+						that.commits.push(new Gh3.Commit(commit));
+					});
+					if (callback) callback(null, that);
+				},
+				error : function (res) {
+					if (callback) callback(new Error(res.responseJSON.message),res);
+				}
+			});
+
+		},
+		
 		reverseContents : function () {
 			this.contents.reverse();
 		},
@@ -676,6 +702,51 @@ jQuery.noConflict();
 		},
 		filterContents : function (comparator) {
 			return _.filter(this.contents, comparator);
+		},
+		getCommits : function () { return this.commits; },
+		getCommitBySha : function (sha) {
+			return _.find(this.commits, function (commit) {
+				return commit.sha == sha;
+			});
+		},
+		getCommitsRange : function (since, until) {
+			return _.find(this.commits, function (commit) {
+				return since < commit.date < until;
+			});
+		},
+		getCommitsSinceDate : function (date) {
+			return _.find(this.commits, function (commit) {
+				return commit.date > since;
+			});
+		},
+		getCommitsUntilDate : function (date) {
+			return _.find(this.commits, function (commit) {
+				return commit.date > until;
+			});
+		},
+		getLastCommit : function () {
+			return this.commits[0];
+		},
+		getFirstCommit : function () {
+			return this.commits[this.commits.length-1];
+		},
+		eachCommit : function (callback) {
+			_.each(this.commits, function (branch) {
+			callback(branch);
+		});
+		},
+		filterCommits : function (comparator) {
+			return _.filter(this.commits, comparator);
+		},
+		reverseCommits : function () {
+			this.commits.reverse();
+		},
+		sortCommits: function (comparison_func) {
+			if (comparison_func) {
+			this.commits.sort(comparison_func);
+			} else {
+			this.commits.sort();
+			}
 		}
 
 	},{});
@@ -758,7 +829,10 @@ jQuery.noConflict();
 				service : "repos/"+that.user.login+"/"+that.name+"/branches",
 				success : function(res) {
 					_.each(res.data, function (branch) {
-						that.branches.push(new Gh3.Branch(branch.name, branch.commit.sha,  branch.commit.url, that.user, that.name));
+						//console.log("dendtro de fetch brnaches..");
+						//console.log(branch);
+						//console.log(branch.commit);
+						that.branches.push(new Gh3.Branch(branch.name, branch.commit.sha, branch.commit.message, branch.commit.url, that.user, that.name));
 					});
 
 					if (callback) callback(null, that);
@@ -769,6 +843,7 @@ jQuery.noConflict();
 			});
 
 		},
+		
 		fetchIssues : function (callback) {
 			var that = this;
 			that.issues = [];
@@ -809,6 +884,26 @@ jQuery.noConflict();
 			});
 
 		},
+		fetchCommits : function (callback) {//http://developer.github.com/v3/repos/commits/
+			console.log("dentroooo fetchCommits para Gh3-repository");
+			var that = this;
+			that.commits = [];
+
+			Gh3.Helper.callHttpApi({
+				service : "repos/"+that.user.login+"/"+that.name+"/commits",
+				data : {path: that.path },
+				success : function(res) {
+					_.each(res.data, function (commit) {
+						that.commits.push(new Gh3.Commit(commit));
+					});
+					if (callback) callback(null, that);
+				},
+				error : function (res) {
+					if (callback) callback(new Error(res.responseJSON.message),res);
+				}
+			});
+
+		},
 		getBranches : function () { return this.branches; },
 		getBranchByName : function (name) {
 			return _.find(this.branches, function (branch) {
@@ -838,6 +933,36 @@ jQuery.noConflict();
 		},
 		reverseIssues : function () {
 			this.issues.reverse();
+		},	
+		getCommits : function () { return this.commits; },
+		getCommitBySha : function (sha) {
+			return _.find(this.commits, function (commit) {
+				return commit.sha == sha;
+			});
+		},
+		getLastCommit : function () {
+			return this.commits[0];
+		},
+		getFirstCommit : function () {
+			return this.commits[this.commits.length-1];
+		},
+		eachCommit : function (callback) {
+			_.each(this.commits, function (branch) {
+			callback(branch);
+		});
+		},
+		filterCommits : function (comparator) {
+			return _.filter(this.commits, comparator);
+		},
+		reverseCommits : function () {
+			this.commits.reverse();
+		},
+		sortCommits: function (comparison_func) {
+			if (comparison_func) {
+			this.commits.sort(comparison_func);
+			} else {
+			this.commits.sort();
+			}
 		}
 
 	},{});
@@ -1136,16 +1261,17 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var list=parameter[0].split("\n");
 						    var user=parameter[1];
 						    var author=parameter[2];
-						    console.log("Lista: "+list+user+author);
+						    var commitMessages=parameter[3];
+						    console.log("Mensajes Commits:"+commitMessages);
 						    var line;
-						    console.log("list: "+list);
-						    console.log("feature lengh:"+list.length);
+						  //  console.log("list: "+list);
+						   // console.log("feature lengh:"+list.length);
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
-						    	console.log("line: "+line);
-						    	console.log("compare/"+author+':'+line[1]+'...'+author+'...'+line[0]);
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' is not up to date</a></h4><a class="minibutton primary add-button" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">'+'Check changes'+'</a></div></li>';
+						    //	console.log("line: "+line);
+						    //	console.log("compare/"+author+':'+line[1]+'...'+author+'...'+line[0]);
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' has updates!</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
 						    }
 						    html+="</div></ul>";
 						    tabTemplate.innerHTML=html;//'<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
@@ -1230,7 +1356,7 @@ GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  if(position==null){position=n.length;} 
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
-  	console.log("N: "+n);
+ // 	console.log("N: "+n);
    var last=n[position-1];
    last.parentNode.appendChild(toAdd);          
   }else{
@@ -1530,7 +1656,7 @@ ShowFeatureUpdatesView.prototype.setViewData=function(params){
 this.click=params.click;
 };
 ShowFeatureUpdatesView.prototype.render=function(features){
-console.log("En render ShowFeatureUpdatesView: "+features);
+// console.log("En render ShowFeatureUpdatesView: "+features);
 var obj=this;
 var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
 
@@ -1576,7 +1702,7 @@ LoadEController.prototype.execute=function(){
 var fo;
 if (GitHub.getForkedFrom()!=null)
  fo=GitHub.getForkedFrom().split("/")[0];
-console.log("Fo: "+fo);
+//console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
  if(user!=null&&repo!=null&&actions!=null&&fo!=user){
  	if(user!=author){
@@ -1599,9 +1725,9 @@ var button2=GitHub.getPullRequestButton();
 
  var brackwardProp=GitHub.getBrackward();
  var actual=user+"/"+repo;
-  console.log("author: "+author);
- console.log("user: "+user);
-  console.log("actual: "+actual);
+//  console.log("author: "+author);
+// console.log("user: "+user);
+//  console.log("actual: "+actual);
 
  if(brackwardProp!=null){
  	if(GitHub.getForkedFrom()==actual){
@@ -1614,24 +1740,52 @@ var button2=GitHub.getPullRequestButton();
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
 
- console.log(window.location.href);
- console.log(user);
- console.log(repo);
- if(showFeatureUpdate!=null){
- 	  //
+ //console.log(window.location.href);
+ //console.log(user);
+ //console.log(repo);
+ 
+ if(showFeatureUpdate){
  	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/pulls")
  	  	return;
- 	  console.log("showFeatureUpdates en ADD");
- 	  console.log(showFeatureUpdate);
+ 	 // console.log("showFeatureUpdates en ADD");
+ 	 // console.log(showFeatureUpdate);
  	  var  featureButton=new ShowFeatureUpdatesEController();
   	  featureButton.execute("add");
  }else console.log("no going to retreive for update features");
 
-console.log("FORKED FROM: "+GitHub.getForkedFrom());
-console.log(GitHub.getPullRequestList());
-console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
-console.log(GitHub.getNewPullRequestButton());
+//console.log("FORKED FROM: "+GitHub.getForkedFrom());
+//console.log(GitHub.getPullRequestList());
+//console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
+//console.log(GitHub.getNewPullRequestButton());
 
+/*
+var user= new Gh3.User("lemome88");
+var k33gBlog = new Gh3.Repository("stack-SPL", user);
+    k33gBlog.fetch(function (err, res) {
+      if(err) { throw "outch ..." }
+      k33gBlog.fetchBranches(function (err, res) {
+        if(err) { throw "outch ..." }
+        var master = k33gBlog.getBranchByName("master");
+        master.fetchContents(function (err, res) {
+          if(err) { throw "outch ..." }
+          master.eachContent(function (content) {
+            console.log(content.name+" : "+content.type);
+          });
+         master.fetchCommits(function (err, res) {
+            if(err) { throw "outch ..." }
+            console.log("uuuuuuuu");
+            var com=master.getCommitBySha("8a63b7dc2bde28f215bc2949a1ae9e0bd82a6570");
+            console.log("Coomit msg: "+com.message);
+            console.log(com);
+            console.log(com.parents[0].sha);
+        	master.eachCommit(function (commit) {
+              console.log(commit.author.login, commit.message, commit.date);
+            });
+    	});
+        });
+      })
+    });
+*/
 }; 
 
 /* De momento no uso la semantica del branching
@@ -1837,8 +1991,9 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 		 var forked=GitHub.getForkedFrom().split("/");
 		 var author=forked[0]; 
 		 var obj=this;
-
+		 	  	console.log("ShowFeatureUpdatesEController triggered");
 			var featuresChanged="";
+			var commitMessages=" ";
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 			var ghUser = new Gh3.User(user);
@@ -1856,14 +2011,12 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 			      	  	return;
 			      	  }
 			      	  else{
-			      	  	
 			      	  	//Step 2: leer contenido del product config
 			      	  	productConfigFile.fetchContent(function (err, res) {
 	            			if(err) { throw "outch ..." }
 	           				 //console.log("Content: "+productConfigFile.getRawContent());
 	           				//Step 2.1 parse productConfig File
 	           				var lines=productConfigFile.getRawContent().split("\n");
-	           		//		console.log("Lines: "+lines);
 	           				var colums;
 	           				var branch;
 	           				var i;
@@ -1874,33 +2027,49 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 	         					 	ghAuthorRepo.fetchBranches(function (err, res) {
 	         					 		for(i=0;i<lines.length;i++){
 				           					colums=lines[i].split(" ");
-				         					//console.log(lines[i]);
 				         					branches=colums[0];
 				         					commits=colums[1];
-				         					//console.log("branches: "+branches);
 				         					branch=ghAuthorRepo.getBranchByName(branches);
-				         					//console.log("branch " +branch);
+				         					console.log(branch);
 				         					if(branch!=null){
-				         						//console.log(branch.sha+"equals "+commits);
 				         					 	if(branch.sha!=commits){
+				         					 		var bsha=branch.sha;
 				         					 	  	featuresChanged+=branches+" "+commits+"\n";
-				         					 	  	console.log(branch);
+				         					 	  	console.log("aquiiiiiii");
+				         					 	  	var tope=commits;
+				         					 	  	branch.fetchContents(function (err, res){
+											          if(err) { throw "outch ..." }
+											          	console.log(213123);
+					         					 	  	ghAuthorRepo.fetchCommits(function (err, res) {
+												            if(err) { throw "outch ..." }
+												            console.log("uuuuuuuu "+bsha);
+												            var com=ghAuthorRepo.getCommitBySha(bsha);
+												            while(tope!=com.sha){
+												            	console.log("inside");
+												            	commitMessages=commitMessages+com.message+"\n";
+												            	com=ghAuthorRepo.getCommitBySha(com.parents[0].sha);
+												            }
+												            console.log("messages:" + commitMessages);
+												            console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
+									         				if(featuresChanged=="") return;//featuresChanged=null;
+									         				
+									         				//add notifications to GitHub
+															var featureUp=new ShowFeatureUpdatesView();
+															featureUp.setViewData({click:function(){obj.execute("run");}});
+															var params=[featuresChanged,user,author,commitMessages];
+															var render=featureUp.render(params);//pasarle parametros al render
+															GitHub.injectIntoShowFeatureUpdates(render);
+																									//en vez de hacer el show, directamente hacer un pull request
+															// var forwardPropagation=new ForwardPropagationEController();
+					  	 									 //forwardPropagation.execute("run");
+
+												    	});
+					         					 	});
 				         					 	}
 				         					 	//RETRIVE THE COMMITS COMMENTS
 				         					}
 				         				}
-				         				console.log("featuresChanged: "+featuresChanged);
-				         				if(featuresChanged=="") return;//featuresChanged=null;
 				         				
-				         				//add notifications to GitHub
-										var featureUp=new ShowFeatureUpdatesView();
-										featureUp.setViewData({click:function(){obj.execute("run");}});
-										var params=[featuresChanged,user,author];
-										var render=featureUp.render(params);//pasarle parametros al render
-										GitHub.injectIntoShowFeatureUpdates(render);
-																				//en vez de hacer el show, directamente hacer un pull request
-										// var forwardPropagation=new ForwardPropagationEController();
-  	 									 //forwardPropagation.execute("run");
 	         					 	});
 	         					 }
 	         					});
@@ -1911,8 +2080,6 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 			});
 	}else if(act=="run"){
 		console.log("BUTTON CLICK!");
-
-		
 	}
 };
 
@@ -1962,7 +2129,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		ghRepo.fetch(function (err, res) {
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
-				console.log(ghRepo);
+			//	console.log(ghRepo);
 				var master=ghRepo.getBranchByName("master");
 				master.fetchContents(function (err, res) {
 		          if(err) { throw "outch ..." }

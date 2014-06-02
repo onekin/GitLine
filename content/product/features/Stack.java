@@ -33,7 +33,6 @@ public   class  Stack {
 			return pop__wrappee__master();
 		}
 		else{
-			Syste.out.println("stack is empty");
 			return null;
 		}
 	}

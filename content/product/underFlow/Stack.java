@@ -13,7 +13,9 @@ public class Stack {
 			count--;
 			return original();
 		}
-		else
+		else{
+			Syste.out.println("stack is empty");
 			return null;
+		}
 	}
 }

@@ -32,8 +32,10 @@ public   class  Stack {
 			count--;
 			return pop__wrappee__master();
 		}
-		else
+		else{
+			Syste.out.println("stack is empty");
 			return null;
+		}
 	}
 
 	

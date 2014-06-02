@@ -758,7 +758,7 @@ jQuery.noConflict();
 				service : "repos/"+that.user.login+"/"+that.name+"/branches",
 				success : function(res) {
 					_.each(res.data, function (branch) {
-						that.branches.push(new Gh3.Branch(branch.name, branch.commit.sha, branch.commit.url, that.user, that.name));
+						that.branches.push(new Gh3.Branch(branch.name, branch.commit.sha,  branch.commit.url, that.user, that.name));
 					});
 
 					if (callback) callback(null, that);
@@ -1614,11 +1614,18 @@ var button2=GitHub.getPullRequestButton();
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
 
+ console.log(window.location.href);
+ console.log(user);
+ console.log(repo);
  if(showFeatureUpdate!=null){
+ 	  //
+ 	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/pulls")
+ 	  	return;
  	  console.log("showFeatureUpdates en ADD");
+ 	  console.log(showFeatureUpdate);
  	  var  featureButton=new ShowFeatureUpdatesEController();
   	  featureButton.execute("add");
- }else console.log("showFeatureUpdates en NO ADD");
+ }else console.log("no going to retreive for update features");
 
 console.log("FORKED FROM: "+GitHub.getForkedFrom());
 console.log(GitHub.getPullRequestList());
@@ -1877,11 +1884,12 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         						//console.log(branch.sha+"equals "+commits);
 				         					 	if(branch.sha!=commits){
 				         					 	  	featuresChanged+=branches+" "+commits+"\n";
+				         					 	  	console.log(branch);
 				         					 	}
-				         					 	//else console.log(commits+"  NO");
+				         					 	//RETRIVE THE COMMITS COMMENTS
 				         					}
 				         				}
-				         				console.log("featuresChanged 0: "+featuresChanged);
+				         				console.log("featuresChanged: "+featuresChanged);
 				         				if(featuresChanged=="") return;//featuresChanged=null;
 				         				
 				         				//add notifications to GitHub

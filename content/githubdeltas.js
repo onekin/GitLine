@@ -626,7 +626,9 @@ jQuery.noConflict();
 			if (name) this.name = name;
 			if (sha) this.sha = sha;
 			if (url) this.url = url;
-			if (message) this.message=message;
+			
+			if (message) this.message=message;//leti
+			
 			if (ghUser) this.user = ghUser;
 			if (repositoryName) this.repositoryName = repositoryName;
 
@@ -1741,12 +1743,8 @@ var button2=GitHub.getPullRequestButton();
 
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
-
- //console.log(window.location.href);
- //console.log(user);
- //console.log(repo);
  
- if(showFeatureUpdate){
+ if(showFeatureUpdate && false){
  	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/pulls")
  	  	return;
  	 // console.log("showFeatureUpdates en ADD");
@@ -1760,33 +1758,29 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
 //console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
 //console.log(GitHub.getNewPullRequestButton());
 
-/*
-var user= new Gh3.User("lemome88");
-var k33gBlog = new Gh3.Repository("stack-SPL", user);
-    k33gBlog.fetch(function (err, res) {
-      if(err) { throw "outch ..." }
-      k33gBlog.fetchBranches(function (err, res) {
-        if(err) { throw "outch ..." }
-        var master = k33gBlog.getBranchByName("master");
-        master.fetchContents(function (err, res) {
-          if(err) { throw "outch ..." }
-          master.eachContent(function (content) {
-            console.log(content.name+" : "+content.type);
-          });
-         master.fetchCommits(function (err, res) {
-            if(err) { throw "outch ..." }
-            console.log("uuuuuuuu");
-            var com=master.getCommitBySha("8a63b7dc2bde28f215bc2949a1ae9e0bd82a6570");
-            console.log("Coomit msg: "+com.message);
-            console.log(com);
-            console.log(com.parents[0].sha);
-        	master.eachCommit(function (commit) {
-              console.log(commit.author.login, commit.message, commit.date);
-            });
-    	});
-        });
-      })
-    });
+/*console.log(111111111);
+var ghAuthor = new Gh3.User("letimome");
+var ghRepo = new Gh3.Repository("stack-SPL", ghAuthor);
+		//step 1: descargame todas las branches (para tenerlas listas a la hora de componer)
+		ghRepo.fetch(function (err, res){
+          if(err) { console.log("ERROR ghRepo.fetch"); }
+			ghRepo.fetchBranches(function (err, res) {
+				//console.log(ghRepo);
+				var master=ghRepo.getBranchByName("master");
+				master.fetchContents(function (err, res) {
+					//console.log(master.getContents());
+					var dir=master.getDirByName("carpeta");
+					dir.fetchContents(function (err, res) {
+						console.log(master);
+						console.log(dir);
+						var file=dir.getFileByName("hola.txt");
+						file.fetchContent(function(content){
+							console.log(file.getRawContent());
+						});
+					});					
+				});
+			});
+		});
 */
 }; 
 
@@ -2289,10 +2283,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		install.setViewData({click:function(){obj.execute("run");}});
 		var render=install.render();
 		GitHub.injectIntoActions(render);
-
 	}else if(act=="run"){
-
-
 		var user=GitHub.getUserName(); 
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
@@ -2302,10 +2293,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		var error=false;
 		var editOrNew="";
 		//clean projetc folder
-
-
 		CleanProjectFolder();
-
 		/* Algorithm steps
 			1. Check config features correspond to branches 
 			2. create a blob with the configuration (branch name - commit sha)
@@ -2319,14 +2307,15 @@ InstallEController.prototype.execute=function(act){//compose product and create 
     	var productConfig="";
     	console.log("bajarme todas las branches");
 		//step 1: descargame todas las branches (para tenerlas listas a la hora de componer)
-		ghRepo.fetch(function (err, res) {
+		ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
 				ghRepo.eachBranch(function (branch) {
-					 DeltaUtils.getBranchFiles(author,repo,branch.name,branch.name);
+					//fetch content + save to disk
+					DeltaUtils.extractBranchContents(branch);
 				});
 		   	});
-		});
+		});//end descarga de branche
 
 		/*step 2: Ask for product configuration equation*/
 		console.log("ask config equation");
@@ -2455,7 +2444,7 @@ DeltaUtils.createDeltaXML=function(author,repo){
  return delta;
 }
 
-DeltaUtils.getBranchFiles=function(user,repo,branch,branchName){
+DeltaUtils.getBranchFiles=function(user,repo,branch,branchName){//branch==commit, and branchName contains the featureName
 	console.log("getBranchFiles");
 	try{
 		var fileName;
@@ -2478,6 +2467,53 @@ DeltaUtils.getBranchFiles=function(user,repo,branch,branchName){
 	}
 }
 
+DeltaUtils.extractBranchContents=function(branch){
+	branch.fetchContents(function (err, res) {
+        if(err) { throw "outch ..." }
+        branch.eachContent(function(content){
+        if (content.type=='file'){
+        	var file=branch.getFileByName(content.name);
+         	file.fetchContent(function (err, res) {
+				if(err) { throw "outch ..." }
+					SaveToDisk(file.getRawContent(),file.name,branch.name);
+				});
+	         	}else{
+         			console.log(content.name+" is a dir");
+         			var dir=branch.getDirByName(content.name);
+         			DeltaUtils.iterateDirs(dir,branch.name);	
+         		}
+         });
+     });
+}
+
+DeltaUtils.iterateDirs=function(dir,branchName){
+console.log("en iterate dirs for "+dir.name);
+//console.log(dir);
+	dir.fetchContents(function (err, res) {
+		if(err) { throw "outch ..." }
+		dir.eachContent(function (content) {
+			if(content.type=="file"){ 
+				var file2=dir.getFileByName(content.name);
+				console.log("en file");
+				console.log(file2);
+				file2.fetchContent(function (err, res) {
+					if(err) { throw "outch ..." }
+					console.log("saving: "+file2.path);
+					SaveToDisk(file2.getRawContent(),file2.path,branchName);
+				});
+			}
+			else{//if it is a dir
+				console.log(content.name+" is a dir");
+				var dir_aux=dir.getDirByName(content.name);
+				console.log(dir_aux);
+				DeltaUtils.iterateDirs(dir_aux,branchName);
+
+				
+			}
+		});
+    }); 
+
+}
 DeltaUtils.getErrorLog=function(){
 	
 	var log=GetLogFileContent();

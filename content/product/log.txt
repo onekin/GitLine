@@ -1,5 +1,0 @@
-Found the following features:
-master
-underFlow
-processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/master/Stack.java
-processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/underFlow/Stack.java

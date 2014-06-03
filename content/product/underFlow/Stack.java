@@ -1,20 +1,17 @@
 package util;
 
+import java.util.LinkedList;
 public class Stack {
-	private int count = 0;
-
+	private LinkedList<Object> data = 
+			new LinkedList<Object>();
+	
 	public void push(Object obj) {
-		original(obj);
-		count++;
+		data.addFirst(obj);
 	}
-
 	public Object pop() {
-		if(count > 0) {
-			count--;
-			return original();
-		}
-		else{
-			return null;
-		}
+		return data.removeFirst();
 	}
+	
+	//commentatio
+	
 }

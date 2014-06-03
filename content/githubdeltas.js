@@ -1262,7 +1262,9 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var user=parameter[1];
 						    var author=parameter[2];
 						    var commitMessages=parameter[3];
-						    console.log("Mensajes Commits:"+commitMessages);
+						   // var msgs=commitMessages.split("\n");
+						   // console.log("Msgs: "+msgs.length);
+						    //console.log("Mensajes Commits:"+commitMessages);
 						    var line;
 						  //  console.log("list: "+list);
 						   // console.log("feature lengh:"+list.length);
@@ -1993,7 +1995,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 		 var obj=this;
 		 	  	console.log("ShowFeatureUpdatesEController triggered");
 			var featuresChanged="";
-			var commitMessages=" ";
+			var commitMessages="";
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 			var ghUser = new Gh3.User(user);
@@ -2044,10 +2046,12 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 												            if(err) { throw "outch ..." }
 												            console.log("uuuuuuuu "+bsha);
 												            var com=ghAuthorRepo.getCommitBySha(bsha);
+												            var i=1;
 												            while(tope!=com.sha){
 												            	console.log("inside");
-												            	commitMessages=commitMessages+com.message+"\n";
+												            	commitMessages=commitMessages+"<h5>Update "+i+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
 												            	com=ghAuthorRepo.getCommitBySha(com.parents[0].sha);
+												            	i++;
 												            }
 												            console.log("messages:" + commitMessages);
 												            console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);

@@ -1800,6 +1800,11 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
   	  featureButton.execute("add");
  }else console.log("not going to retreive for update features");
 
+var oauth_token=token;
+var gh = new Octokit({
+  token: oauth_token
+});
+console.log(gh);
 
 /*
   var k33g = new Gh3.User("letimome");
@@ -2207,7 +2212,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		           					 DeltaUtils.extractBranchContents(fetchBranch);
 		           					}
 				           		}//end for
-						  /*  console.log("aaaaaa");
+						    /*console.log("aaaaaa");
 						    console.log(productConfigFile);
 							var feature=authorRepo.getBranchByName(fordwardFeature);
 							console.log(feature);
@@ -2218,8 +2223,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		           				//read blob
 		           				console.log(newConfig);
 		           				console.log(commits);
-		           				console.log(branches);
-		           		/*
+		           				console.log(branches);*/
 								//step 4: confirm fordward propagation
 		           				var ok=window.confirm("You are going to forward-propagate "+ fordwardFeature);
 		           				console.log(ok);
@@ -2531,7 +2535,7 @@ DeltaUtils.getCommitContent=function(authorRepo,ghuser,shaToFetch){
 	authorRepo.fetchCommitsFromSha(shaToFetch,function(err,res){
 		if (err) console.log("error on getCommitContent");
 		else{
-			console.log(authorRepo);
+			console.log(authorRepo.getCommits());
 			var commit=authorRepo.getCommitBySha(shaToFetch);
 			console.log("commit: "+commit);
 			commit.fetchContent(function(content){

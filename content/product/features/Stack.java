@@ -1,11 +1,16 @@
-package util;
+package util; 
 
-public class Stack {
+public  class  Stack {
+	
 	private int count = 0;
+
+	
 	public void push(Object obj) {
 		original(obj);
 		count++;
 	}
+
+	
 	public Object pop() {
 		if(count > 0) {
 			count--;
@@ -15,4 +20,6 @@ public class Stack {
 			return null;
 			}
 	}
+
+
 }

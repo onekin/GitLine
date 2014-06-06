@@ -500,8 +500,8 @@ jQuery.noConflict();
 			that.contents = [];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.author.login+"/"+repositoryName+"/contents",
-				data : {ref:that.sha },
+				service : "repos/"+that.author.login+"/"+repositoryName+"/contents?ref="+that.sha,
+				//data : {ref:that.sha },
 				success : function(res) {
 					_.each(res.data, function (item) {
 					console.log("item "+item);
@@ -537,14 +537,14 @@ jQuery.noConflict();
 			var that = this;
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,
-				data : {ref:that.branchName },
+				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path+"?ref="+that.branchName,
+				//data : {ref:that.branchName },
 				success : function(res) {
 					that.content = res.data.content;
 
 					that.rawContent = Base64.decode(res.data.content);
-					console.log("rawContent for: " +that.branchName);
-					console.log(that.rawContent);
+					//console.log("rawContent for: " +that.branchName);
+					//console.log(that.rawContent);
 					if (callback) callback(null, that);
 				},
 				error : function (res) {
@@ -610,8 +610,8 @@ jQuery.noConflict();
 			that.contents = [];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,
-				data : {ref: that.branchName },
+				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path+"?ref="+that.branchName,
+				//data : {ref: that.branchName },
 				success : function(res) {
 					_.each(res.data, function (item) {
 						if (item.type == "file") that.contents.push(new Gh3.File(item, that.user, that.repositoryName, that.branchName));
@@ -673,8 +673,8 @@ jQuery.noConflict();
 			that.contents = [];
 
 			Gh3.Helper.callHttpApi({
-			service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/",
-			data : {ref: that.name },
+			service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents?ref="+that.name,
+			//data : {ref: that.name },
 			success : function(res) {
 			_.each(res.data, function (item) {
 
@@ -686,6 +686,8 @@ jQuery.noConflict();
 
 
 			error : function (res) {
+				console.log("ERROR re:"+res);
+				console.log(res);
 			if (callback) callback(new Error(res.responseJSON.message),res);
 			}
 			});
@@ -1823,12 +1825,6 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
   	  featureButton.execute("add");
  }else console.log("not going to retreive for update features");
 
-var oauth_token=token;
-var gh = new Octokit({
-  token: oauth_token
-});
-console.log(gh);
-
 /*
   var k33g = new Gh3.User("letimome");
   var k33gBlog = new Gh3.Repository("stack", k33g);
@@ -2105,7 +2101,6 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         					 	  	var b2=branch;
 				         					 	  	//(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged)
 				         					 	  	DeltaUtils.getUpdateMessagesFromBanch(b2,bsha,tope,i,lines.length,commitMessages,user,author,featuresChanged);
-				         					 	
 				         					 	}//if
 				         					}//if
 				         				}//end for
@@ -2152,7 +2147,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		forward.setViewData({click:function(){obj.execute("run");}});
 		//forward.setViewData({mouseover:function(){obj.execute("help");}});
 		var render=forward.render();
-		console.log(render);
+		//console.log(render);
 		GitHub.injectIntoCompareSummary(render);
 		}
 	else if(act=="run"){
@@ -2243,7 +2238,8 @@ ForwardPropagationEController.prototype.execute=function(act){
 		           				//example https://github.com/letimome/stack-spl/compare/lemome88:master...underFlow
 		           				//step 5: compose branches content with the config file (branch names)
 								RunFHComposition(configFileContent);	//compose product
-								var listFiles=SearchFilesInLocalFolder("content/product/features");
+								var listFiles=[];
+								listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
 								var branch= ghRepo.default_branch;
 								var productB=DeltaUtils.getProductShadowBranchName();
 								//Step 6_ create a new branch with the new product and new product config file
@@ -2330,13 +2326,6 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		var editOrNew="";
 		//clean projetc folder
 		CleanProjectFolder();
-		/* Algorithm steps
-			1. Check config features correspond to branches 
-			2. create a blob with the configuration (branch name - commit sha)
-			3. dowload branch content
-			4. compose product with featureHouse
-			5. create a new repository with the product and the product configuration file
-		 */
 
 		var ghAuthor = new Gh3.User(author);
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
@@ -2354,7 +2343,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		});//end descarga de branche
 
 		/*step 2: Ask for product configuration equation*/
-		console.log("ask config equation");
+	
 		var productBranches=window.prompt("Please enter the configuration equation","");
 		
 		if (productBranches!=null)
@@ -2363,7 +2352,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 		var listBranches=productBranches.split(" ");
 		//Step 3: Precondition, check configuration equation correspond to branch names
 		console.log("step 3");
-    	ghRepo.fetch(function (err, res) {
+    	ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
 			var ghBranch;
@@ -2373,8 +2362,7 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 					//step3.1: fill in the configFile
 					productConfig+=ghBranch.name+" "+ghBranch.sha+"\n";
 					configFileContent+=ghBranch.name+"\n";
-				}
-				else{ 
+				}else{ 
 					window.alert("No such feature in the repository: '"+listBranches[i]+"'");
 					error=true;
 					return;
@@ -2384,65 +2372,86 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 			console.log("step 4");
 			RunFHComposition(configFileContent);	//compose product
 			console.log("step 4.1");
-			var listFiles=SearchFilesInLocalFolder("content/product/features");
+			var listFiles=[];
+			listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
 			console.log(listFiles);
 			if(listFiles==null) {
 				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
 				return;
 			}
-
 			console.log("step 5");
-			//Step5: create a fork
-			Utils.XHR("/"+author+"/"+repo+"/fork",function(){//FORK & delete all branches + post the product
+			//Step5: create PRODUCT REPOSITORY
+			Utils.XHR("/"+author+"/"+repo+"/fork",function(){//FORK & delete all branches + post the product + seed and develop branches
 				//step 5 post the new product in the master branch
 				console.log("step 5");
 				console.log("the files: "+listFiles);
 				console.log("product config:"+productConfig);
 				var len= listFiles.length;
-				var productBranch=ghRepo.default_branch;
+				var productBranch=ghRepo.default_branch;//Master branch
+				var develop_branch="develop";
+				var seeds_branch="seeds";
 		    	var commit;
-					//Step 6: create the product.config  file
-					console.log("step 6");
-					Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
-						console.log("here");
+				//Step 6: create the product.config  file
+				console.log("step 6");
+				Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
+					console.log("step 7");
 					commit = jQuery(res).find("input[name='commit']").attr("value");
-					console.log(DeltaUtils.getProductConfigName());
-						Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
-							console.log("aqui");
-							//Step 7:upload  other files		
-							for (var i=0; i<len; i++){
-								var file=listFiles[i];
-								console.log("ahora: "+file);
-								var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
-								console.log("file content encodedURI:"+encodeURIComponent(fileContent));
-									fileContent=fileContent.trim();
-										Utils.XHR("/"+user+"/"+repo+ "/edit/"+productBranch+"/"+listFiles[i],function(res){
-											commit = jQuery(res).find("input[name='commit']").attr("value");
-											Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productBranch+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-													//Step 8: delete all branches except the master
-													var ghUser = new Gh3.User(user);
-													var ghUserRepo = new Gh3.Repository(repo, ghUser);
-													ghRepo.fetch(function (err, res) {
-													  console.log(ghRepo);
-											          if(err) { console.log("ERROR ghRepo.fetch"); }
-														ghRepo.fetchBranches(function (err, res) {
-															var branches= ghRepo.getBranches();
-															console.log(branches);
-															ghRepo.eachBranch(function (branch) {
-									        					if(branch.name!=productBranch) //we cannot delete default_branch
-									        					Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(){
-																   window.location.href="/"+user+"/"+repo+"/tree/"+productBranch;
-															    },"DELETE",token);
-									    					})
-														});
-													});
-											},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=New Product"+"&content_changed=true");					
-										},"POST","authenticity_token="+encodeURIComponent(token));	
-							}
-
-						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
-					},"POST","authenticity_token="+encodeURIComponent(token));
-					
+					console.log("commit2");
+					console.log(commit);
+					//Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
+						console.log("aqui");
+						//delete branches and for default branch delete its files
+						//Step 8: delete all branches except the master
+						var ghUser = new Gh3.User(user);
+						var ghUserRepo = new Gh3.Repository(repo, ghUser);
+						console.log(ghUserRepo);
+						ghUserRepo.fetch(function (err, res) {
+							console.log(ghUserRepo);
+							if(err) { console.log("ERROR ghRepo.fetch"); }
+							ghUserRepo.fetchBranches(function (err, res) {
+								if(err) console.log("error on fetch branches: "+err);
+								var branches= ghUserRepo.getBranches();
+								console.log(branches);
+								ghUserRepo.eachBranch(function (branch){
+									if(branch.name!=productBranch){ //delete branches except default_branch
+										Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(){
+											window.location.href="/"+user+"/"+repo;
+										},"DELETE",token);
+									}else{//delete files for the default branch
+										DeltaUtils.deleteBranchContents(user,repo,token,commit,branch,null);//last parameter is the callback
+										//las dos lineas estan repetidas en el paso 4.1
+										//listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+										//console.log(listFiles);
+										//Step 7:upload  composed files	
+										console.log("before create files for master");
+										/*for (var i=0; i<len; i++){
+											var file=listFiles[i];
+											var fileName=file.split("/"); 
+											var fname=fileName[fileName.length-1];
+											console.log("path: "+file+"  and name:"+fname);
+											var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+											console.log("file content encodedURI:"+encodeURIComponent(fileContent));
+												fileContent=fileContent.trim();
+												Utils.XHR("/"+user+"/"+repo+ "/new/"+productBranch,function(res){
+													Utils.XHR("/"+user+"/"+repo+ "/create/"+productBranch,function(res){
+														commit = jQuery(res).find("input[name='commit']").attr("value");
+														//Utils.XHR("/"+user+"/"+repo+"/tree-save/"+productBranch+"/"+file,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
+															//Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//https://github.com/letimome/stack/branches	
+															//	Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//https://github.com/letimome/stack/branches
+																	window.location.href="/"+user+"/"+repo+"/tree/"+productBranch;
+															//	},"POST","authenticity_token="+encodeURIComponent(token)+"&name="+seeds_branch+"&branch="+productBranch);								
+															//},"POST","authenticity_token="+encodeURIComponent(token)+"&name="+develop_branch+"&branch="+productBranch);						
+														//},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=New Product"+"&content_changed=true");					
+													},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fname+"&new_filename="+listFiles[i]+"&commit="+commit+"&value="+encodeURIComponent(fileContent));					
+												},"POST","authenticity_token="+encodeURIComponent(token));
+										}//end for	
+										*/
+									}//else
+								});
+							});
+						});						
+				//	},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
+				},"POST","authenticity_token="+encodeURIComponent(token));
 			},"POST","authenticity_token="+encodeURIComponent(token));	
           });
         });
@@ -2454,8 +2463,6 @@ InstallEController.prototype.execute=function(act){//compose product and create 
 var DeltaUtils={};
 
 DeltaUtils.currentBranch="master";
-
-
 
 DeltaUtils.sleep=function(millis){
   var date = new Date();
@@ -2570,6 +2577,49 @@ DeltaUtils.getCommitContent=function(authorRepo,ghuser,shaToFetch,featureName){
 	});
 }
 
+
+DeltaUtils.deleteBranchContents=function(user, repo, token, commit, branch,callback){
+	console.log("deleteBranchContents for: "+branch.name);
+	branch.fetchContents(function (err, res) {
+        if(err) { throw "outch ..." }
+        branch.eachContent(function(content){
+	       if(content.type=="file"){ 
+				console.log("contnet "+content.name);
+				console.log(content);
+				//var file=branch.getFileByName(content.name);
+				console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
+				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
+			    },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commit+"&placeholder_message=remove file");
+		    }else{
+	         	var dir=branch.getDirByName(content.name);
+	         	DeltaUtils.deleteDirectories(dir, user,repo,token, commit, branch);	
+	        }
+        });
+	});
+}
+DeltaUtils.deleteDirectories=function(dir,user, repo, token, commit, branch){
+console.log("en deleteDirectories dirs for "+dir.name);
+//console.log(dir);
+	dir.fetchContents(function (err, res) {
+		if(err) { throw "outch ..." }
+		dir.eachContent(function (content) {
+			if(content.type=="file"){ 
+				console.log("contnet "+content.name);
+				console.log(content);
+				//var file=branch.getFileByName(content.name);
+				console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
+				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
+			    },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commit+"&placeholder_message=remove file");
+			}
+			else{//it's a dir
+				var dir_aux=dir.getDirByName(content.name);
+				DeltaUtils.deleteDirectories(dir_aux, user, repo, token, commit, branch);
+			}
+		});
+    }); 
+
+}
+
 DeltaUtils.extractBranchContents=function(branch){
 	branch.fetchContents(function (err, res) {
         if(err) { throw "outch ..." }
@@ -2596,8 +2646,8 @@ console.log("en iterate dirs for "+dir.name);
 		dir.eachContent(function (content) {
 			if(content.type=="file"){ 
 				var file2=dir.getFileByName(content.name);
-				console.log("en file");
-				console.log(file2);
+				//console.log("en file");
+				//console.log(file2);
 				file2.fetchContent(function (err, res) {
 					if(err) { throw "outch ..." }
 					console.log("saving: "+file2.path);
@@ -2605,9 +2655,9 @@ console.log("en iterate dirs for "+dir.name);
 				});
 			}
 			else{//if it is a dir
-				console.log(content.name+" is a dir");
+				//console.log(content.name+" is a dir");
 				var dir_aux=dir.getDirByName(content.name);
-				console.log(dir_aux);
+				//console.log(dir_aux);
 				DeltaUtils.iterateDirs(dir_aux,branchName);
 			}
 		});
@@ -2627,7 +2677,7 @@ Utils.XHR=function(url,f,method,params){
 
  if(method=="DELETE"){
  	console.log("method delete");
- 	xhr.open("DELETE", url, true);
+ 	xhr.open("DELETE", url, false);
  	if(params!=null){
  		console.log(params);
         xhr.setRequestHeader("X-CSRF-Token",params);
@@ -2635,10 +2685,11 @@ Utils.XHR=function(url,f,method,params){
  	}
  }
  else{
- 		xhr.open(method?method:"GET", url, true);
- 		if(params!=null){
- 			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
- 		}
+	 		xhr.open(method?method:"GET", url, false);
+	 		if(params!=null){
+	 			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	 		}
+ 		
  	 
  } 
  xhr.onload = function (e) {
@@ -2647,6 +2698,7 @@ Utils.XHR=function(url,f,method,params){
         debugger;
       f(xhr.responseText,xhr);
     } else {
+      console.error("error on XHR onload");
       console.error(xhr.statusText);
     }
   }
@@ -2660,7 +2712,7 @@ Utils.XHR=function(url,f,method,params){
  xhr.onerror = function (e) {
      debugger;
   f(null,xhr);
-  console.log("XHR on error:\n");
+  console.log("XHR ONERROR\n");
   console.log(e);
   console.error(xhr.statusText);
  };

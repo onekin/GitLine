@@ -15,7 +15,4 @@ public class Stack {
 			return null;
 			}
 	}
-	
-	
-	//a manoooo
 }

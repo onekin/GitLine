@@ -1,25 +1,40 @@
 package util; 
 
-public  class  Stack {
+import java.util.LinkedList; 
+
+public   class  Stack {
 	
-	private int count = 0;
+	private LinkedList<Object> data = new LinkedList<Object>();
+
+	
+	private void  push__wrappee__master  (Object obj) {
+		data.addFirst(obj);
+	}
 
 	
 	public void push(Object obj) {
-		original(obj);
+		push__wrappee__master(obj);
 		count++;
+	}
+
+	
+	private Object  pop__wrappee__master  () {
+		return data.removeFirst();
 	}
 
 	
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return original();
+			return pop__wrappee__master();
 		}
 		else{ 
 			return null;
 			}
 	}
+
+	
+	private int count = 0;
 
 
 }

@@ -108,11 +108,12 @@ callShellScript: function(){
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
+	window.alert("en saveToDisk ");
 	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
-
+		window.alert("Saving file in "+theFilePath);
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -128,7 +129,7 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 		converter.writeString(fileContent);
 		converter.close(); // this closes foStream
 	}catch(e){
-		alert("ERROR:"+e);
+		window.alert("ERROR:"+e);
 	}
 },
 
@@ -322,7 +323,7 @@ contentLoad: function(e) {
 	var unsafeWin=e.target.defaultView;
 	if (unsafeWin.wrappedJSObject) unsafeWin=unsafeWin.wrappedJSObject;
 
-	var unsafeLoc=new XPCNativeWrapper(unsafeWin, "location").location;
+	var unsafeLoc=new XPCNativeWrapper(unsafeWin,"location").location;
 	var href=new XPCNativeWrapper(unsafeLoc, "href").href;
 
 	if (
@@ -346,7 +347,7 @@ injectScript: function(script, url, unsafeContentWin) {
 	var sandbox, script, logger, storage, xmlhttpRequester;
 	var safeWin=new XPCNativeWrapper(unsafeContentWin);
 
-	sandbox=new Components.utils.Sandbox(safeWin);
+	sandbox=new Components.utils.Sandbox(safeWin);//set here api.github.com
 
 	var storage=new githubdeltas_ScriptStorage();
 	xmlhttpRequester=new githubdeltas_xmlhttpRequester(

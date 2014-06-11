@@ -95,25 +95,20 @@ callShellScript: function(){
 		
 		proc.run(true, parameters, parameters.length);
 		
-		
-	
 	}catch (err){
 		console.log("ERROR:"+err.message);
 		alert("ERROR callShellScript!:"+err.message);
 		}
-
 },
-
-
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
-	window.alert("en saveToDisk ");
+	//window.alert("en saveToDisk ");
 	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
-		window.alert("Saving file in "+theFilePath);
+		//window.alert("Saving file in "+theFilePath);
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{

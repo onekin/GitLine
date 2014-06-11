@@ -2462,28 +2462,9 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 													console.log("commit: "+comm);
 													Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
 												       branch.eachContent(function(content){
-													       if(content.type=="file"){ 
-																console.log("contnet "+content.name);
-																console.log(content);
-																//var file=branch.getFileByName(content.name);
-																console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
-																var file= branch.getFileByName(content.name);
-																console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
-																if(file.name!= DeltaUtils.getProductConfigName())
-																	Utils.XHR("/"+user+"/"+repo+"/tree/"+branch.name,function(res){
-																		console.log("The sha:"+commitSha);
-																		Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
-																		 },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commitSha+"&placeholder_message=remove file");
-														    			commitSha=ghUserRepo.getLastCommit().sha;
-														    			console.log("new commit sha:"+commitSha);
-														    		},"GET");
-														    	else console.log(file.name+" not deleted");												
-														    }else{
-														         var dir=branch.getDirByName(content.name);
-														         DeltaUtils.deleteDirectories(dir, user,repo,token, commitSha, branch);	
-													        }
-												        });
-													},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+comm+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
+												       		DeltaUtils.deleteContent(ghUserRepo,content,branch,user, repo, token ,commitSha);
+												       });
+													},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commitSha+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
 												},"POST","authenticity_token="+encodeURIComponent(token));
 											});
 										}
@@ -2621,35 +2602,31 @@ DeltaUtils.getCommitContent=function(authorRepo,ghuser,shaToFetch,featureName){
 }
 
 
-DeltaUtils.deleteBranchContents=function(user, repo, token, commit, branch,callback){
-	console.log("deleteBranchContents for: "+branch.name);
-	console.log(commit);
-	branch.fetchContents(function (err, res) {
-        if(err) { throw "outch ..." }
-        branch.eachContent(function(content){
-	       if(content.type=="file"){ 
-				console.log("contnet "+content.name);
-				console.log(content);
-				//var file=branch.getFileByName(content.name);
-				console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
-				var file= branch.getFileByName(content.name);
-					Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
-					commit=jQuery(res).find("input[name='commit']").attr("value");
-					//Utils.XHR("/"+user+"/"+repo+"/delete/"+branch.name+"/"+content.path,function(res){
-					Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(){
-						    	window.location.href="/"+user+"/"+repo;
-						 },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commit+"&placeholder_message=remove file");
-			    		//},"POST","authenticity_token="+encodeURIComponent(token));
-		    		},"GET");
-				
-				
-		    }else{
-	         	var dir=branch.getDirByName(content.name);
-	         	DeltaUtils.deleteDirectories(dir, user,repo,token, commit, branch);	
-	        }
-        });
-	});
+DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha){
+	if(content.type=="file"){ 
+		console.log("contnet "+content.name);
+		console.log(content);
+		//var file=branch.getFileByName(content.name);
+		console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
+		var file= branch.getFileByName(content.name);
+		console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
+		if(file.name!= DeltaUtils.getProductConfigName())
+			Utils.XHR("/"+user+"/"+repo+"/tree/"+branch.name,function(res){
+				console.log("The sha:"+commitSha);
+				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
+				},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commitSha+"&placeholder_message=remove file");
+				commitSha=ghUserRepo.getLastCommit().sha;
+				console.log("new commit sha:"+commitSha);
+			},"GET");
+
+		else console.log(file.name+" not deleted");		
+	}
+	else{
+		var dir=branch.getDirByName(content.name);
+		DeltaUtils.deleteDirectories(dir, user,repo,token, commitSha, branch);	
+	}
 }
+
 DeltaUtils.deleteDirectories=function(dir,user, repo, token, commit, branch){
 console.log("en deleteDirectories dirs for "+dir.name);
 //console.log(dir);

@@ -1,11 +1,9 @@
 package util;
 
 import java.util.LinkedList;
-//Base feature
-public class Stack {
-	private LinkedList<Object> data = 
-			new LinkedList<Object>();
 
+public class Stack {
+	private LinkedList<Object> data = new LinkedList<Object>();
 	public void push(Object obj) {
 		data.addFirst(obj);
 	}

@@ -2,20 +2,16 @@ package util;
 
 import java.util.LinkedList; 
 
-//UnderFlow Feature
 public   class  Stack {
 	
-	private LinkedList<Object> data = 
-			new LinkedList<Object>();
+	private LinkedList<Object> data = new LinkedList<Object>();
 
 	
-
 	private void  push__wrappee__master  (Object obj) {
 		data.addFirst(obj);
 	}
 
 	
-
 	public void push(Object obj) {
 		push__wrappee__master(obj);
 		count++;
@@ -30,15 +26,11 @@ public   class  Stack {
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return pop__wrappee__master(); 
-
+			return pop__wrappee__master();
 		}
-		else{
-			System.out.prinln("stack is empty");
+		else{ 
 			return null;
-
-		}
-
+			}
 	}
 
 	

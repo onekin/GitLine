@@ -25,10 +25,6 @@ scxmlResolver: function(ns){
 	if(ns=="scxml") 	return "http://www.w3.org/2005/07/scxml";
 },
 
-
-
-
-
 runFHComposition: function(configFileContent){
  	//alert("run FH");
 
@@ -78,134 +74,7 @@ runFHComposition: function(configFileContent){
 },
 
 
-downloadBranch: function(user, repo, branch){
 
-	try{
-		alert("download brach");
-
-		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
-		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/files/downloadBranch.sh");
-		
-		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
-		proc.init(shell);
-
-	//	var zipFile= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/files/"+branch+".zip";		
-		var downloadURL="https://github.com/"+user+"/"+repo+"/archive/"+branch+".zip";
-
-		//"Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/log.txt"
-		var zipFilePath=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/files";		
-		var zipFileName=branch+".zip";
-		var parameters =[zipFilePath,zipFileName, downloadURL];// [zipFile, downloadURL];
-		alert(parameters);
-
-		proc.run(true, parameters, parameters.length);
-		alert(proc.isRunning);//false
-		alert(proc.exitValue);//127
-		
-	}catch (err){
-		console.log("ERROR:"+err.message);
-		alert("ERROR callShellScript!:"+err.message);
-	}
-
-},
-
-
-
-checkExistsTargetAsState: function(arrayStates, arrayTargets){
-	for (var i=0;i<arrayTargets.length;i++){
-		var target=arrayTargets[i];
-		var find=false;
-		for (var j=0;j<arrayStates.length;j++){
-			var stateId=arrayStates[j];
-			if (target==stateId){
-				find=true;
-			}
-		}
-		if (find==false) return false;
-	}
-	return true;
-},
-
-checkDuplicateStateId: function(arrayStates){
-	for (var i=0;i<arrayStates.length;i++){
-		var stateIdi=arrayStates[i];
-		for (var j=0;j<arrayStates.length;j++){
-			if (j!=i){
-				var stateIdj=arrayStates[j];
-				if (stateIdi==stateIdj) return false;
-			}
-		}
-	}
-	return true;
-},
-
-FileValidation: function (file,name){
-
-	var arrayStates=[];
-	var numStates=0;
-	var parser=new DOMParser();	 
-	var xmlDoc=parser.parseFromString(file,"text/xml");
-
-	if(xmlDoc.documentElement.nodeName == "parsererror"){
-		alert("error while parsing file"+ name); 
-		return false; 
-	}
-
-	var nodes=xmlDoc.evaluate("//scxml:state",xmlDoc, githubdeltas_gmCompiler.scxmlResolver,6, null); 
-	for(var i=0;i<nodes.snapshotLength;i++){
-		var node=nodes.snapshotItem(i);
-		var id=node.getAttribute("id");
-		//check ids
-	}
-	
-	if ( githubdeltas_gmCompiler.checkDuplicateStateId(arrayStates)==false){
-		alert("Duplicate states exist!!!!");
-		return false;
-	}
-	var arrayTargets=[];
-	var numTargets=0;													//result type 6 is UNORDERED_NODE_SNAPSHOT_TYPE
-	var nodes=xmlDoc.evaluate("//scxml:state//scxml:transition",xmlDoc,githubdeltas_gmCompiler.scxmlResolver,6, null); 
-	for(var i=0;i<nodes.snapshotLength;i++){
-		//validations for the nodes
-	}	
-	return true;
-},
-
-
-
-
-
-
-runComposition: function (deltaString, baseScript){   
-	try{
-		
-		console.log("Hola Leti.Estas en runComposition");
-	//	alert("holaaaaa");
-		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		var pathToFiles=ProfilePath+ '/extensions/scxmlGitDelta@onekin.org/content/files/';
-	//	alert("path to files: "+pathToFiles);
-		githubdeltas_gmCompiler.writeToDisk(deltaString, pathToFiles+"delta.xml"); //write delta to disk
-		githubdeltas_gmCompiler.writeToDisk(baseScript, pathToFiles+"base.xml" ); //write base to disk
-		
-		console.log("paso call Shell");
-		
-		githubdeltas_gmCompiler.callShellScript();
-
-		console.log("readFrom file");
-		var xmlCode=githubdeltas_gmCompiler.readFromFile();
-		
-		console.log("Composition is done! XMLCode is:\n"+xmlCode);
-
-		//alert(xmlCode);
-		return xmlCode;
-		
-  }catch(err){
-		console.log(err.message);
-		alert("ERROR runComposition!:"+err.message);
-	}
-
- },
 
 callShellScript: function(){
 	try{
@@ -226,24 +95,20 @@ callShellScript: function(){
 		
 		proc.run(true, parameters, parameters.length);
 		
-		
-	
 	}catch (err){
 		console.log("ERROR:"+err.message);
 		alert("ERROR callShellScript!:"+err.message);
 		}
-
 },
-
-
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
+	//window.alert("en saveToDisk ");
 	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
-
+		//window.alert("Saving file in "+theFilePath);
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -259,7 +124,7 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 		converter.writeString(fileContent);
 		converter.close(); // this closes foStream
 	}catch(e){
-		alert("ERROR:"+e);
+		window.alert("ERROR:"+e);
 	}
 },
 
@@ -323,44 +188,41 @@ readFromFile: function(){
  
 },
 
-searchFilesInLocalFolder: function(pathToTheFolder){
-	try{
-		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-				
-	    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
-
-
-		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-	     folder.initWithPath(folderPath);
-
-	     var entries = folder.directoryEntries;
-		 var array = [];
-		 var listNames=[];
-		 var i=0;
-			while(entries.hasMoreElements())
-			{
-			  var entry = entries.getNext();
-			  entry.QueryInterface(Components.interfaces.nsIFile);
-			  array.push(entry);
-			  listNames[i]=array[i].leafName;
-			  i++;
-			}
-			//alert(array[0].leafName);
-			//alert(listNames);
-			return listNames;
-	}catch(e){
-		return null;
-	}
-},
 
 getLogFileContent:function(){
-
-
 	var logContent=githubdeltas_gmCompiler.readFilesFromLocal("content/product/log.txt");
 	return logContent;
 },
-
-readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles[i]
+searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/features"
+	try{
+		
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
+		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	     folder.initWithPath(folderPath);
+	     var entries = folder.directoryEntries;
+		 var array = [];
+		 var i=0;
+			while(entries.hasMoreElements()){
+			  var entry = entries.getNext();
+			  entry.QueryInterface(Components.interfaces.nsILocalFile);
+			  if(entry.isDirectory())//if it is a directory, keep on reading
+			  	githubdeltas_gmCompiler.searchFilesInLocalFolder(pathToTheFolder+"/"+entry.leafName, list);
+			  else{
+			  	array.push(entry);
+			    var nativePath=array[i].path;
+			    var relativePath=(nativePath.split("features/"))[1];
+			    list.push(relativePath);
+			    i++;
+			  }
+			}
+			return list;
+	}catch(e){
+		alert("error en searchFilesInLocalFolder: "+e);
+		return null;
+	}
+},
+readFilesFromLocal: function (pathToFile){//content/product/features/fileName
 	try{
 			var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 			
@@ -385,13 +247,15 @@ readFilesFromLocal: function (pathToFile){//content/product/features/"+listFiles
 			 istream.close();  
 			// alert("File Content");
 		 return str;//lines as string
-	}catch (err){ console.log("Error: "+err);
+	}catch (err){ 
+		console.log("Error en readFilesFromLocal: "+err);
+		
 		}
 },
 
 cleanProjectFolder: function(){
 	try{
-
+		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		shell.initWithPath(ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh");
@@ -399,15 +263,12 @@ cleanProjectFolder: function(){
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-
 		var projectHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 		
 		var parameters =[projectHome];//project home
-
-		
 		proc.run(true, parameters, parameters.length);
 
-		//alert(parameters);
+
 
 	}catch(err){
 
@@ -457,7 +318,7 @@ contentLoad: function(e) {
 	var unsafeWin=e.target.defaultView;
 	if (unsafeWin.wrappedJSObject) unsafeWin=unsafeWin.wrappedJSObject;
 
-	var unsafeLoc=new XPCNativeWrapper(unsafeWin, "location").location;
+	var unsafeLoc=new XPCNativeWrapper(unsafeWin,"location").location;
 	var href=new XPCNativeWrapper(unsafeLoc, "href").href;
 
 	if (
@@ -465,15 +326,12 @@ contentLoad: function(e) {
 		&& ( /^https:\/\/github\.com\/.*$/i.test(href) )
 		&& true
 	) {
-		var script=githubdeltas_gmCompiler.getUrlContents(
-			'chrome://scxmlGitDelta/content/githubdeltas.js'
-		);
-		//Leti: added new javascripts
-		/*var scriptDeflate=githubdeltas_gmCompiler.getUrlContents(
-			'chrome://githubdeltas/content/deflate.js'
-		);*/
+		var script=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/githubdeltas.js');
+		var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
 		
-		githubdeltas_gmCompiler.injectScript(script/*+"\n"+scriptDeflate*/, href, unsafeWin);
+		
+		githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
+		githubdeltas_gmCompiler.injectScript(script, href, unsafeWin);
 	}
 },
 
@@ -481,7 +339,7 @@ injectScript: function(script, url, unsafeContentWin) {
 	var sandbox, script, logger, storage, xmlhttpRequester;
 	var safeWin=new XPCNativeWrapper(unsafeContentWin);
 
-	sandbox=new Components.utils.Sandbox(safeWin);
+	sandbox=new Components.utils.Sandbox(safeWin);//set here api.github.com
 
 	var storage=new githubdeltas_ScriptStorage();
 	xmlhttpRequester=new githubdeltas_xmlhttpRequester(
@@ -499,14 +357,6 @@ injectScript: function(script, url, unsafeContentWin) {
 	sandbox.GM_addStyle=function(css) { githubdeltas_gmCompiler.addStyle(sandbox.document, css) };
 	sandbox.GM_setValue=githubdeltas_gmCompiler.hitch(storage, "setValue");
 	sandbox.GM_getValue=githubdeltas_gmCompiler.hitch(storage, "getValue");
-	
-	//Mi variable que ejecuta la composicion
-	sandbox.DeltaComposer=githubdeltas_gmCompiler.hitch(this, "runComposition");
-	//Mi variable que ejecuta la validación
-	sandbox.FileValidation=githubdeltas_gmCompiler.hitch(this, "FileValidation");
-	
-	//mi variable para download de los branches
-	sandbox.DownloadBranchFile=githubdeltas_gmCompiler.hitch(this, "downloadBranch");
 	
 	//mi variable para la composicion con FeatureHouse
 	sandbox.RunFHComposition=githubdeltas_gmCompiler.hitch(this, "runFHComposition");

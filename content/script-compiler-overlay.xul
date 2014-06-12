@@ -3,6 +3,7 @@
 
 <script type='application/x-javascript' src='chrome://scxmlGitDelta/content/xmlhttprequester.js'></script>
 <script type='application/x-javascript' src='chrome://scxmlGitDelta/content/prefman.js'></script>
+<script type='application/x-javascript' src='chrome://scxmlGitDelta/content/gh3.js'></script>
 <script type='application/x-javascript' src='chrome://scxmlGitDelta/content/script-compiler.js'></script>
 <script type='application/x-javascript' src='chrome://scxmlGitDelta/content/githubdeltas.js'></script>
 </overlay>

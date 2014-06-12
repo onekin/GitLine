@@ -737,6 +737,9 @@ jQuery.noConflict();
 		getCommits : function () { 
 			console.log("branch "+this.name+" returning commits");
 			return this.commits; },
+		getLastCommit : function () {
+			return this.commits[0];
+		},
 		getCommitBySha : function (sha) {
 			return _.find(this.commits, function (commit) {
 				return commit.sha == sha;
@@ -906,7 +909,7 @@ jQuery.noConflict();
 
 		},
 		fetchCommits : function (callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("dentroooo fetchCommits para Gh3 Repository");
+			console.log("dentroooo fetchCommits para Gh3 Repository "+this.name);
 			var that = this;
 			that.commits = [];
 
@@ -2332,6 +2335,7 @@ var InstallEController=function(){
 };
 
 
+/* BACKUP
 InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 
 	var docTile= document.title;// e.g. lemome88/SimpleRobot at de (de is branch)
@@ -2364,7 +2368,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 		//step 1: descargame todas las branches (para tenerlas listas a la hora de componer)
 		
 
-		/*ghRepo.fetch(function (err, res){
+		ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
 				ghRepo.eachBranch(function (branch) {
@@ -2373,7 +2377,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 		   	});
 		});//end descarga de branche
 
-		/*step 2: Ask for product configuration equation*/
+		//step 2: Ask for product configuration equation
 	
 		var productBranches=window.prompt("Please enter the configuration equation","");
 		console.log("window closed");
@@ -2477,7 +2481,71 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 							});
 						});
 				},"POST","authenticity_token="+encodeURIComponent(token));
+
+          	});
+        });
+   }
+};
+
 */
+
+
+InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
+
+	var docTile= document.title;// e.g. lemome88/SimpleRobot at de (de is branch)
+	var str=docTile.split("at ");
+	var currentBranch=str[1];
+	if(!currentBranch) currentBranch="master";
+	
+	if(act=="add"){
+		var obj=this;
+		var install=new ActionView();
+		install.setViewData({click:function(){obj.execute("run");}});
+		var render=install.render();
+		GitHub.injectIntoActions(render);
+	}else if(act=="run"){
+		var user=GitHub.getUserName(); 
+		var author=GitHub.getCurrentAuthor(); 
+		var repo=GitHub.getCurrentRepository();
+		var token=GitHub.getAuthenticityToken(); 	
+		var configFileContent="";
+		var error=false;
+		//clean projetc folder
+	
+		/*step 0: Clean profile folder*/
+		CleanProjectFolder();
+
+		var ghAuthor = new Gh3.User(author);
+    	var ghRepo = new Gh3.Repository(repo, ghAuthor);
+    	var productConfig="";
+    
+		/*step 1: Ask for product configuration equation*/
+	
+		var productBranches=window.prompt("Please enter the configuration equation","");
+		console.log("window closed");
+		if (productBranches!=null)
+			console.log("Config: "+productBranches);
+		else return;
+		var listBranches=productBranches.split(" ");
+		//Step 2: Precondition, check configuration equation correspond to branch names
+		
+		console.log("step 3");
+    	ghRepo.fetch(function (err, res){
+          if(err) { console.log("ERROR ghRepo.fetch"); }
+			ghRepo.fetchBranches(function (err, res) {
+				var ghBranch;
+				for (i=0; i<listBranches.length;i++){
+					ghBranch=ghRepo.getBranchByName(listBranches[i]);
+					if(ghBranch!=null){
+						productConfig+=ghBranch.name+" "+ghBranch.sha+"\n";
+						configFileContent+=ghBranch.name+"\n";
+					}else{ 
+						window.alert("No such feature in the repository: '"+listBranches[i]+"'");
+						error=true;
+						return;
+					}
+				}
+				DeltaUtils.downloadBranches(ghAuthor,ghRepo,configFileContent,productConfig);
           	});
         });
    }
@@ -2489,7 +2557,8 @@ var DeltaUtils={};
 
 DeltaUtils.currentBranch="master";
 
-
+DeltaUtils.productForkTimeOut="undefined";
+DeltaUtils.postProductTimeOut="undefined";
 
 DeltaUtils.sleep=function(millis){
   var date = new Date();
@@ -2515,25 +2584,47 @@ DeltaUtils.createDeltaXML=function(author,repo){
  return delta;
 }
 
-DeltaUtils.postNewProduct=function(branchName, user,repo,token,commitSha){//post en masterBranch o seedBranch
+DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en masterBranch o seedBranch
 	console.log("Listo para hacer POST del producto");
 	var listFiles=[];
 	listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
-	for (i=0; i<listFiles.length; i++){
-		Utils.XHR("/"+user+"/"+repo+"/new/"+branchName,function(res){
-			var file=listFiles[i];//file path
-			var splitPath=file.split("/");
-			var fileName=splitPath[(splitPath.length-1)];
-			console.log("ahora "+fileName+ " for path file "+file);
-			var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
-			fileContent=fileContent.trim();
-			Utils.XHR("/"+user+"/"+repo+"/create/"+branchName+"/"+file,function(res){
-			 //	window.location.href="/"+user+"/"+repo;
-			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&new_filename="+file+"&commit="+commitSha+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=New product");					
-		},"POST","authenticity_token="+encodeURIComponent(token));
-	}
+	console.log("lis files: "+listFiles);
+
+	var ghUser=new Gh3.User(user);
+	var ghUserRepo=new Gh3.Repository(repo,ghUser);
+	DeltaUtils.sleep(1000);
+	ghUserRepo.fetch(function (err, res) {
+		console.log(ghUserRepo);
+		if(err) { console.log("ERROR ghRepo.fetch");}
+		ghUserRepo.fetchBranches(function(err,res){
+			var master= ghUserRepo.getBranchByName(branchName);//master
+			master.fetchCommits(function(err,res){
+				var commit=master.getLastCommit().sha;
+				console.log("commit for postinf product "+commit);
+				for (i=0; i<listFiles.length; i++){
+					var file=listFiles[i];//file path
+					console.log("file: "+file);
+					var splitPath=file.split("/");
+					var fileName=splitPath[(splitPath.length-1)];
+					console.log("ahora "+fileName+ " for path file "+file);
+					var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+					fileContent=fileContent.trim();
+					DeltaUtils.postFile(user,repo,branchName,fileName,file,commit,token,fileContent);
+				}
+			});
+		});
+	});
 }
 
+DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fileContent){
+	Utils.XHR("/"+user+"/"+repo+"/tree/"+branchName,function(res){
+		Utils.XHR("/"+user+"/"+repo+"/new/"+branchName,function(res){
+			Utils.XHR("/"+user+"/"+repo+"/create/"+branchName+"/"+file,function(res){
+				window.location.href="/"+user+"/"+repo+"/tree/master";
+			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&new_filename="+file+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message=New product");					
+		},"POST","authenticity_token="+encodeURIComponent(token));
+	},"GET");
+}
 
 
 
@@ -2604,11 +2695,10 @@ DeltaUtils.getCommitContent=function(authorRepo,ghuser,shaToFetch,featureName){
 }
 
 
-DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha){
+DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha){//tiene set timeOut para el post product
 	if(content.type=="file"){ 
 		console.log("contnet "+content.name);
 		console.log(content);
-		//var file=branch.getFileByName(content.name);
 		console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
 		var file= branch.getFileByName(content.name);
 		console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
@@ -2616,7 +2706,11 @@ DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token
 			Utils.XHR("/"+user+"/"+repo+"/tree/"+branch.name,function(res){
 				console.log("The sha:"+commitSha);
 				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
-					//si es el ultimo content llamar a postProduct
+					if(DeltaUtils.postProductTimeOut!="undefined")
+					   window.clearTimeout(DeltaUtils.postProductTimeOut);
+					DeltaUtils.postProductTimeOut=window.setTimeout(function(){
+						DeltaUtils.postNewProduct("master",user,repo,token);//......
+					},3000);
 				},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commitSha+"&placeholder_message=remove file");
 				commitSha=ghUserRepo.getLastCommit().sha;
 				console.log("new commit sha:"+commitSha);
@@ -2655,23 +2749,12 @@ console.log("en deleteDirectories dirs for "+dir.name);
 DeltaUtils.downloadBranches=function(ghAuthor,ghRepo,configFileContent,productConfig){
 	var branchToFetch;
 	var listBranches=configFileContent.split("\n");
-	console.log("downloading branches. List branches:"+listBranches.length);
-	for(var i=0; i<listBranches.length-1;i++){
+	console.log("downloading branches. List branches:"+listBranches.length);// 3 for master and underFlow
+	for(var i=0; i<listBranches.length-1;i++){//2 vueltas
 		branchToFetch=ghRepo.getBranchByName(listBranches[i]);
-		if(i==listBranches.length-2){
-			console.log("VAMOOOOOOOS");
-			//DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);
-			branchToFetch.fetchContents(function (err,res){
-				DeltaUtils.extractBranchContents(branchToFetch);//,true,ghAuthor,ghRepo,configFileContent,productConfig);	
-			});
-			
-		}else{
-		 //if(i==listBranches.length-1) DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);
-		 //else 
-		 DeltaUtils.extractBranchContents(branchToFetch);
-		}
+		DeltaUtils.extractBranchContents(branchToFetch,ghAuthor,ghRepo,configFileContent,productConfig);
+		//DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);	has a timeout
 	}
-	console.log("finished download branches");
 }
 
 DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig){
@@ -2682,13 +2765,10 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 	var repo=GitHub.getCurrentRepository();
 	var token=GitHub.getAuthenticityToken(); 
 
-
-			console.log("step 4");
-			RunFHComposition(configFileContent);	
-			console.log("step 4.1");
+	//RunFHComposition(configFileContent);	
 			var listFiles=[];
 			listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
-			console.log(listFiles);
+			console.log("Files in feature folder to post:"+listFiles);
 			if(listFiles==null) {
 				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
 				return;
@@ -2706,14 +2786,14 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 					console.log("step 6");
 					var ghUser = new Gh3.User(user);
 					var ghUserRepo = new Gh3.Repository(repo, ghUser);
-					console.log(ghUserRepo);
 					ghUserRepo.fetch(function (err, res) {
 						console.log(ghUserRepo);
 						if(err) { console.log("ERROR ghRepo.fetch");}
 						ghUserRepo.fetchCommits(function(err,res){//get the last commit
-							var commit=ghUserRepo.getLastCommit();
-							console.log("commit:"+commit);
-							var commitSha=commit.sha;
+							var commit1=ghUserRepo.getLastCommit();
+							console.log(ghUserRepo);
+							console.log("last commit :"+commit1);
+							//var commitSha=commit1.sha;
 								ghUserRepo.fetchBranches(function (err, res){
 									if(err) console.log("error on fetch branches: "+err);
 									var branches= ghUserRepo.getBranches();
@@ -2724,41 +2804,44 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 												console.log("deleted branch "+branch.name);
 											},"DELETE",token);
 										}else{
-											//delete files for the default branch
+
 											console.log("deleteBranchContents for: "+branch.name);
-											console.log(commitSha);
+											//console.log("commit (used for post product.config)"+commitSha);
 											branch.fetchContents(function (err, res) {//for master branch only
 										        if(err) { throw "outch ..." }
-										        //POST product config
-										    	Utils.XHR("/"+user+"/"+repo+"/tree/"+productBranch,function(res){
-													Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
-														var comm=jQuery(res).find("input[name='commit']").attr("value");
-														console.log("commit: "+comm);
-														Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
-													       branch.eachContent(function(content){
-													       		DeltaUtils.deleteContent(ghUserRepo,content,branch,user, repo, token ,commitSha);
-													       		var b=ghUserRepo.getBranchByName("master");
-													      		b.fetchContents(function(err,res){
-													       			console.log("contents len del branch: "+b.getContents().length);
-													       			//if(branch.getContents().length ==1)
-													       			//	DeltaUtils.postNewProduct("master",user,repo,token,commitSha);
-													       		});
-													       });
-														},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commitSha+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
-													},"POST","authenticity_token="+encodeURIComponent(token));
-												},"GET");
+										    	//branch.fetchCommits(function(err,res){
+										    		var commit=branch.sha; // = jQuery(res).find("input[name='commit']").attr("value");
+													console.log("new commmit (not used): "+commit);
+											    	Utils.XHR("/"+user+"/"+repo+"/tree/"+productBranch,function(res){    //POST product config
+														Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
+																Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
+															        branch.eachContent(function(content){//DELETE EACH CONTENT
+															       		branch.fetchCommits(function(err,res){
+															       			var lastCommit=branch.getLastCommit();
+															       			console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
+															       			DeltaUtils.deleteContent(ghUserRepo,content,branch,user, repo, token ,lastCommit.sha);
+																       		//var b=ghUserRepo.getBranchByName("master");
+																      		//b.fetchContents(function(err,res){
+																       		//	console.log("contents len del branch: "+b.getContents().length);
+																       			//if(branch.getContents().length ==1)
+																       				//DeltaUtils.postNewProduct("master",user,repo,token,commitSha);
+																       		//});
+															       		});
+																    });
+																},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File");					
+														},"POST","authenticity_token="+encodeURIComponent(token));
+													},"GET");
+												//});
 											});
-											console.log("after deleting contents");
 										}
 									});
-									console.log("after each branch");
 								});
 						});
 					});
 			},"POST","authenticity_token="+encodeURIComponent(token));
 }
 
-DeltaUtils.extractBranchContents=function(branch,last, ghAuthor,ghRepo,configFileContent,productConfig){
+DeltaUtils.extractBranchContents=function(branch, ghAuthor,ghRepo,configFileContent,productConfig){
 	console.log("extractBranchContents for "+branch.name);
 	branch.fetchContents(function (err, res) {
         if(err) { throw "outch ..." }
@@ -2770,23 +2853,24 @@ DeltaUtils.extractBranchContents=function(branch,last, ghAuthor,ghRepo,configFil
 	         	file.fetchContent(function (err, res) {
 					if(err) { console.log( "outch extractBranchContents..."); }
 					 console.log("saving: "+file.path);
-					 SaveToDisk(file.getRawContent(),file.name,branch.name);
-					 console.log("after extractBranchContents");
-					 
-					 if(last){
-					 	console.log("LLAMAR A PRODUCT FORK");
-					 	DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);
-					 }
-					});
+					if(DeltaUtils.productForkTimeOut!="undefined")
+						window.clearTimeout(DeltaUtils.productForkTimeOut);
+					DeltaUtils.productForkTimeOut=window.setTimeout(function (){
+					RunFHComposition(configFileContent);
+					DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);
+						},3000);
+					SaveToDisk(file.getRawContent(),file.name,branch.name);//SAVE TO DISC! 
+					
+				});
 		    }else{
 	         	console.log(content.name+" is a dir");
 	         	var dir=branch.getDirByName(content.name);
-	         	DeltaUtils.iterateDirs(dir,branch.name);	
+	         	DeltaUtils.iterateDirs(dir,branch.name,ghAuthor,ghRepo,configFileContent,productConfig);	
 	        }
         });
 	});
 }
-DeltaUtils.iterateDirs=function(dir,branchName){
+DeltaUtils.iterateDirs=function(dir,branchName,ghAuthor,ghRepo,configFileContent,productConfig){
 console.log("en iterate dirs for "+dir.name+ "and branhc "+branchName);
 //console.log(dir);
 	dir.fetchContents(function (err, res) {
@@ -2798,8 +2882,14 @@ console.log("en iterate dirs for "+dir.name+ "and branhc "+branchName);
 				//console.log(file2);
 				file2.fetchContent(function (err, res) {
 					if(err) { throw "outch ..." }
-					console.log("saving: "+file2.path);
+					if(DeltaUtils.productForkTimeOut!="undefined")
+						window.clearTimeout(DeltaUtils.productForkTimeOut);
+					DeltaUtils.productForkTimeOut=window.setTimeout(function (){
+						RunFHComposition(configFileContent);
+						DeltaUtils.productFork(ghAuthor,ghRepo,configFileContent,productConfig);
+					},3000);
 					SaveToDisk(file2.getRawContent(),file2.path,branchName);
+					
 				});
 			}
 			else{//if it is a dir
@@ -2825,7 +2915,7 @@ Utils.XHR=function(url,f,method,params){
 
  if(method=="DELETE"){
  //	console.log("method delete "+url+"   "+params);
- 	xhr.open("DELETE", url, false);
+ 	xhr.open("DELETE", url, true);
  	if(params!=null){
  		console.log(params);
         xhr.setRequestHeader("X-CSRF-Token",params);
@@ -2836,13 +2926,13 @@ Utils.XHR=function(url,f,method,params){
  else{
 	 		
 	 		if(method=="POST"){ //it's a post
-	 			xhr.open("POST",url+"?"+params,false);
+	 			xhr.open("POST",url+"?"+params,true);
 	 			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	 			xhr.setRequestHeader("Pragma","no-cache");
 	 			
 	 		}
 		 	else{
-		 		xhr.open("GET", url, false);
+		 		xhr.open("GET", url, true);
 		 		xhr.setRequestHeader("Pragma","no-cache");
 		 		
 		 	}
@@ -2853,7 +2943,7 @@ Utils.XHR=function(url,f,method,params){
   if (xhr.readyState === 4) {
     if (xhr.status === 200) {
         debugger;
-      f(xhr.responseText,xhr);
+        f.apply(xhr.responseText,xhr);//
     } else {
       console.error("error on XHR onload");
       console.error(xhr.statusText);

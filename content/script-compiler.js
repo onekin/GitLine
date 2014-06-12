@@ -326,15 +326,12 @@ contentLoad: function(e) {
 		&& ( /^https:\/\/github\.com\/.*$/i.test(href) )
 		&& true
 	) {
-		var script=githubdeltas_gmCompiler.getUrlContents(
-			'chrome://scxmlGitDelta/content/githubdeltas.js'
-		);
-		//Leti: added new javascripts
-		/*var scriptDeflate=githubdeltas_gmCompiler.getUrlContents(
-			'chrome://githubdeltas/content/deflate.js'
-		);*/
+		var script=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/githubdeltas.js');
+		var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
 		
-		githubdeltas_gmCompiler.injectScript(script/*+"\n"+scriptDeflate*/, href, unsafeWin);
+		
+		githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
+		githubdeltas_gmCompiler.injectScript(script, href, unsafeWin);
 	}
 },
 

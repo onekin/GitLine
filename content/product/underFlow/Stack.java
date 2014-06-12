@@ -15,4 +15,8 @@ public class Stack {
 			return null;
 			}
 	}
+	private void newMethod(){
+		//Asdadadadadada
+		//asdasdasda
+	}
 }

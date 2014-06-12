@@ -80,7 +80,6 @@ jQuery.noConflict();
 		return child;
 	};
 
-
 	Base64 = { //http://www.webtoolkit.info/javascript-base64.html
 
 		// private property
@@ -1764,11 +1763,12 @@ ShowFeatureUpdatesView.prototype.setViewData=function(params){
 this.click=params.click;
 };
 ShowFeatureUpdatesView.prototype.render=function(features){
-// console.log("En render ShowFeatureUpdatesView: "+features);
+ console.log("En render ShowFeatureUpdatesView: "+features);
 var obj=this;
 var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
 
 var tab=GitHub.applyTemplate(tabTemplate,features);//get updated Features
+
  tab.getElementsByTagName("a")[1].addEventListener("click",function(ev){
  ev.preventDefault();
  ev.stopPropagation();
@@ -2096,7 +2096,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				ghRepo.fetchBranches(function (err, res) {
 					//console.log(ghRepo);
 					var master=ghRepo.getBranchByName("master");
-					master.fetchContents(function (err, res) {
+					master.fetchContents(function (err, res) {//step1: fetch product.config
 			          if(err) { throw "outch ..." }
 			          var productConfigFile = master.getFileByName(DeltaUtils.getProductConfigName());
 			      	  if(productConfigFile==null){
@@ -2107,41 +2107,72 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 			      	  	//Step 2: leer contenido del product config
 			      	  	productConfigFile.fetchContent(function (err, res) {
 	            			if(err) { throw "outch ..." }
-	           				 //console.log("Content: "+productConfigFile.getRawContent());
 	           				//Step 2.1 parse productConfig File
 	           				var lines=productConfigFile.getRawContent().split("\n");
 	           				var colums;
-	           				var i;
+	           				
 	           				var bsha;
 	           				var branches,commits;
-	           				ghAuthorRepo.fetch(function (err, res) {
+	           				ghAuthorRepo.fetch(function (err, res) {//Step 3: fetch author repo
 	         				if(err) { console.log("ERROR ghRepo.fetch"); }
 	         				else{
-	         					 	var branch;
-	         					 	ghAuthorRepo.fetchBranches(function (err, res){
-	         					 		for(i=0;i<lines.length;i++){
+	         					 	ghAuthorRepo.fetchBranches(function (err, res){//fetch author branches
+	         					 		//for each branch get commit messages
+	         					 		for(var i=0;i<lines.length;i++){
 				           					colums=lines[i].split(" ");
 				         					branches=colums[0];
 				         					commits=colums[1];
-				         					branch=ghAuthorRepo.getBranchByName(branches);
+				         					var branch=ghAuthorRepo.getBranchByName(branches);
 				         					if(branch!=null){
 				         					 	if(branch.sha!=commits){//is not up to date?
 				         					 		bsha=branch.sha;
 				         					 	  	featuresChanged+=branches+" "+commits+"\n";
-				         					 	  	console.log( "changed to sha: "+bsha);
+				         					 	  	console.log( branch.name+" changed to sha: "+bsha);
 				         					 	  	var tope=commits;
-				         					 	  	console.log(branch);
-				         					 	  	var b2=branch;
-				         					 	  	//(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged)
-				         					 	  	DeltaUtils.getUpdateMessagesFromBanch(b2,bsha,tope,i,lines.length,commitMessages,user,author,featuresChanged);
+				         					 	  //	var nb=branch;
+				         					 	  	//	var msg=DeltaUtils.getUpdateMessagesFromBanch(b2,bsha,tope,i,lines.length,commitMessages,user,author,featuresChanged);
+				         					 		branch.fetchCommits(function (err, res) {				         					 	  		
+														//console.log("Lengh "+len+" and loop number: "+iteration);
+														console.log("RES");
+														console.log(res);
+														console.log("commits for branch"+ res.name);
+														console.log(res.getCommits());
+														var com=res.getCommitBySha(bsha);
+														console.log("commit: "+com);
+														var j=1;
+														var msg;
+														var commitsMsgsPerBranch=[];
+														while(tope!=com.sha){//get all commits messages for a feature
+															console.log("Message:");
+															console.log(com.message);
+															msg=msg+"<h5>Update "+j+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
+															com=res.getCommitBySha(com.parents[0].sha);
+															j++;
+														}
+														commitsMsgsPerBranch[i]=msg;
+														console.log("commitsMsgsPerBranch "+res.name);
+														console.log(commitsMsgsPerBranch);
+													//	console.log("llamar al render");
+								         				
+								         				/*var params;
+														var render;
+														// console.log("messages:" + commitMessages);
+														console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
+														if(featuresChanged=="") return;//featuresChanged=null;
+														//add notifications to GitHub
+														var featureUp=new ShowFeatureUpdatesView();
+														featureUp.setViewData({click:function(){obj.execute("run");}});
+														params=[featuresChanged,user,author,commitsMsgsPerBranch];
+														render=featureUp.render(params);//pasarle parametros al render
+														GitHub.injectIntoShowFeatureUpdates(render);*/
+													});
 				         					 	}//if
 				         					}//if
 				         				}//end for
-				         				//aqui
-				         				
+				         				console.log("END FOR");
 	         					 	});
-	         					 }
-	         					});
+	         					}
+	         				});
 	           			});
 			      	  }
 			      	});
@@ -2423,10 +2454,39 @@ DeltaUtils.getProductShadowBranchName=function(){
 	return name;
 }
 
-DeltaUtils.createDeltaXML=function(author,repo){
- var delta='<delta id="delta_name" core="https://github.com/'+author+'/'+repo+'">\n';
- delta=delta+'</delta>';
- return delta;
+DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged){
+	var nb=b;
+	nb.fetchCommits(function (err, res) {				         					 	  		
+		console.log("Lengh "+len+" and loop number: "+iteration);
+		console.log(nb);
+		console.log(nb.getCommits());
+		var com=nb.getCommitBySha(bsha);
+		console.log("com: "+com);
+		var i=1;
+		var msg;
+		while(tope!=com.sha){//get all commits messages for a feature
+			console.log("Message:");
+			console.log(com.message);
+			msg=msg+"<h5>Update "+i+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
+			com=nb.getCommitBySha(com.parents[0].sha);
+			i++;
+		}
+		/*if(iteration==(len-2)){
+				var params;
+				var render;
+				// console.log("messages:" + commitMessages);
+				console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
+				if(featuresChanged=="") return;//featuresChanged=null;
+				//add notifications to GitHub
+				var featureUp=new ShowFeatureUpdatesView();
+				featureUp.setViewData({click:function(){obj.execute("run");}});
+				params=[featuresChanged,user,author,commitMessages];
+				render=featureUp.render(params);//pasarle parametros al render
+				GitHub.injectIntoShowFeatureUpdates(render);
+		}*/
+		return msg;
+
+	});
 }
 
 DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en masterBranch o seedBranch
@@ -2488,40 +2548,7 @@ DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f){
 	},"GET");
 }
 
-DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged){
-	var nb=b;
-	nb.fetchCommits(function (err, res) {				         					 	  		
-		console.log("Lengh "+len+" and loop number: "+iteration);
-		console.log(nb);
-		console.log(nb.getCommits());
-		var com=nb.getCommitBySha(bsha);
-		console.log("com: "+com);
-		var i=1;
-		var msg;
-		while(tope!=com.sha){
-			console.log("Message:");
-			console.log(com.message);
-			msg=msg+"<h5>Update "+i+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
-			com=nb.getCommitBySha(com.parents[0].sha);
-			i++;
-		}
-		if(iteration==(len-2)){
-				var params;
-				var render;
-				// console.log("messages:" + commitMessages);
-				console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
-				if(featuresChanged=="") return;//featuresChanged=null;
-				//add notifications to GitHub
-				var featureUp=new ShowFeatureUpdatesView();
-				featureUp.setViewData({click:function(){obj.execute("run");}});
-				params=[featuresChanged,user,author,commitMessages];
-				render=featureUp.render(params);//pasarle parametros al render
-				GitHub.injectIntoShowFeatureUpdates(render);
-		}
-		return msg;
 
-	});
-}
 
 DeltaUtils.getCommitContent=function(authorRepo,ghuser,shaToFetch,featureName){
 	console.log("en getCommitContent");

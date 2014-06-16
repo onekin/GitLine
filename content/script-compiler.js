@@ -327,10 +327,10 @@ contentLoad: function(e) {
 		&& true
 	) {
 		var script=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/githubdeltas.js');
-		//var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
+		var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
 		
 		
-		//githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
+		githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
 		githubdeltas_gmCompiler.injectScript(script, href, unsafeWin);
 	}
 },

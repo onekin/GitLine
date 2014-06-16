@@ -1367,21 +1367,17 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var user=parameter[1];
 						    var author=parameter[2];
 						    var commitMessages=parameter[3];
-						   // var msgs=commitMessages.split("\n");
-						   // console.log("Msgs: "+msgs.length);
-						    //console.log("Mensajes Commits:"+commitMessages);
+						   
 						    var line;
-						  //  console.log("list: "+list);
-						   // console.log("feature lengh:"+list.length);
+						  
+						  
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
-						    //	console.log("line: "+line);
-						    //	console.log("compare/"+author+':'+line[1]+'...'+author+'...'+line[0]);
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Feature '+line[0]+ ' has updates!</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Propagate Updates from Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
 						    }
-						    html+="</div></ul>";
-						    tabTemplate.innerHTML=html;//'<div class="select-menu js-menu-container js-select-menu"><a class="minibutton primary add-button" href="">New Forward Propagation</a></div>';
+						    html+="</div>";
+						    tabTemplate.innerHTML=html;
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
@@ -2129,47 +2125,11 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         					 	  	featuresChanged+=branches+" "+commits+"\n";
 				         					 	  	console.log( branch.name+" changed to sha: "+bsha);
 				         					 	  	var tope=commits;
-				         					 	  //	var nb=branch;
-				         					 	  	//	var msg=DeltaUtils.getUpdateMessagesFromBanch(b2,bsha,tope,i,lines.length,commitMessages,user,author,featuresChanged);
-				         					 		branch.fetchCommits(function (err, res) {				         					 	  		
-														//console.log("Lengh "+len+" and loop number: "+iteration);
-														console.log("RES");
-														console.log(res);
-														console.log("commits for branch"+ res.name);
-														console.log(res.getCommits());
-														var com=res.getCommitBySha(bsha);
-														console.log("commit: "+com);
-														var j=1;
-														var msg;
-														var commitsMsgsPerBranch=[];
-														while(tope!=com.sha){//get all commits messages for a feature
-															console.log("Message:");
-															console.log(com.message);
-															msg=msg+"<h5>Update "+j+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
-															com=res.getCommitBySha(com.parents[0].sha);
-															j++;
-														}
-														commitsMsgsPerBranch[i]=msg;
-														console.log("commitsMsgsPerBranch "+res.name);
-														console.log(commitsMsgsPerBranch);
-													//	console.log("llamar al render");
-								         				
-								         				/*var params;
-														var render;
-														// console.log("messages:" + commitMessages);
-														console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
-														if(featuresChanged=="") return;//featuresChanged=null;
-														//add notifications to GitHub
-														var featureUp=new ShowFeatureUpdatesView();
-														featureUp.setViewData({click:function(){obj.execute("run");}});
-														params=[featuresChanged,user,author,commitsMsgsPerBranch];
-														render=featureUp.render(params);//pasarle parametros al render
-														GitHub.injectIntoShowFeatureUpdates(render);*/
-													});
-				         					 	}//if
-				         					}//if
-				         				}//end for
-				         				console.log("END FOR");
+				         					 	  	//fetch and display commit messages for features not up-to
+				         					 	  	DeltaUtils.fetchMessagesForFeature(branch,tope);
+				         					 	  }
+				         					 }
+				         				}
 	         					 	});
 	         					}
 	         				});
@@ -2244,7 +2204,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		      	  else{
 		      	  	console.log(222);
 		      	  	//step 2: leer el product config
-		      	  	productConfigFile.fetchContent(function (err, res) {
+		      	  	productConfigFile.fetchContent(function (err, res){
             			if(err) { throw "outch ..." }
            				console.log("Config File Content: "+productConfigFile.getRawContent());
            			 	var ghAuthor= new Gh3.User(author);
@@ -2271,7 +2231,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 		           				for (i=0; i<lines.length-1; i++){
 		           					var l=lines[i];
 		           					colums=l.split(" ");
-		           					console.log("analizing product feature: "+l);
+		           					console.log("analyzing product feature: "+l);
 		           					branches.push(colums[0]);//branch-feature
 		           					//step 3: descargarse los branches con el commit adecuado y el updated branch actual //https://github.com/lemome88/stack/tree/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81
 		           					configFileContent+=branches[i]+"\n";
@@ -2443,6 +2403,55 @@ DeltaUtils.sleep=function(millis){
   while(curDate-date < millis);
 }
 
+DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
+	console.log("retrieving commit messages for feature: "+branch.name);
+	var user=GitHub.getUserName(); 
+	var repo=GitHub.getCurrentRepository();
+	var forked=GitHub.getForkedFrom().split("/");
+	var author=forked[0]; 
+	branch.fetchCommits(function (err, res) {				         					 	  												
+		//console.log("commits for branch"+ res.name);//res=branch
+		//console.log(res.getCommits());
+		var com=res.getCommits()[0];//.getLastCommit();//res.getCommitBySha(bsha); branch.getLastCommit()
+		console.log("commit for "+branch.name);
+		//console.log(com);
+		var j=1;
+		var msg="";
+		//msg="<div id='commits_bucket' class='tab-content'><thead><tr><th class='timeline-commits-header' colspan='4'><span class='octicon octicon-calendar'></span>"+branch.name+"</th></thead><tbody>";
+		msg='<h3 class="commit-group-heading">'+'Feature '+branch.name+' new commits</h3>';
+		msg=msg+'<ol class="commit-group">';
+		while(sinceCommit!=com.sha){//get all commits messages for a feature
+			console.log("com");
+			console.log(com);
+			console.log("Message:");
+			console.log(com.message);
+			//original
+			//msg=msg+"<h5>Update "+j+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
+		
+			msg=msg+'<li class="commit commit-group-item js-navigation-item js-details-container">';
+			msg=msg+'<img class="gravatar" width="36" height="36" src="https://2.gravatar.com/avatar/405f5d2af7dd000b91c22a5920dcc565?d=https%3A%2F%2Fassets-cdn.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png&r=x&s=140" alt="">';
+			msg=msg+'<p class="commit-title js-pjax-commit-title">';
+			msg=msg+'<a class="message" title="'+com.message+'" data-pjax="true" href="/'+user+'/'+repo+'/commit/'+com.sha+'">'+com.message+'</a></p>';
+			msg=msg+'<div class="commit-meta"><div class="authorship">';
+			msg=msg+'<span class="author-name"><a rel="contributor" href="/'+author+'"> '+author+' </a></span> authored <time is="relative-time" datetime="'+com.date+'" title="'+com.date+'">'+com.date+'</time></div></div>';
+			msg=msg+'</li>';
+
+			com=branch.getCommitBySha(com.parents[0].sha);
+			console.log("new commit:"+com.sha);//res.getCommitBySha(com.parents[0].sha);
+			console.log(branch.name+"  message "+j+" "+msg);
+			j++;	
+		}
+		var params;
+		var render;
+		msg=msg+'</ol>';
+		var featureUp=new ShowFeatureUpdatesView();
+		featureUp.setViewData({click:function(){obj.execute("run");}});
+		params=[branch.name+" "+sinceCommit+"\n",user,author,msg];
+		render=featureUp.render(params);//pasarle parametros al render
+		GitHub.injectIntoShowFeatureUpdates(render);
+	});
+
+}
 
 DeltaUtils.getProductConfigName=function(){
 	var name="product.config";
@@ -2471,19 +2480,6 @@ DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitM
 			com=nb.getCommitBySha(com.parents[0].sha);
 			i++;
 		}
-		/*if(iteration==(len-2)){
-				var params;
-				var render;
-				// console.log("messages:" + commitMessages);
-				console.log("featuresChanged 1212: "+featuresChanged ); //+ "  "+branch.sha);
-				if(featuresChanged=="") return;//featuresChanged=null;
-				//add notifications to GitHub
-				var featureUp=new ShowFeatureUpdatesView();
-				featureUp.setViewData({click:function(){obj.execute("run");}});
-				params=[featuresChanged,user,author,commitMessages];
-				render=featureUp.render(params);//pasarle parametros al render
-				GitHub.injectIntoShowFeatureUpdates(render);
-		}*/
 		return msg;
 
 	});

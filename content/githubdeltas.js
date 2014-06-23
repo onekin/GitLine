@@ -232,10 +232,17 @@ jQuery.noConflict();
 		protocol : "https",
 		domain : "api.github.com",
 		callHttpApi : function (apiParams) {
-			apiParams.url = Gh3.Helper.protocol + "://" + Gh3.Helper.domain + "/" + apiParams.service;
+			console.log("api params");
+			console.log(apiParams);
+			apiParams.url = Gh3.Helper.protocol + "://" + Gh3.Helper.domain + "/" + apiParams.service+"?access_token="+DeltaUtils.getUserAccessToken();
+			//apiParams.access_token=DeltaUtils.getUserAccessToken;
+
 			if (jQuery.support.cors) {
 
-				//apiParams.headers = {Origin: location.host }//not needed, the browser will do it
+				//apiParams.headers = {Origin: "api.github.com" }//not needed, the browser will do it
+				
+				//apiParams.headers={Access_Token: DeltaUtils.getUserAccessToken()}
+				
 				
 				var success = apiParams.success
 				if (jQuery.isFunction(success)) {
@@ -537,7 +544,7 @@ jQuery.noConflict();
 			var that = this;
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,//"?ref="+that.branchName,
+				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,
 				data : {ref:that.branchName },
 				success : function(res) {
 					that.content = res.data.content;
@@ -610,7 +617,7 @@ jQuery.noConflict();
 			that.contents = [];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,//+"?ref="+that.branchName,
+				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,
 				data : {ref: that.branchName },
 				success : function(res) {
 					_.each(res.data, function (item) {
@@ -1920,15 +1927,15 @@ console.log("after");
 
 var lem = new Gh3.User("lemome88");
 console.log(lem);
-  var lemlog = new Gh3.Repository("stack", lem);
+var lemlog = new Gh3.Repository("notepad-spl", lem);
     lemlog.fetch(function (err, res) {
       if(err) { throw "outch ..." }
       console.log(lemlog);
        lemlog.fetchPullRequest(function(err,res){
        	console.log(lemlog.getPullRequests());
        });
-	});*/
-
+	});
+*/
 }; 
 
 //console.log("FORKED FROM: "+GitHub.getForkedFrom());
@@ -2401,6 +2408,10 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 
 var DeltaUtils={};
 
+DeltaUtils.getUserAccessToken=function(){
+	return "USER API TOKEN ";
+}
+
 DeltaUtils.currentBranch="master";
 
 DeltaUtils.productForkTimeOut="undefined";
@@ -2721,8 +2732,9 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 						console.log(ghUserRepo);
 						if(err) { console.log("ERROR ghRepo.fetch");}
 						ghUserRepo.fetchCommits(function(err,res){//get the last commit
-							var commit1=ghUserRepo.getLastCommit();
-							console.log(ghUserRepo);
+							console.log(res);
+							var commit1=res.getLastCommit();//ghUserRepo, ghRepo.getLastCommit
+							//console.log(ghUserRepo.getCommits());
 							console.log("last commit :"+commit1);
 							//var commitSha=commit1.sha;
 								ghUserRepo.fetchBranches(function (err, res){
@@ -2912,7 +2924,7 @@ Utils.XHR=function(url,f,method,params){
  else{
 	 		
 	 		if(method=="POST"){ //it's a post
-	 			xhr.open("POST",url+"?"+params,true);
+	 			xhr.open("POST",url,true);
 	 			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	 			xhr.setRequestHeader("Pragma","no-cache");
 	 			

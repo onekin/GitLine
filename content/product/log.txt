@@ -1,4 +1,40 @@
 Found the following features:
-master
-processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/master/Stack.java
-processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/master/doc/doc.txt
+undirectedWithEdges
+testProg
+Number
+connected
+Cycle
+MSTKruskal
+DFS
+weightedWithEdges
+weighted
+undirected
+withEdges
+base
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/undirectedWithEdges/GPL/Edge.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/undirectedWithEdges/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/undirectedWithEdges/GPL/Neighbor.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/undirectedWithEdges/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/testProg/GPL/Main.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Number/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Number/GPL/NumberWorkSpace.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Number/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/connected/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/connected/GPL/RegionWorkSpace.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/connected/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Cycle/GPL/CycleWorkSpace.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Cycle/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/Cycle/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/MSTKruskal/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/MSTKruskal/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/DFS/GPL/Graph.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/DFS/GPL/Vertex.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/DFS/GPL/WorkSpace.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/weightedWithEdges/GPL/Edge.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/weightedWithEdges/GPL/EdgeIfc.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/withEdges/images/Gen.jpg
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/GPL/EdgeIfc.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/GPL/EdgeIter.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/GPL/NeighborIfc.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/GPL/VertexIter.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/images/FopButton3.jpg

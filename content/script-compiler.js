@@ -219,6 +219,8 @@ searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/fea
 			return list;
 	}catch(e){
 		alert("error en searchFilesInLocalFolder: "+e);
+		alert(pathToTheFolder);
+		alert(list);
 		return null;
 	}
 },

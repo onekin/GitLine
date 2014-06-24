@@ -507,8 +507,8 @@ jQuery.noConflict();
 			that.contents = [];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.author.login+"/"+repositoryName+"/contents?ref="+that.sha,
-				//data : {ref:that.sha },
+				service : "repos/"+that.author.login+"/"+repositoryName+"/contents",//?ref="+that.sha,
+				data : {ref:that.sha },
 				success : function(res) {
 					_.each(res.data, function (item) {
 					console.log("item "+item);
@@ -746,9 +746,10 @@ jQuery.noConflict();
 		getLastCommit : function () {
 			return this.commits[0];
 		},
-		getCommitBySha : function (sha) {
+		getCommitBySha : function (shaId) {
 			return _.find(this.commits, function (commit) {
-				return commit.sha == sha;
+				if (commit.sha == shaId)//that.s
+					return commit;
 			});
 		},
 		reverseContents : function () {
@@ -1022,8 +1023,8 @@ jQuery.noConflict();
 			that.commits=[];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.name+"/commits?sha="+sha,
-				//data : {sha: that.sha },
+				service : "repos/"+that.user.login+"/"+that.name+"/commits",//?sha="+sha,
+				data : {sha: that.sha },
 				success : function(res) {
 					_.each(res.data, function (commit) {
 						that.commits.push(new Gh3.Commit(commit));
@@ -1044,13 +1045,11 @@ jQuery.noConflict();
 			that.blob=[];
 
 			Gh3.Helper.callHttpApi({
-				service : "repos/"+that.user.login+"/"+that.name+"/blobs?sha="+sha,
-				//data : {sha: that.sha },
+				service : "repos/"+that.user.login+"/"+that.name+"/blobs",//?sha="+sha,
+				data : {sha: sha },
 				success : function(res) {
 					_.each(res.data, function (commit) {
 						that.commits.push(new Gh3.Commit(commit));
-						//console.log(commit);
-						//return (new Gh3.Commit(commit));
 					});
 					if (callback) callback(null, that);
 				},
@@ -1060,7 +1059,7 @@ jQuery.noConflict();
 			});
 
 		},
-		getCommitsFromShaSinceUntil : function (sha,since,until, callback) {//http://developer.github.com/v3/repos/commits/
+		/*getCommitsFromShaSinceUntil : function (sha,since,until, callback) {//http://developer.github.com/v3/repos/commits/
 			console.log("getCommitsFromShaSinceUntil Gh3 Repository");
 			var that = this;
 			that.commits = [];
@@ -1080,7 +1079,7 @@ jQuery.noConflict();
 				}
 			});
 
-		},
+		},*/
 		getBranches : function () { return this.branches; },
 		getPullRequests : function () { return this.pulls; },
 		getBranchByName : function (name) {
@@ -1115,7 +1114,8 @@ jQuery.noConflict();
 		getCommits : function () { return this.commits; },
 		getCommitBySha : function (sha) {
 			return _.find(this.commits, function (commit) {
-				return commit.sha == sha;
+				if (commit.sha == sha)
+					return commit;
 			});
 		},
 		getLastCommit : function () {
@@ -2296,7 +2296,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 				           				var featureSplit=fordwardFeature.split(":")[1];
 				           				//console.log("featureSplit: "+featureSplit);
 				           				var configFileContent="";//file for featureHouse composition
-				           				var newConfig="";
+				           				
 
 				           				//download features at commits stated in product.config file!
 				           				for (i=0; i<lines.length-1; i++){
@@ -2310,17 +2310,17 @@ ForwardPropagationEController.prototype.execute=function(act){
 				           					if(fordwardFeature!=colums[0]){//si no es la feature to update
 				           					  console.log("feature "+ branches[i]+ " remains equal");
 				           					  commits.push(colums[1]);
-				           					  newConfig+=colums[0]+" "+colums[1]+"\n";
+				           					  DeltaUtils.newSeedConfig+=colums[0]+" "+colums[1]+"\n";
 				           					  var shaToFetch=colums[1];
-				           					  DeltaUtils.getCommitContent(ghAuthor,authorRepo,ghAuthor, shaToFetch,branches[i],configFileContent,newConfig,true);
+				           					  DeltaUtils.getCommitContent(ghAuthor,authorRepo,ghAuthor, shaToFetch,branches[i],configFileContent,DeltaUtils.newSeedConfig,false,true);
 				           					}
 				           					else{ //para la feature que se tiene que actualizar
 				           					  //get updated files!!
 				           					  console.log("get updated files for "+ branches[i]+" and commit sha:"+colums[1]);
 				           					  commits.push(colums[1]);
-				           					  newConfig+=colums[0]+" "+colums[1]+"\n";
 				           					 var fetchBranch=authorRepo.getBranchByName(branches[i]);
-				           					 DeltaUtils.extractBranchContents(fetchBranch,ghAuthor,ghRepo,configFileContent,newConfig,false,true);
+				           					 DeltaUtils.newSeedConfig+=colums[0]+" "+fetchBranch.sha+"\n";
+				           					 DeltaUtils.extractBranchContents(fetchBranch,ghAuthor,ghRepo,configFileContent,DeltaUtils.newSeedConfig,false,true);
 				           					}
 						           		}//end for
 									});
@@ -2409,8 +2409,10 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 var DeltaUtils={};
 
 DeltaUtils.getUserAccessToken=function(){
-	return "USER API TOKEN ";
+	return "your token";
 }
+
+DeltaUtils.newSeedConfig="";
 
 DeltaUtils.currentBranch="master";
 
@@ -2549,6 +2551,18 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 	});
 }
 
+
+DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
+	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
+		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
+			Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
+
+			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
+		},"POST","authenticity_token="+encodeURIComponent(token));
+	},"GET");
+}
+
+
 DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fileContent,createBranches,createPullRequest,newOrUpdateMessage){
 	Utils.XHR("/"+user+"/"+repo+"/tree/"+branchName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/new/"+branchName,function(res){
@@ -2566,9 +2580,10 @@ DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fil
 							ghRepo.fetch(function(err,res){
 								ghRepo.fetchPullRequest(function(err,res){
 									var pull=ghRepo.getPullRequests()[0];
-									if(pull!="undefined")
+									window.location.href="/"+user+"/"+repo+"/pulls";
+								/*	if(pull!="undefined")
 										window.location.href="/"+user+"/"+repo+"/pull/"+pull.number;
-									else window.location.href="/"+user+"/"+repo+"/pulls/";
+									else window.location.href="/"+user+"/"+repo+"/pulls/";*/
 								});
 							});
 						},"POST","authenticity_token="+encodeURIComponent(token)+"&pull_request[title]=Update Feature "+branchName+"&repo="+user+"/"+repo+"&base="+user+":develop&head="+user+":seeds");   		
@@ -2592,13 +2607,23 @@ DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f){
 DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featureName,configFileContent,productConfig,isForwardProp){
 	console.log("en getCommitContent");
 	console.log("shaToFetch "+shaToFetch);
-	authorRepo.fetchCommitsFromSha(shaToFetch,function(err,res){
+
+	var featureBranch=authorRepo.getBranchByName(featureName);
+
+	featureBranch.fetchCommits(function(err,res){
 		if (err){ 
 			console.log("error on getCommitContent");
 			console.log(err);
 		}
 		else{
-			var commit=authorRepo.getCommitBySha(shaToFetch);
+			console.log("author repo Commits ");
+			console.log(res);//el commit
+
+			var commit=featureBranch.getCommitBySha(shaToFetch);//authorRepo.getCommitBySha
+			//
+			console.log("commit ");
+			console.log(commit);
+			//console.log(authorRepo);
 			commit.fetchContents(authorRepo.name, function(err,res){
 				console.log("commit object");
 				console.log(commit);
@@ -2630,36 +2655,41 @@ DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featu
 
 
 DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha,isProductFork,isForwardProp){//tiene set timeOut para el post product
+	console.log("isForwardProp= "+isForwardProp);
 	if(content.type=="file"){ 
 		console.log("contnet "+content.name);
 		console.log(content);
 		console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
 		var file= branch.getFileByName(content.name);
 		console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
-		if(file.name!= DeltaUtils.getProductConfigName())
+		if(file.name!= DeltaUtils.getProductConfigName()){
 			Utils.XHR("/"+user+"/"+repo+"/tree/"+branch.name,function(res){
 				console.log("The sha:"+commitSha);
-				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
-					if(isProductFork){
-						if(DeltaUtils.postProductTimeOut!="undefined")
-						   window.clearTimeout(DeltaUtils.postProductTimeOut);
-						DeltaUtils.postProductTimeOut=window.setTimeout(function(){
-							DeltaUtils.postNewProduct("master",user,repo,token);//......
-						},3000);
-					}
-					if(isForwardProp){
-						if(DeltaUtils.postProductTimeOut!="undefined")
-						   window.clearTimeout(DeltaUtils.postProductTimeOut);
-						DeltaUtils.postProductTimeOut=window.setTimeout(function(){
-							DeltaUtils.postNewProduct("seeds",user,repo,token);//......
-						},3000);
-					}
+				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){					
 				},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commitSha+"&placeholder_message=remove file");
 				commitSha=ghUserRepo.getLastCommit().sha;
 				console.log("new commit sha:"+commitSha);
 			},"GET");
-
+		}
 		else console.log(file.name+" not deleted");		
+		
+		if(isProductFork==true){
+			if(DeltaUtils.postProductTimeOut!="undefined")
+				window.clearTimeout(DeltaUtils.postProductTimeOut);
+			DeltaUtils.postProductTimeOut=window.setTimeout(function(){
+				DeltaUtils.postNewProduct("master",user,repo,token);//......
+			},3000);
+		}
+		else if(isForwardProp==true){
+				console.log("isForwardProp");
+				if(DeltaUtils.postProductTimeOut!="undefined")
+					window.clearTimeout(DeltaUtils.postProductTimeOut);
+				DeltaUtils.postProductTimeOut=window.setTimeout(function(){
+					console.log("AAAAAAAAAAAAAAAAAAAAAAAA");
+					DeltaUtils.postNewProduct("seeds",user,repo,token);//......
+				},3000);
+			}
+
 	}
 	else{
 		var dir=branch.getDirByName(content.name);
@@ -2782,9 +2812,13 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 	//2. Update new config file
 	//3. Post newProduct in seed branch
 	//4. Create pull request
+
+	//Compare which content changed 
+	//edit File
 	
 	console.log("configFileContent: "+configFileContent);
 	console.log("productConfig:"+productConfig);
+	console.log("new seed: "+DeltaUtils.newSeedConfig);
 	
 	var user=GitHub.getUserName(); 	
 	var repo=GitHub.getCurrentRepository();
@@ -2813,10 +2847,11 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 								branch.fetchCommits(function(err,res){
 									var lastCommit=branch.getLastCommit();
 										console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
+																//ghUserRepo, content, branch, user, repo, token, commitSha,isProductFork,isForwardProp
 										DeltaUtils.deleteContent(ghRepo,content,branch,user, repo, token ,lastCommit.sha,false,true);
 								});
 							});
-						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfig)+"&placeholder_message=product configuration File updated");					
+						},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(DeltaUtils.newSeedConfig)+"&placeholder_message=product configuration File updated");					
 					},"POST","authenticity_token="+encodeURIComponent(token));
 				},"GET");
 			});
@@ -2969,7 +3004,7 @@ Utils.XHR=function(url,f,method,params){
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
-var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+/*var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
   var list = document.querySelector('#js-repo-pjax-container');
   
   var observer = new MutationObserver(function(mutations) {  
@@ -3002,7 +3037,7 @@ var MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
   	attributes: true, 
   	childList: true, 
   	characterData: true
-  });
+  });*/
 
 
 new LoadEController().init();

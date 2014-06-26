@@ -2404,12 +2404,10 @@ InstallEController.prototype.execute=function(act){ //compose product and create
    }
 };
 
-
-
 var DeltaUtils={};
 
 DeltaUtils.getUserAccessToken=function(){
-	return "your token";
+	return "your token here";
 }
 
 DeltaUtils.newSeedConfig="";

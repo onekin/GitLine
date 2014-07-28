@@ -31,9 +31,17 @@ runFHComposition: function(configFileContent){
  	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ "features.config";
+		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+		var theFilePath;
+		
 
 		//write the config file for FeatureHouse
+		if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ "features.config";
+		else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\content\\product\\"+"features.config";
+
+
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -50,22 +58,33 @@ runFHComposition: function(configFileContent){
 		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/scripts/fhComposition.sh");
 		
+		var fhHome,fhJar, configFile, productHome;
+		var path;  
+		//if mac
+		if(osString == "Darwin"){ 
+			path= "/extensions/scxmlGitDelta@onekin.org/content/scripts/fhComposition.sh"
+			fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
+			fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
+			configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
+			productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+		}
+		//if Windows	
+		else if (osString == "WINNT"){         
+			path="\\extensions\\scxmlGitDelta@onekin.org\\content\\scripts\\fhComposition.bat";
+			fhHome = ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\featureHouse";
+			fhJar = ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\featureHouse\\FeatureHouse.jar"; 
+			configFile=ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\product\\features.config";
+			productHome= ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\product";
+			
+		}
+		//run process
+		shell.initWithPath(ProfilePath+ path);
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-		
-		var fhHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse";
-		var fhJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/featureHouse/FeatureHouse.jar"; 
-		var configFile=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product/features.config";
-		var productHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
-		
-
 		var parameters =[configFile, fhHome, fhJar,productHome];//project home
-		//alert (parameters);
 		proc.run(true, parameters, parameters.length);
-		//alert ("Product Composed!");
-		
+
 	}catch (err){
 		alert("ERROR in Running FeatureHouse composition!:"+err.message);
 		}
@@ -75,7 +94,7 @@ runFHComposition: function(configFileContent){
 
 
 
-
+/*
 callShellScript: function(){
 	try{
 		//console.log("In call shell script");
@@ -99,7 +118,7 @@ callShellScript: function(){
 		console.log("ERROR:"+err.message);
 		alert("ERROR callShellScript!:"+err.message);
 		}
-},
+},*/
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
@@ -107,7 +126,15 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
+		
+	    var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+	    var theFilePath;
+	    if (osString=="Darwin")
+	    	theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
+	    else if (osString=="WINNT")
+	    		theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\content\\product\\"+branchFolder+ "\\"+fileName;
+
+		
 		//window.alert("Saving file in "+theFilePath);
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
@@ -128,7 +155,7 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 	}
 },
 
-
+/*
 writeToDisk: function(content, path, fileName){ 
 
 	
@@ -152,8 +179,9 @@ writeToDisk: function(content, path, fileName){
 	converter.init(foStream, "UTF-8", 0, 0);
 	converter.writeString(content);
 	converter.close(); // this closes foStream
-},
+},*/
 
+/*
 readFromFile: function(){
 		//create component for file writing
 	try{
@@ -187,6 +215,7 @@ readFromFile: function(){
 		}
  
 },
+*/
 
 
 getLogFileContent:function(){
@@ -197,7 +226,15 @@ searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/fea
 	try{
 		
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-	    var folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
+		var folderPath;
+
+
+		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+		if (osString=="Darwin")
+			folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
+		else if (osString=="WINNT")
+			folderPath=ProfilePath+'\\extensions\\scxmlGitDelta@onekin.org\\'+pathToTheFolder;
+
 		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	     folder.initWithPath(folderPath);
 	     var entries = folder.directoryEntries;
@@ -211,7 +248,11 @@ searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/fea
 			  else{
 			  	array.push(entry);
 			    var nativePath=array[i].path;
-			    var relativePath=(nativePath.split("features/"))[1];
+			    var relativePath;
+			    if (osString=="Darwin")
+			    	relativePath=(nativePath.split("features/"))[1];
+			    else if (osString=="WINNT")
+			    	relativePath=(nativePath.split("features\\"))[1];
 			    list.push(relativePath);
 			    i++;
 			  }
@@ -229,8 +270,14 @@ readFilesFromLocal: function (pathToFile){//content/product/features/fileName
 			var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 			
 			var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-			var completePath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToFile;
+			var completePath;
 
+			var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+			if (osString=="Darwin")
+				completePath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToFile;
+			else if (osString=="WINNT")
+				completePath=ProfilePath+'\\extensions\\scxmlGitDelta@onekin.org\\'+pathToFile;
+			
 			file.initWithPath(completePath);
 			
 			 // console.log("after ini");
@@ -260,8 +307,16 @@ cleanProjectFolder: function(){
 		
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh");
-		//console.log ("Shell: "+shell);
+		var path;
+
+		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+			if (osString=="Darwin")
+				path="/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh";
+			else if(osString=="WINNT")
+				path="\\extensions\\scxmlGitDelta@onekin.org\\content\\scripts\\cleanProjectFolder.bat";
+		
+		shell.initWithPath(ProfilePath);
+		
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
@@ -269,9 +324,6 @@ cleanProjectFolder: function(){
 		
 		var parameters =[projectHome];//project home
 		proc.run(true, parameters, parameters.length);
-
-
-
 	}catch(err){
 
 	}

@@ -13,6 +13,8 @@ return d||(f=$b[b],$b[b]=e,e=null!=c(a,b,d)?b.toLowerCase():null,$b[b]=f),e}});v
 //**
 jQuery.noConflict();
 
+
+
 /**********************************************************************/
 /**********************************************************************/
 /*******   GitHub API v3   ********************************************/
@@ -232,8 +234,8 @@ jQuery.noConflict();
 		protocol : "https",
 		domain : "api.github.com",
 		callHttpApi : function (apiParams) {
-			console.log("api params");
-			console.log(apiParams);
+			//console.log("api params");
+			//console.log(apiParams);
 			apiParams.url = Gh3.Helper.protocol + "://" + Gh3.Helper.domain + "/" + apiParams.service+"?access_token="+DeltaUtils.getUserAccessToken();
 			//apiParams.access_token=DeltaUtils.getUserAccessToken;
 
@@ -511,7 +513,7 @@ jQuery.noConflict();
 				data : {ref:that.sha },
 				success : function(res) {
 					_.each(res.data, function (item) {
-					console.log("item "+item);
+					//console.log("item "+item);
 					if (item.type == "file") that.contents.push(new Gh3.File(item, that.author, repositoryName, that.sha));
 					if (item.type == "dir") that.contents.push(new Gh3.Dir(item, that.author, repositoryName, that.sha));
 					});
@@ -932,7 +934,6 @@ jQuery.noConflict();
 					if (callback) callback(new Error(res.responseJSON.message),res);
 				}
 			});
-
 		},
 
 		fetchPullRequest : function (callback) {
@@ -1103,6 +1104,13 @@ jQuery.noConflict();
 			}
 		},
 		getIssues : function () { return this.issues; },
+		getIssueByNumber : function (num) { 
+			return _.find(this.issues, function (issue) {
+				if (issue.number == num)
+					return issue;
+			});
+		 },
+
 		eachIssue : function (callback) {
 			_.each(this.issues, function (issue) {
 				callback(issue);
@@ -1366,7 +1374,8 @@ var GitHubWrapper=function(){
  //this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary']",supplements:[]}; 												//node.value
  this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary left js-details-target']",supplements:[]}; 	
  this.nodes.diffCode={nodes:[],values:[],listeners:{},xpath:"//*[contains(@class,'file-diff-line js-file-line')]//*[@class='diff-line-code']",supplements:[],regexp:function(node){return node.textContent.trim();}}; 
-
+ 
+this.nodes.selectedIssues={nodes:[],values:[],listeners:{},xpath:"//*[@class='list-group issue-list-group']/li[contains(@class,'selected')]",supplements:[], regexp:function(node){return node;}}; 
  
 this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
@@ -1407,7 +1416,7 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
 						   return object;
 						 	}
 						   };	
-/*						   					//issues-list-options
+/*			//issues-list-options
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues-list-options']/*",supplements:[],                 
                      template: function(){
                          var object={};
@@ -1425,6 +1434,20 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues
 this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']",supplements:[]};	
 this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
 
+this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons button-wrap']/*",supplements:[],                 
+                     template: function(){
+                     	//console.log("en template")
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<div class="select-menu label-select-menu js-issue-list-label-select-menu js-issue-mass-assign js-menu-container js-select-menu" data-multiple=""><a class="minibutton js-menu-target  js-mass-assign-button disabled">Post to Asana</a></div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("div");
+
+						 };
+						 return object;
+					}
+}; 
 
 
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']/*",supplements:[],                 
@@ -1438,10 +1461,7 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var user=parameter[1];
 						    var author=parameter[2];
 						    var commitMessages=parameter[3];
-						   
 						    var line;
-						  
-						  
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
@@ -1482,6 +1502,8 @@ GitHubWrapper.prototype._populateObj=function(){
  	 if(node.regexp!=null){	 
 	  var val;
 	  if(typeof node.regexp=="function"){
+	  	//console.log("Noooode");
+	  	//console.log(node);
 	   val=node.regexp(nod[i]);
 	  }else{
 	   val=this._getFirstMatch(nod[i].textContent,node.regexp);
@@ -1524,9 +1546,14 @@ GitHubWrapper.prototype._addChild=function(node,toAdd){
   n.appendChild(toAdd);
   node.supplements[node.supplements.length]=toAdd;
  }
-};													//node= compararesumarry, to add=render
+};										//node= this.nodes.toasaba, toAdd=
 GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  var n=node.nodes;
+ /*console.log("N: "+n);
+ console.log(node)
+ console.log("to add: " +toAdd);
+ console.log(toAdd);
+*/
  if(position==null){position=n.length;} 
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
@@ -1578,6 +1605,12 @@ GitHubWrapper.prototype.getActionTemplate=function(){
  return this.nodes.actions.template();
 };
 
+GitHubWrapper.prototype.injectIntoAsana=function(node,position){
+	//console.log("in injectIntoAsana ");
+	//console.log(node);
+	//console.log("to asana button");
+this._addSibling(this.nodes.toAsanaButton,node,position);
+};
 //new showFeatureUpdates
 GitHubWrapper.prototype.injectIntoShowFeatureUpdates=function(node,position){
 this._addSibling(this.nodes.showFeatureUpdates,node,position);
@@ -1585,6 +1618,16 @@ this._addSibling(this.nodes.showFeatureUpdates,node,position);
 
 GitHubWrapper.prototype.getShowFeatureUpdates=function(){
  return this.nodes.showFeatureUpdates.nodes;
+};
+GitHubWrapper.prototype.getButtonToAsana=function(){
+ return this.nodes.toAsanaButton.nodes;
+};
+GitHubWrapper.prototype.getSelectedIssues=function(){
+ return this.nodes.selectedIssues.nodes;
+};
+
+GitHubWrapper.prototype.getButtonToAsanaTemplate=function(){
+ return this.nodes.toAsanaButton.template();
 };
 
 GitHubWrapper.prototype.getShowFeatureUpdatesTemplate=function(){
@@ -1771,6 +1814,29 @@ return tab;
 };
 
 
+
+var toAsanaView=function(){
+this.click=null;
+};
+toAsanaView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+toAsanaView.prototype.render=function(){
+	//console.log("into asana render");
+var obj=this;
+var tabTemplate=GitHub.getButtonToAsanaTemplate();
+
+var tab=GitHub.applyTemplate(tabTemplate,null);
+tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+	console.log(2222);
+	 ev.preventDefault();
+	 ev.stopPropagation();
+	 obj.click(ev);
+},true);
+return tab;
+};
+
+
 var CompareSummaryView=function(){
 this.click=null;
 };
@@ -1917,6 +1983,90 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  	  var  featureButton=new ShowFeatureUpdatesEController();//Trigger en it is in the pull request section
   	  featureButton.execute("add");
  }else console.log("not going to retreive for update features");
+
+var botonToAsana=GitHub.getButtonToAsana();
+if(tasksToAsanaEController!="undefined"){
+	 if(window.location.href.indexOf("https://github.com/"+user+"/"+repo+"/issues")!=-1){
+	 	  var  toAsana=new tasksToAsanaEController();
+	  	  toAsana.execute("add");
+	 }else console.log("not going to add ");
+}
+
+
+//http://wiki.greasespot.net/GM_xmlhttpRequest
+//invocation.setRequestHeader("Username", "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R");
+//invocation.setRequestHeader("Password", "");
+//var url = 'https://app.asana.com/api/1.0/tasks/13842232691476';
+/*
+GM_xmlhttpRequest ({
+    method:     "GET",
+    url:        "https://app.asana.com/api/1.0/tasks/13842232691476",
+    headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6"
+  	},
+    onload:     function (response) {
+    				var jsonResp = JSON.parse(response.responseText);
+                    console.log (   response.status,
+                                    response.responseText,
+                                    jsonResp
+                                );
+                }
+} );
+//gitline: 8206296441983
+//workspace
+
+/*
+GM_xmlhttpRequest({
+  method: "POST",
+  url: "https://app.asana.com/api/1.0/tasks",
+  data: "name=pruebadesdeGitLine2&assignee=me&projects=8206296441983&workspace=8179240333828",
+  headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Username": "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R",
+    "Password": "",
+  },
+  onreadystatechange: function(response) {
+  		var jsonResp = JSON.parse(response.responseText);
+        console.log (response.status,response.responseText, jsonResp);
+  		if(response.readyState === 4)
+      		window.location.href = "https://asana.com";
+  }
+});
+*/
+
+/*
+//GET WORKSPACE ID
+var workspaceName="ONEKIN";
+
+GM_xmlhttpRequest({
+ method:     "GET",
+    url:        "https://app.asana.com/api/1.0/workspaces",
+    headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6"
+  },
+  onreadystatechange: function(response) {
+  		if(response.readyState === 4){
+      		//window.location.href = "https://asana.com";
+      		var jsonResp = JSON.parse(response.responseText);
+        	console.log (jsonResp);
+        	var listWorkspaces=jsonResp.data;
+        	//console.log(listWorkspaces);
+        	for (var i=0; i<listWorkspaces.length;i++){
+        		if(listWorkspaces[i].name==workspaceName){
+        			console.log(listWorkspaces[i].id);//return
+        		}
+        	}
+
+      	}
+  }
+});*/
+
+
+}; 
+
+
+
 /*
 console.log("before");
  jQuery.ajax({type: "GET", url: "https://api.github.com/repos/github/linguist",dataType: "json"}).done(function(data){
@@ -1936,7 +2086,9 @@ var lemlog = new Gh3.Repository("notepad-spl", lem);
        });
 	});
 */
-}; 
+
+
+
 
 //console.log("FORKED FROM: "+GitHub.getForkedFrom());
 //console.log(GitHub.getPullRequestList());
@@ -1973,6 +2125,68 @@ if(user!=null&&token!=null&&repo!=null&&button4!=null){
   });
  }
 */
+
+
+//tasksToAsanaEController
+var tasksToAsanaEController=function(){
+ if (tasksToAsanaEController.prototype._singletonInstance) {
+  return tasksToAsanaEController.prototype._singletonInstance;
+ }
+ tasksToAsanaEController.prototype._singletonInstance = this;        
+};
+
+tasksToAsanaEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob	
+	console.log("tasksToAsanaEController");
+	if(act=="add"){
+		var obj=this;
+		var toAsana=new toAsanaView();
+		toAsana.setViewData({click:function(){obj.execute("run");}});
+		var render=toAsana.render();
+		GitHub.injectIntoAsana(render);
+		
+	}else if(act=="run"){
+		console.log("To Asana RUUUN");		
+		//recorrer que
+		
+		//var worskpaceName=window.prompt("Select the workspace","<ul><li></li></ul>");
+		//recorrer los issues y recoger aquellos que estan "selected"
+		//tag issues as "inAsana"
+	
+		GitHub.init();
+		var issues=GitHub.getSelectedIssues();
+		console.log("issue: "+issues);
+		console.log(issues);
+
+		var gh3_issues=[];
+		var user=GitHub.getUserName(); 
+		var repo=GitHub.getCurrentRepository();
+		var ghUser= new Gh3.User(user);
+		console.log(ghUser);
+		var ghRepo= new Gh3.Repository(repo,ghUser);
+		
+		ghRepo.fetch(function(err, res){
+			ghRepo.fetchIssues(function(err, res){
+				console.log(ghRepo);
+				for(var i=0; i< issues.length;i++){
+					console.log(issues[i].id);
+					console.log(ghRepo.getIssues());
+					var number=issues[i].id.split("issue_")[1];
+					var issue=ghRepo.getIssueByNumber(number);
+					console.log(issue);
+					DeltaUtils.issueToAsana(issue);
+				}
+			});
+		});
+
+
+/*
+		
+
+*/
+	}
+};
+
+
 
 var BranchEController=function(){
  if (BranchEController.prototype._singletonInstance) {
@@ -2335,6 +2549,9 @@ ForwardPropagationEController.prototype.execute=function(act){
 };
 
 
+
+//
+
 var InstallEController=function(){
  if (InstallEController.prototype._singletonInstance) {
   return InstallEController.prototype._singletonInstance;
@@ -2407,7 +2624,10 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 var DeltaUtils={};
 
 DeltaUtils.getUserAccessToken=function(){
-	return "your token here";
+	return "a01d3a39eb682d60cc1354162ed59689566b6867";
+}
+DeltaUtils.getAssanaApiToken=function(){
+	return "2kDOdTDX.8lAUnLWS0V6UIPizPdQhMeI";
 }
 
 DeltaUtils.newSeedConfig="";
@@ -2424,6 +2644,33 @@ DeltaUtils.sleep=function(millis){
   do { curDate = new Date(); }
   while(curDate-date < millis);
 }
+
+DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
+	console.log("To Asana Issue: "+ghIssue);
+
+
+	GM_xmlhttpRequest({//POST Task in workspace ONEKIN y project 
+	  method: "POST",
+	  url: "https://app.asana.com/api/1.0/tasks",
+	  data: "name="+ghIssue.title+"&assignee=me&projects=8206296441983&workspace=8179240333828",
+	  headers: {
+	    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6",
+	    "Content-Type": "application/x-www-form-urlencoded",
+	  },
+	  onreadystatechange: function(response) {
+	  		var jsonResp = JSON.parse(response.responseText);
+	        console.log (response.status,response.responseText, jsonResp);
+	  		if(response.readyState === 4)
+	      		//window.open("https://asana.com","_blank");
+	      		//addTags
+	      		DeltaUtils.addTagsToAsanaTask
+	  }
+	});
+
+
+
+}
+
 
 DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
 	console.log("retrieving commit messages for feature: "+branch.name);

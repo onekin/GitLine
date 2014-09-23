@@ -13,6 +13,8 @@ return d||(f=$b[b],$b[b]=e,e=null!=c(a,b,d)?b.toLowerCase():null,$b[b]=f),e}});v
 //**
 jQuery.noConflict();
 
+
+
 /**********************************************************************/
 /**********************************************************************/
 /*******   GitHub API v3   ********************************************/
@@ -232,8 +234,8 @@ jQuery.noConflict();
 		protocol : "https",
 		domain : "api.github.com",
 		callHttpApi : function (apiParams) {
-			console.log("api params");
-			console.log(apiParams);
+			//console.log("api params");
+			//console.log(apiParams);
 			apiParams.url = Gh3.Helper.protocol + "://" + Gh3.Helper.domain + "/" + apiParams.service+"?access_token="+DeltaUtils.getUserAccessToken();
 			//apiParams.access_token=DeltaUtils.getUserAccessToken;
 
@@ -511,7 +513,7 @@ jQuery.noConflict();
 				data : {ref:that.sha },
 				success : function(res) {
 					_.each(res.data, function (item) {
-					console.log("item "+item);
+					//console.log("item "+item);
 					if (item.type == "file") that.contents.push(new Gh3.File(item, that.author, repositoryName, that.sha));
 					if (item.type == "dir") that.contents.push(new Gh3.Dir(item, that.author, repositoryName, that.sha));
 					});
@@ -932,7 +934,6 @@ jQuery.noConflict();
 					if (callback) callback(new Error(res.responseJSON.message),res);
 				}
 			});
-
 		},
 
 		fetchPullRequest : function (callback) {
@@ -1103,6 +1104,13 @@ jQuery.noConflict();
 			}
 		},
 		getIssues : function () { return this.issues; },
+		getIssueByNumber : function (num) { 
+			return _.find(this.issues, function (issue) {
+				if (issue.number == num)
+					return issue;
+			});
+		 },
+
 		eachIssue : function (callback) {
 			_.each(this.issues, function (issue) {
 				callback(issue);
@@ -1337,7 +1345,7 @@ var GitHubWrapper=function(){
  //added by me:Leti 					//*[@class='minibutton select-menu-button js-menu-target']//*[@class='js-select-button']	
  this.nodes.currentBranch={node:null,listeners:{},xpath:"/html/body/div/div[2]/div[2]/div/div[2]/div[4]/div/span/span[2]", supplements:[],regexp:/([^ \n]+)/};
  
- this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//a[@class='name']",supplements:[],regexp:/([^ \n]+)/}; 
+ this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//span[@class='css-truncate-target']",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
  this.nodes.currentRepository={node:null,listeners:{},xpath:"//*[contains(@class,'js-current-repository')]",supplements:[],regexp:/([^ \n]+)/}; 
@@ -1366,7 +1374,8 @@ var GitHubWrapper=function(){
  //this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary']",supplements:[]}; 												//node.value
  this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='button primary left js-details-target']",supplements:[]}; 	
  this.nodes.diffCode={nodes:[],values:[],listeners:{},xpath:"//*[contains(@class,'file-diff-line js-file-line')]//*[@class='diff-line-code']",supplements:[],regexp:function(node){return node.textContent.trim();}}; 
-
+ 
+this.nodes.selectedIssues={nodes:[],values:[],listeners:{},xpath:"//*[@class='list-group issue-list-group']/li[contains(@class,'selected')]",supplements:[], regexp:function(node){return node;}}; 
  
 this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
@@ -1387,7 +1396,7 @@ this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[contains(@class,'j
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Forward Propagation</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> Propagate changes to your repository.</p><div>';
+						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Pull Updates</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> This diff view shows feature evolution. \nPropagate the changes to your repository clicking "Pull Updates" button.</p><div>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
@@ -1407,7 +1416,7 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
 						   return object;
 						 	}
 						   };	
-/*						   					//issues-list-options
+/*			//issues-list-options
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues-list-options']/*",supplements:[],                 
                      template: function(){
                          var object={};
@@ -1426,8 +1435,23 @@ this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-l
 this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
 
 
+this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons button-wrap']/*",supplements:[],                 
+                     template: function(){
+                     	//console.log("en template")
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<div class="select-menu label-select-menu js-issue-list-label-select-menu js-issue-mass-assign js-menu-container js-select-menu" data-multiple=""><a class="minibutton js-menu-target  js-mass-assign-button disabled">Post to Asana</a></div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+						    return newTab.querySelector("div");
 
-this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']/*",supplements:[],                 
+						 };
+						 return object;
+					}
+};
+
+
+this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-listing']/*",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){//parameter es feature list!!
@@ -1438,14 +1462,11 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var user=parameter[1];
 						    var author=parameter[2];
 						    var commitMessages=parameter[3];
-						   
 						    var line;
-						  
-						  
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Propagate Updates from Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">New Updates for Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
 						    }
 						    html+="</div>";
 						    tabTemplate.innerHTML=html;
@@ -1482,6 +1503,8 @@ GitHubWrapper.prototype._populateObj=function(){
  	 if(node.regexp!=null){	 
 	  var val;
 	  if(typeof node.regexp=="function"){
+	  	//console.log("Noooode");
+	  	//console.log(node);
 	   val=node.regexp(nod[i]);
 	  }else{
 	   val=this._getFirstMatch(nod[i].textContent,node.regexp);
@@ -1524,9 +1547,14 @@ GitHubWrapper.prototype._addChild=function(node,toAdd){
   n.appendChild(toAdd);
   node.supplements[node.supplements.length]=toAdd;
  }
-};													//node= compararesumarry, to add=render
+};										//node= this.nodes.toasaba, toAdd=
 GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  var n=node.nodes;
+ /*console.log("N: "+n);
+ console.log(node)
+ console.log("to add: " +toAdd);
+ console.log(toAdd);
+*/
  if(position==null){position=n.length;} 
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
@@ -1578,6 +1606,12 @@ GitHubWrapper.prototype.getActionTemplate=function(){
  return this.nodes.actions.template();
 };
 
+GitHubWrapper.prototype.injectIntoAsana=function(node,position){
+	//console.log("in injectIntoAsana ");
+	//console.log(node);
+	//console.log("to asana button");
+this._addSibling(this.nodes.toAsanaButton,node,position);
+};
 //new showFeatureUpdates
 GitHubWrapper.prototype.injectIntoShowFeatureUpdates=function(node,position){
 this._addSibling(this.nodes.showFeatureUpdates,node,position);
@@ -1585,6 +1619,16 @@ this._addSibling(this.nodes.showFeatureUpdates,node,position);
 
 GitHubWrapper.prototype.getShowFeatureUpdates=function(){
  return this.nodes.showFeatureUpdates.nodes;
+};
+GitHubWrapper.prototype.getButtonToAsana=function(){
+ return this.nodes.toAsanaButton.nodes;
+};
+GitHubWrapper.prototype.getSelectedIssues=function(){
+ return this.nodes.selectedIssues.nodes;
+};
+
+GitHubWrapper.prototype.getButtonToAsanaTemplate=function(){
+ return this.nodes.toAsanaButton.template();
 };
 
 GitHubWrapper.prototype.getShowFeatureUpdatesTemplate=function(){
@@ -1771,6 +1815,29 @@ return tab;
 };
 
 
+
+var toAsanaView=function(){
+this.click=null;
+};
+toAsanaView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+toAsanaView.prototype.render=function(){
+	//console.log("into asana render");
+var obj=this;
+var tabTemplate=GitHub.getButtonToAsanaTemplate();
+
+var tab=GitHub.applyTemplate(tabTemplate,null);
+tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+	console.log(2222);
+	 ev.preventDefault();
+	 ev.stopPropagation();
+	 obj.click(ev);
+},true);
+return tab;
+};
+
+
 var CompareSummaryView=function(){
 this.click=null;
 };
@@ -1859,6 +1926,7 @@ LoadEController.prototype.init=function(func){
 LoadEController.prototype.execute=function(){       
 
  var user=GitHub.getUserName(); 
+ console.log("user "+user);
  var token=GitHub.getAuthenticityToken(); 
  var author=GitHub.getCurrentAuthor(); 
  var repo=GitHub.getCurrentRepository(); 
@@ -1879,9 +1947,15 @@ if (GitHub.getForkedFrom()!=null)
  fo=GitHub.getForkedFrom().split("/")[0];
 //console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
+ console.log(user);
+ console.log(repo);
+ console.log(actions);
+ console.log(fo);
+
  if(user!=null&&repo!=null&&actions!=null&&fo!=user){
  	if(user!=author){
 		var install=new InstallEController();
+		console.log("adding product fork");
   		install.execute("add");
 	}
  }
@@ -1890,7 +1964,7 @@ try{
 var compareSummary=GitHub.getCompareSummary();  
 var button2=GitHub.getPullRequestButton(); 
  if(compareSummary!=null){//&&button2!=null){
- 	  console.log("dentro");
+ 	  console.log("dentro fordward add");
  	  var forwardPropagation=new ForwardPropagationEController();
       forwardPropagation.execute("add");
  }}catch(e){
@@ -1911,12 +1985,96 @@ var button2=GitHub.getPullRequestButton();
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  //console.log("https://github.com/"+user+"/"+repo+"/pulls"+"--Es igual a---"+window.location.href);
- if(window.location.href=="https://github.com/"+user+"/"+repo+"/pulls"){
- 	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/pulls")
+ if(window.location.href=="https://github.com/"+user+"/"+repo+"/issues"){
+ 	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/issues")
  	  	return;
  	  var  featureButton=new ShowFeatureUpdatesEController();//Trigger en it is in the pull request section
   	  featureButton.execute("add");
  }else console.log("not going to retreive for update features");
+
+/*var botonToAsana=GitHub.getButtonToAsana();
+if(tasksToAsanaEController!="undefined"){
+	 if(window.location.href.indexOf("https://github.com/"+user+"/"+repo+"/issues")!=-1){
+	 	  var  toAsana=new tasksToAsanaEController();
+	  	  toAsana.execute("add");
+	 }else console.log("not going to add ");
+}
+*/
+
+//http://wiki.greasespot.net/GM_xmlhttpRequest
+//invocation.setRequestHeader("Username", "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R");
+//invocation.setRequestHeader("Password", "");
+//var url = 'https://app.asana.com/api/1.0/tasks/13842232691476';
+/*
+GM_xmlhttpRequest ({
+    method:     "GET",
+    url:        "https://app.asana.com/api/1.0/tasks/13842232691476",
+    headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6"
+  	},
+    onload:     function (response) {
+    				var jsonResp = JSON.parse(response.responseText);
+                    console.log (   response.status,
+                                    response.responseText,
+                                    jsonResp
+                                );
+                }
+} );
+//gitline: 8206296441983
+//workspace
+
+/*
+GM_xmlhttpRequest({
+  method: "POST",
+  url: "https://app.asana.com/api/1.0/tasks",
+  data: "name=pruebadesdeGitLine2&assignee=me&projects=8206296441983&workspace=8179240333828",
+  headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Username": "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R",
+    "Password": "",
+  },
+  onreadystatechange: function(response) {
+  		var jsonResp = JSON.parse(response.responseText);
+        console.log (response.status,response.responseText, jsonResp);
+  		if(response.readyState === 4)
+      		window.location.href = "https://asana.com";
+  }
+});
+*/
+
+/*
+//GET WORKSPACE ID
+var workspaceName="ONEKIN";
+
+GM_xmlhttpRequest({
+ method:     "GET",
+    url:        "https://app.asana.com/api/1.0/workspaces",
+    headers: {
+    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6"
+  },
+  onreadystatechange: function(response) {
+  		if(response.readyState === 4){
+      		//window.location.href = "https://asana.com";
+      		var jsonResp = JSON.parse(response.responseText);
+        	console.log (jsonResp);
+        	var listWorkspaces=jsonResp.data;
+        	//console.log(listWorkspaces);
+        	for (var i=0; i<listWorkspaces.length;i++){
+        		if(listWorkspaces[i].name==workspaceName){
+        			console.log(listWorkspaces[i].id);//return
+        		}
+        	}
+
+      	}
+  }
+});*/
+
+
+}; 
+
+
+
 /*
 console.log("before");
  jQuery.ajax({type: "GET", url: "https://api.github.com/repos/github/linguist",dataType: "json"}).done(function(data){
@@ -1936,7 +2094,9 @@ var lemlog = new Gh3.Repository("notepad-spl", lem);
        });
 	});
 */
-}; 
+
+
+
 
 //console.log("FORKED FROM: "+GitHub.getForkedFrom());
 //console.log(GitHub.getPullRequestList());
@@ -1973,6 +2133,68 @@ if(user!=null&&token!=null&&repo!=null&&button4!=null){
   });
  }
 */
+
+
+//tasksToAsanaEController
+var tasksToAsanaEController=function(){
+ if (tasksToAsanaEController.prototype._singletonInstance) {
+  return tasksToAsanaEController.prototype._singletonInstance;
+ }
+ tasksToAsanaEController.prototype._singletonInstance = this;        
+};
+
+tasksToAsanaEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob	
+	console.log("tasksToAsanaEController");
+	if(act=="add"){
+		var obj=this;
+		var toAsana=new toAsanaView();
+		toAsana.setViewData({click:function(){obj.execute("run");}});
+		var render=toAsana.render();
+		GitHub.injectIntoAsana(render);
+		
+	}else if(act=="run"){
+		console.log("To Asana RUUUN");		
+		//recorrer que
+		
+		//var worskpaceName=window.prompt("Select the workspace","<ul><li></li></ul>");
+		//recorrer los issues y recoger aquellos que estan "selected"
+		//tag issues as "inAsana"
+	
+		GitHub.init();
+		var issues=GitHub.getSelectedIssues();
+		console.log("issue: "+issues);
+		console.log(issues);
+
+		var gh3_issues=[];
+		var user=GitHub.getUserName(); 
+		var repo=GitHub.getCurrentRepository();
+		var ghUser= new Gh3.User(user);
+		console.log(ghUser);
+		var ghRepo= new Gh3.Repository(repo,ghUser);
+		
+		ghRepo.fetch(function(err, res){
+			ghRepo.fetchIssues(function(err, res){
+				console.log(ghRepo);
+				for(var i=0; i< issues.length;i++){
+					console.log(issues[i].id);
+					console.log(ghRepo.getIssues());
+					var number=issues[i].id.split("issue_")[1];
+					var issue=ghRepo.getIssueByNumber(number);
+					console.log(issue);
+					DeltaUtils.issueToAsana(issue);
+				}
+			});
+		});
+
+
+/*
+		
+
+*/
+	}
+};
+
+
 
 var BranchEController=function(){
  if (BranchEController.prototype._singletonInstance) {
@@ -2335,6 +2557,9 @@ ForwardPropagationEController.prototype.execute=function(act){
 };
 
 
+
+//
+
 var InstallEController=function(){
  if (InstallEController.prototype._singletonInstance) {
   return InstallEController.prototype._singletonInstance;
@@ -2366,10 +2591,12 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 		//clean projetc folder
 	
 		/*step 0: Clean profile folder*/
+		console.log("To erase project folder");
 		CleanProjectFolder();
 
 		var ghAuthor = new Gh3.User(author);
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
+		console.log(ghRepo);
     	var productConfig="";
     
 		/*step 1: Ask for product configuration equation*/
@@ -2407,7 +2634,10 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 var DeltaUtils={};
 
 DeltaUtils.getUserAccessToken=function(){
-	return "your token here";
+	return "a01d3a39eb682d60cc1354162ed59689566b6867";
+}
+DeltaUtils.getAssanaApiToken=function(){
+	return "2kDOdTDX.8lAUnLWS0V6UIPizPdQhMeI";
 }
 
 DeltaUtils.newSeedConfig="";
@@ -2424,6 +2654,33 @@ DeltaUtils.sleep=function(millis){
   do { curDate = new Date(); }
   while(curDate-date < millis);
 }
+
+DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
+	console.log("To Asana Issue: "+ghIssue);
+
+
+	GM_xmlhttpRequest({//POST Task in workspace ONEKIN y project 
+	  method: "POST",
+	  url: "https://app.asana.com/api/1.0/tasks",
+	  data: "name="+ghIssue.title+"&assignee=me&projects=8206296441983&workspace=8179240333828",
+	  headers: {
+	    "Authorization": "Basic MmtET2RURFguOGxBVW5MV1MwVjZVSVBpelBkUWhNZUk6",
+	    "Content-Type": "application/x-www-form-urlencoded",
+	  },
+	  onreadystatechange: function(response) {
+	  		var jsonResp = JSON.parse(response.responseText);
+	        console.log (response.status,response.responseText, jsonResp);
+	  		//if(response.readyState === 4)
+	      		//window.open("https://asana.com","_blank");
+	      		//addTags
+	      	//	DeltaUtils.addTagsToAsanaTask
+	  }
+	});
+
+
+
+}
+
 
 DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
 	console.log("retrieving commit messages for feature: "+branch.name);
@@ -2508,9 +2765,16 @@ DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitM
 }
 
 DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en masterBranch o seedBranch
+	var OSName;
+	if (window.navigator.appVersion.indexOf("Win")!=-1) OSName="win";
+	if (window.navigator.appVersion.indexOf("Mac")!=-1) OSName="mac";
+
 	console.log("Listo para hacer POST del producto en la branch: "+branchName);
 	var listFiles=[];
-	listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+	if(OSName=="mac")
+		listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+	else if (OSName=="win")
+			listFiles=SearchFilesInLocalFolder("content\\product\\features",listFiles);
 	console.log("lis files: "+listFiles);
 	var createBranches,createPullRequest=false;
 	var ghUser=new Gh3.User(user);
@@ -2528,10 +2792,18 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 				for (i=0; i<listFiles.length; i++){
 					var file=listFiles[i];//file path
 					console.log("file: "+file);
-					var splitPath=file.split("/");
+					var splitPath;
+					//if (OSName=="mac")
+					  splitPath=file.split("/");
+					//else if(OSName=="win") 
+						//splitPath=file.split("\\");
 					var fileName=splitPath[(splitPath.length-1)];
 					console.log("ahora "+fileName+ " for path file "+file);
-					var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+					var fileContent;
+					if (OSName=="mac")
+						fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+					else if (OSName=="win")
+						fileContent= ReadFilesFromLocal("content\\product\\features\\"+listFiles[i]);
 					fileContent=fileContent.trim();
 					if(i==listFiles.length-1){
 						if(branchName=="master") createBranches=true;
@@ -2542,7 +2814,9 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 					var commitMessage="";
 					if (branchName=="master") commitMesage="New derived product";
 					else commitMessage="Propagated change";
-					DeltaUtils.postFile(user,repo,branchName,fileName,file,commit,token,fileContent,createBranches,createPullRequest,commitMessage);
+					var fileWithbarOk=file.replace(/\\/g, "/");
+					console.log("fileWithbarOk "+fileWithbarOk );
+					DeltaUtils.postFile(user,repo,branchName,fileName,fileWithbarOk,commit,token,fileContent,createBranches,createPullRequest,commitMessage);
 				}
 			});
 		});
@@ -2737,8 +3011,17 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 	var token=GitHub.getAuthenticityToken(); 
 	//RunFHComposition(configFileContent);	
 			var listFiles=[];
-			listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+			var OSName;
+			if (window.navigator.appVersion.indexOf("Win")!=-1){ 
+				OSName="win";
+				listFiles=SearchFilesInLocalFolder("content\\product\\features",listFiles);
+			}
+			else if (window.navigator.appVersion.indexOf("Mac")!=-1) {
+				OSName="mac";
+				listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+			}
 			console.log("Files in feature folder to post:"+listFiles);
+
 			if(listFiles==null) {
 				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
 				return;
@@ -3002,7 +3285,7 @@ Utils.XHR=function(url,f,method,params){
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
-/*var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
   var list = document.querySelector('#js-repo-pjax-container');
   
   var observer = new MutationObserver(function(mutations) {  
@@ -3035,7 +3318,7 @@ Utils.XHR=function(url,f,method,params){
   	attributes: true, 
   	childList: true, 
   	characterData: true
-  });*/
+  });
 
 
 new LoadEController().init();

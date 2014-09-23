@@ -1,0 +1,6 @@
+Found the following features:
+base
+underFlow
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/Main.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/base/Stack.java
+processing: /Users/Onekin/Library/Application Support/Firefox/Profiles/7kabk0a2.default/extensions/scxmlGitDelta@onekin.org/content/product/underFlow/Stack.java

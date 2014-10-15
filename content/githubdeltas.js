@@ -1923,6 +1923,8 @@ LoadEController.prototype.init=function(func){
  /*window.addEventListener("load",function(){*/obj.execute();/*},true);*/ 
 };
 
+
+/*Eider: loadEController funtzioa exekutazen da GitHub Orrian sartzerakoan*/
 LoadEController.prototype.execute=function(){       
 
  var user=GitHub.getUserName(); 
@@ -2567,6 +2569,7 @@ var InstallEController=function(){
  InstallEController.prototype._singletonInstance = this;        
 };
 
+/*Eider: InstallEcontroller funtzioa executatzen da "ProductFork" botoia klikatzeakoan**/
 
 InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 
@@ -2598,17 +2601,21 @@ InstallEController.prototype.execute=function(act){ //compose product and create
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
 		console.log(ghRepo);
     	var productConfig="";
-    
+    	
+
 		/*step 1: Ask for product configuration equation*/
-	
 		var productBranches=window.prompt("Please enter the configuration equation","");
+		/*Eider: zure kodea hemen joan beharko litzateke. "Konfiguradore" antzeko bat sortu model.xml fitxategian*/
+		 /*dauden feature guztien izenekin. Bezeroak feature hoietan klikatzen doan einean SAT Solver-a jakin beharko du*/
+		 /* kongifurazioa baliagarria den edo ez*/
+
 		console.log("window closed");
 		if (productBranches!=null)
 			console.log("Config: "+productBranches);
 		else return;
 		var listBranches=productBranches.split(" ");
-		//Step 2: Precondition, check configuration equation correspond to branch names
 		
+		//Step 2: Precondition, check configuration equation correspond to branch names
 		console.log("step 3");
     	ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
@@ -2625,6 +2632,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 						return;
 					}
 				}
+				//step4: download branches to local
 				DeltaUtils.downloadBranches(ghAuthor,ghRepo,configFileContent,productConfig);
           	});
         });
@@ -3285,6 +3293,8 @@ Utils.XHR=function(url,f,method,params){
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
+
+/*/ Temporal fix to reloading problem 
 var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
   var list = document.querySelector('#js-repo-pjax-container');
   
@@ -3319,7 +3329,7 @@ var MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
   	childList: true, 
   	characterData: true
   });
-
+*/
 
 new LoadEController().init();
 

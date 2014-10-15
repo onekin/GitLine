@@ -1396,7 +1396,7 @@ this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[contains(@class,'j
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Forward Propagation</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> Propagate changes to your repository.</p><div>';
+						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Pull Updates</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> This diff view shows feature evolution. \nPropagate the changes to your repository clicking "Pull Updates" button.</p><div>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
@@ -1451,7 +1451,7 @@ this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons 
 };
 
 
-this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']/*",supplements:[],                 
+this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-listing']/*",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){//parameter es feature list!!
@@ -1466,7 +1466,7 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-
 						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
 						    for(var i=0;i<list.length-1;i++){
 						    	line=list[i].split(" ");
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">Propagate Updates from Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
+						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">New Updates for Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
 						    }
 						    html+="</div>";
 						    tabTemplate.innerHTML=html;
@@ -1923,6 +1923,8 @@ LoadEController.prototype.init=function(func){
  /*window.addEventListener("load",function(){*/obj.execute();/*},true);*/ 
 };
 
+
+/*Eider: loadEController funtzioa exekutazen da GitHub Orrian sartzerakoan*/
 LoadEController.prototype.execute=function(){       
 
  var user=GitHub.getUserName(); 
@@ -1964,7 +1966,7 @@ try{
 var compareSummary=GitHub.getCompareSummary();  
 var button2=GitHub.getPullRequestButton(); 
  if(compareSummary!=null){//&&button2!=null){
- 	  console.log("dentro");
+ 	  console.log("dentro fordward add");
  	  var forwardPropagation=new ForwardPropagationEController();
       forwardPropagation.execute("add");
  }}catch(e){
@@ -1985,21 +1987,15 @@ var button2=GitHub.getPullRequestButton();
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  //console.log("https://github.com/"+user+"/"+repo+"/pulls"+"--Es igual a---"+window.location.href);
- if(window.location.href=="https://github.com/"+user+"/"+repo+"/pulls"){
- 	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/pulls")
+ if(window.location.href=="https://github.com/"+user+"/"+repo+"/issues"){
+ 	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/issues")
  	  	return;
  	  var  featureButton=new ShowFeatureUpdatesEController();//Trigger en it is in the pull request section
   	  featureButton.execute("add");
  }else console.log("not going to retreive for update features");
 
-var botonToAsana=GitHub.getButtonToAsana();
-if(tasksToAsanaEController!="undefined"){
-	 if(window.location.href.indexOf("https://github.com/"+user+"/"+repo+"/issues")!=-1){
-	 	  var  toAsana=new tasksToAsanaEController();
-	  	  toAsana.execute("add");
-	 }else console.log("not going to add ");
-}
 
+var botonToAsana=GitHub.getButtonToAsana();
 
 //http://wiki.greasespot.net/GM_xmlhttpRequest
 //invocation.setRequestHeader("Username", "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R");
@@ -2567,6 +2563,7 @@ var InstallEController=function(){
  InstallEController.prototype._singletonInstance = this;        
 };
 
+/*Eider: InstallEcontroller funtzioa executatzen da "ProductFork" botoia klikatzeakoan**/
 
 InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 
@@ -2598,17 +2595,21 @@ InstallEController.prototype.execute=function(act){ //compose product and create
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
 		console.log(ghRepo);
     	var productConfig="";
-    
+    	
+
 		/*step 1: Ask for product configuration equation*/
-	
 		var productBranches=window.prompt("Please enter the configuration equation","");
+		/*Eider: zure kodea hemen joan beharko litzateke. "Konfiguradore" antzeko bat sortu model.xml fitxategian*/
+		 /*dauden feature guztien izenekin. Bezeroak feature hoietan klikatzen doan einean SAT Solver-a jakin beharko du*/
+		 /* kongifurazioa baliagarria den edo ez*/
+
 		console.log("window closed");
 		if (productBranches!=null)
 			console.log("Config: "+productBranches);
 		else return;
 		var listBranches=productBranches.split(" ");
-		//Step 2: Precondition, check configuration equation correspond to branch names
 		
+		//Step 2: Precondition, check configuration equation correspond to branch names
 		console.log("step 3");
     	ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
@@ -2625,6 +2626,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 						return;
 					}
 				}
+				//step4: download branches to local
 				DeltaUtils.downloadBranches(ghAuthor,ghRepo,configFileContent,productConfig);
           	});
         });
@@ -2670,10 +2672,11 @@ DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
 	  onreadystatechange: function(response) {
 	  		var jsonResp = JSON.parse(response.responseText);
 	        console.log (response.status,response.responseText, jsonResp);
-	  		if(response.readyState === 4)
+
+	  		//if(response.readyState === 4)
 	      		//window.open("https://asana.com","_blank");
 	      		//addTags
-	      		DeltaUtils.addTagsToAsanaTask
+	      	//	DeltaUtils.addTagsToAsanaTask
 	  }
 	});
 
@@ -3285,7 +3288,9 @@ Utils.XHR=function(url,f,method,params){
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
-/*var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+/*/ Temporal fix to reloading problem 
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
   var list = document.querySelector('#js-repo-pjax-container');
   
   var observer = new MutationObserver(function(mutations) {  
@@ -3318,8 +3323,8 @@ Utils.XHR=function(url,f,method,params){
   	attributes: true, 
   	childList: true, 
   	characterData: true
-  });*/
-
+  });
+*/
 
 new LoadEController().init();
 

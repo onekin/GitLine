@@ -3293,6 +3293,8 @@ Utils.XHR=function(url,f,method,params){
 
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
+
+/*/ Temporal fix to reloading problem 
 var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
   var list = document.querySelector('#js-repo-pjax-container');
   
@@ -3327,7 +3329,7 @@ var MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
   	childList: true, 
   	characterData: true
   });
-
+*/
 
 new LoadEController().init();
 

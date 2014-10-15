@@ -83,11 +83,13 @@ runFHComposition: function(configFileContent){
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
 		var parameters =[configFile, fhHome, fhJar,productHome];//project home
+		//alert("Parameters "+parameters );
 		proc.run(true, parameters, parameters.length);
 
 	}catch (err){
 		alert("ERROR in Running FeatureHouse composition!:"+err.message);
-		}
+		alert("Parameters: "+parameters);
+	}
 
 
 },
@@ -122,7 +124,7 @@ callShellScript: function(){
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
-	//window.alert("en saveToDisk ");
+	
 	try{
 		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
@@ -131,11 +133,12 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 	    var theFilePath;
 	    if (osString=="Darwin")
 	    	theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/content/product/"+ branchFolder+ "/" + fileName;
-	    else if (osString=="WINNT")
+	    else if (osString=="WINNT"){
 	    		theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\content\\product\\"+branchFolder+ "\\"+fileName;
-
-		
-		//window.alert("Saving file in "+theFilePath);
+			theFilePath=theFilePath.replace(/\//g,"\\");
+		//	window.alert("fileName "+theFilePath);
+		}
+	//window.alert("Saving file in "+theFilePath);
 		file.initWithPath( theFilePath );
 		if(file.exists() == false) //check to see if file exists
 		{
@@ -155,74 +158,18 @@ saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileC
 	}
 },
 
-/*
-writeToDisk: function(content, path, fileName){ 
-
-	
-	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-	var theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/" + path + fileName;
-
-	//alert("theFilePath: "+theFilePath+"\ncontent: "+content);
-
-	file.initWithPath( theFilePath );
-	if(file.exists() == false) //check to see if file exists
-	{
-	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
-	}
-	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
-	
-	foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
-	
-
-	var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
-	converter.init(foStream, "UTF-8", 0, 0);
-	converter.writeString(content);
-	converter.close(); // this closes foStream
-},*/
-
-/*
-readFromFile: function(){
-		//create component for file writing
-	try{
-			console.log("Vamos a leer result.xml");
-
-			var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-			
-			var theFile=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/content/files/result.xml';
-			var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-			
-			//console.log("before ini");
-			file.initWithPath( theFile );
-			
-			 // console.log("after ini");
-			  var istream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);  
-			  istream.init(file, 0x01, 0444, 0);  
-			  istream.QueryInterface(Components.interfaces.nsILineInputStream);  
-		 
-			 // read lines into array  
-			 var line = {}, lines = [], hasmore, str=" ";  
-			 do {  
-			    hasmore = istream.readLine(line);  
-			    lines.push(line.value);   
-			    str+=line.value+" ";
-			  } while(hasmore);  
-			  
-			 istream.close();  
-			 cowpathCode=str;
-		 return str;//lines as string
-	}catch (err){ console.log("Error: "+err);
-		}
- 
-},
-*/
-
-
 getLogFileContent:function(){
-	var logContent=githubdeltas_gmCompiler.readFilesFromLocal("content/product/log.txt");
+	 var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+	 var logContent;
+
+	 if(osString=="Darwin")
+	 	logContent=githubdeltas_gmCompiler.readFilesFromLocal("content/product/log.txt");
+	 else if (osString=="WINNT")
+	 	logContent=githubdeltas_gmCompiler.readFilesFromLocal("content\\product\\log.txt");
+	
 	return logContent;
 },
-searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/features"
+searchFilesInLocalFolder: function(pathToTheFolder,list){//"content/product/features"
 	try{
 		
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
@@ -230,10 +177,12 @@ searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/fea
 
 
 		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
-		if (osString=="Darwin")
+		if (osString=="Darwin"){
 			folderPath=ProfilePath+'/extensions/scxmlGitDelta@onekin.org/'+pathToTheFolder;
-		else if (osString=="WINNT")
+		}
+		else if (osString=="WINNT"){
 			folderPath=ProfilePath+'\\extensions\\scxmlGitDelta@onekin.org\\'+pathToTheFolder;
+		}
 
 		var folder = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	     folder.initWithPath(folderPath);
@@ -243,9 +192,13 @@ searchFilesInLocalFolder: function(pathToTheFolder, list){//"content/product/fea
 			while(entries.hasMoreElements()){
 			  var entry = entries.getNext();
 			  entry.QueryInterface(Components.interfaces.nsILocalFile);
-			  if(entry.isDirectory())//if it is a directory, keep on reading
-			  	githubdeltas_gmCompiler.searchFilesInLocalFolder(pathToTheFolder+"/"+entry.leafName, list);
-			  else{
+			  if(entry.isDirectory()){//if it is a directory, keep on reading
+			  	
+				if (osString=="Darwin")
+					githubdeltas_gmCompiler.searchFilesInLocalFolder(pathToTheFolder+"/"+entry.leafName, list);
+				else (osString=="WINNT")
+					githubdeltas_gmCompiler.searchFilesInLocalFolder(pathToTheFolder+"\\"+entry.leafName, list);
+			  }else{
 			  	array.push(entry);
 			    var nativePath=array[i].path;
 			    var relativePath;
@@ -308,24 +261,29 @@ cleanProjectFolder: function(){
 		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
 		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
 		var path;
-
+		var projectHome;
 		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
-			if (osString=="Darwin")
+			if (osString=="Darwin"){
 				path="/extensions/scxmlGitDelta@onekin.org/content/scripts/cleanProjectFolder.sh";
-			else if(osString=="WINNT")
+				projectHome=ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
+			}
+			else if(osString=="WINNT"){
 				path="\\extensions\\scxmlGitDelta@onekin.org\\content\\scripts\\cleanProjectFolder.bat";
-		
-		shell.initWithPath(ProfilePath);
+				projectHome=ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\product";
+			}
+		//alert(ProfilePath+path);
+		shell.initWithPath(ProfilePath+path);
 		
 		
 		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
 		proc.init(shell);
-		var projectHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/product";
 		
 		var parameters =[projectHome];//project home
+		//alert("PARAMS: "+parameters);
 		proc.run(true, parameters, parameters.length);
 	}catch(err){
-
+		alert("error erasing project folder "+err);
+		alert("Parameters "+parameters);
 	}
 
 },
@@ -418,9 +376,7 @@ injectScript: function(script, url, unsafeContentWin) {
 	//mi variable para descargarme los archivos de los branches
 	sandbox.SaveToDisk=githubdeltas_gmCompiler.hitch(this, "saveToDisk");
 
-	//mi variable para grabar archivos en disco
-	sandbox.WriteToDisk=githubdeltas_gmCompiler.hitch(this, "writeToDisk");
-	
+
 	//clean project folder
 	sandbox.CleanProjectFolder=githubdeltas_gmCompiler.hitch(this, "cleanProjectFolder");
 	//get Log 

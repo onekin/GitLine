@@ -4,35 +4,35 @@ import java.util.LinkedList;
 
 public   class  Stack {
 	
-	
+	//linea arriba
 	private LinkedList<Object> data = new LinkedList<Object>();
 
 	
-	
-	private void  push__wrappee__master  (Object obj) {
+	private void  push__wrappee__base  (Object obj) {
 		data.addFirst(obj);
 	}
 
 	
+	
 	public void push(Object obj) {
-		push__wrappee__master(obj);
+		push__wrappee__base(obj);
 		count++;
 	}
 
 	
-	
-	private Object  pop__wrappee__master  () {
+	private Object  pop__wrappee__base  () {
 		return data.removeFirst();
 	}
 
 	
+	
 	public Object pop() {
 		if(count > 0) {
 			count--;
-			return pop__wrappee__master();
+			return pop__wrappee__base(); // calling the overriden method
 		}
-		else{ 
-			System.out.println("Estack is empty");
+		else{
+			System.out.prinln("stack  is empty");
 			return null;
 		}
 	}

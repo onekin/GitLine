@@ -1345,7 +1345,7 @@ var GitHubWrapper=function(){
  //added by me:Leti 					//*[@class='minibutton select-menu-button js-menu-target']//*[@class='js-select-button']	
  this.nodes.currentBranch={node:null,listeners:{},xpath:"/html/body/div/div[2]/div[2]/div/div[2]/div[4]/div/span/span[2]", supplements:[],regexp:/([^ \n]+)/};
  
- this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//a[@class='name']",supplements:[],regexp:/([^ \n]+)/}; 
+ this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//span[@class='css-truncate-target']",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
  this.nodes.currentRepository={node:null,listeners:{},xpath:"//*[contains(@class,'js-current-repository')]",supplements:[],regexp:/([^ \n]+)/}; 
@@ -1434,6 +1434,7 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//div[@class='issues
 this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']",supplements:[]};	
 this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
 
+
 this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons button-wrap']/*",supplements:[],                 
                      template: function(){
                      	//console.log("en template")
@@ -1447,7 +1448,7 @@ this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons 
 						 };
 						 return object;
 					}
-}; 
+};
 
 
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']/*",supplements:[],                 
@@ -1925,6 +1926,7 @@ LoadEController.prototype.init=function(func){
 LoadEController.prototype.execute=function(){       
 
  var user=GitHub.getUserName(); 
+ console.log("user "+user);
  var token=GitHub.getAuthenticityToken(); 
  var author=GitHub.getCurrentAuthor(); 
  var repo=GitHub.getCurrentRepository(); 
@@ -1945,9 +1947,15 @@ if (GitHub.getForkedFrom()!=null)
  fo=GitHub.getForkedFrom().split("/")[0];
 //console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
+ console.log(user);
+ console.log(repo);
+ console.log(actions);
+ console.log(fo);
+
  if(user!=null&&repo!=null&&actions!=null&&fo!=user){
  	if(user!=author){
 		var install=new InstallEController();
+		console.log("adding product fork");
   		install.execute("add");
 	}
  }
@@ -2583,10 +2591,12 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 		//clean projetc folder
 	
 		/*step 0: Clean profile folder*/
+		console.log("To erase project folder");
 		CleanProjectFolder();
 
 		var ghAuthor = new Gh3.User(author);
     	var ghRepo = new Gh3.Repository(repo, ghAuthor);
+		console.log(ghRepo);
     	var productConfig="";
     
 		/*step 1: Ask for product configuration equation*/
@@ -2755,9 +2765,16 @@ DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitM
 }
 
 DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en masterBranch o seedBranch
+	var OSName;
+	if (window.navigator.appVersion.indexOf("Win")!=-1) OSName="win";
+	if (window.navigator.appVersion.indexOf("Mac")!=-1) OSName="mac";
+
 	console.log("Listo para hacer POST del producto en la branch: "+branchName);
 	var listFiles=[];
-	listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+	if(OSName=="mac")
+		listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+	else if (OSName=="win")
+			listFiles=SearchFilesInLocalFolder("content\\product\\features",listFiles);
 	console.log("lis files: "+listFiles);
 	var createBranches,createPullRequest=false;
 	var ghUser=new Gh3.User(user);
@@ -2775,10 +2792,18 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 				for (i=0; i<listFiles.length; i++){
 					var file=listFiles[i];//file path
 					console.log("file: "+file);
-					var splitPath=file.split("/");
+					var splitPath;
+					//if (OSName=="mac")
+					  splitPath=file.split("/");
+					//else if(OSName=="win") 
+						//splitPath=file.split("\\");
 					var fileName=splitPath[(splitPath.length-1)];
 					console.log("ahora "+fileName+ " for path file "+file);
-					var fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+					var fileContent;
+					if (OSName=="mac")
+						fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
+					else if (OSName=="win")
+						fileContent= ReadFilesFromLocal("content\\product\\features\\"+listFiles[i]);
 					fileContent=fileContent.trim();
 					if(i==listFiles.length-1){
 						if(branchName=="master") createBranches=true;
@@ -2789,7 +2814,9 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 					var commitMessage="";
 					if (branchName=="master") commitMesage="New derived product";
 					else commitMessage="Propagated change";
-					DeltaUtils.postFile(user,repo,branchName,fileName,file,commit,token,fileContent,createBranches,createPullRequest,commitMessage);
+					var fileWithbarOk=file.replace(/\\/g, "/");
+					console.log("fileWithbarOk "+fileWithbarOk );
+					DeltaUtils.postFile(user,repo,branchName,fileName,fileWithbarOk,commit,token,fileContent,createBranches,createPullRequest,commitMessage);
 				}
 			});
 		});
@@ -2984,8 +3011,17 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 	var token=GitHub.getAuthenticityToken(); 
 	//RunFHComposition(configFileContent);	
 			var listFiles=[];
-			listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+			var OSName;
+			if (window.navigator.appVersion.indexOf("Win")!=-1){ 
+				OSName="win";
+				listFiles=SearchFilesInLocalFolder("content\\product\\features",listFiles);
+			}
+			else if (window.navigator.appVersion.indexOf("Mac")!=-1) {
+				OSName="mac";
+				listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
+			}
 			console.log("Files in feature folder to post:"+listFiles);
+
 			if(listFiles==null) {
 				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
 				return;

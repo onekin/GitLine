@@ -1996,9 +1996,6 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  }else console.log("not going to retreive for update features");
 
 
-<<<<<<< HEAD
-var botonToAsana=GitHub.getButtonToAsana();
-=======
 /****API DEIA PROBA EIDERRRENTZAT****/
 console.log("API DEIA PROBA ");
 			var ghAuthor= new Gh3.User(author);
@@ -2038,7 +2035,6 @@ if(tasksToAsanaEController!="undefined"){
 	 }else console.log("not going to add ");
 }
 */
->>>>>>> Updates
 
 //http://wiki.greasespot.net/GM_xmlhttpRequest
 //invocation.setRequestHeader("Username", "2kDOdTDX.X8DLAnayL1RZryH6JVYsL1R");

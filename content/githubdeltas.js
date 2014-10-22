@@ -2675,7 +2675,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 var DeltaUtils={};
 
 DeltaUtils.getUserAccessToken=function(){
-	return "a01d3a39eb682d60cc1354162ed59689566b6867";
+	return "877f51e5b60ac4fa652c21788d2b2d29a12f4556";
 }
 DeltaUtils.getAssanaApiToken=function(){
 	return "2kDOdTDX.8lAUnLWS0V6UIPizPdQhMeI";

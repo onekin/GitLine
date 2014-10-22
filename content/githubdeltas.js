@@ -2017,9 +2017,9 @@ console.log("API DEIA PROBA ");
 			      	  }
 			      	  else{
 			      	  	//Step 2: leer contenido del product config
-			      	  	featureModel.fetchContent(function (err, res) {}//6:fetch file content
-			      	  		console.log(productConfigFile.getRawContent());//7: gte raw content and display in console
-			      	  	);
+			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
+			      	  		console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
+			      	  	});
 			      	  }
 			      	});
 			    });

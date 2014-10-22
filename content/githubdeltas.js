@@ -2000,19 +2000,17 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
 console.log("API DEIA PROBA ");
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
-			var ghUser = new Gh3.User(user);
-	    	var ghRepo = new Gh3.Repository(repo, ghUser);
 	    	//1: access repository
-			ghRepo.fetch(function (err, res) {
+			ghAuthorRepo.fetch(function (err, res) {
 	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
 				//2:fetch repository all branches
-				ghRepo.fetchBranches(function (err, res) {
-					var master=ghRepo.getBranchByName("master");//3: get master branh
+				ghAuthorRepo.fetchBranches(function (err, res) {
+					var master=ghAuthorRepo.getBranchByName("master");//3: get master branh
 					master.fetchContents(function (err, res) {//4: get contents (folders and files) for master branch
 			          if(err) { throw "outch ..." }
 			          var featureModelFile = master.getFileByName("model.xml");//5: get model.xml file
 			      	  if(featureModelFile==null){
-			      	  	window.alert("Could not reach model.xml file in master branch!\n.");
+			      	  	console.log("Could not reach model.xml file in master branch!\n.");
 			      	  	return;
 			      	  }
 			      	  else{

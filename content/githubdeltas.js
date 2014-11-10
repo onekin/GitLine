@@ -2637,19 +2637,35 @@ InstallEController.prototype.execute=function(act){ //compose product and create
     	
 
 		/*step 1: Ask for product configuration equation*/
-		var productBranches=window.prompt("Please enter the configuration equation","");
+		//var productBranches=window.prompt("Please enter the configuration equation","");
+		
 		/*Eider: zure kodea hemen joan beharko litzateke. "Konfiguradore" antzeko bat sortu model.xml fitxategian*/
 		 /*dauden feature guztien izenekin. Bezeroak feature hoietan klikatzen doan einean SAT Solver-a jakin beharko du*/
 		 /* kongifurazioa baliagarria den edo ez*/
 
-		console.log("window closed");
-		if (productBranches!=null)
-			console.log("Config: "+productBranches);
-		else return;
-		var listBranches=productBranches.split(" ");
+		var htmlConfiguration='<html><head><title>GitDelta Configurator</title></head><body><div align="center"><br><input type="checkbox" id="option1" value="Feature A"> Feature A<br><input type="checkbox" id="option2" value="Feature B" checked> Feature B<br><input type="checkbox" id="option3" value="Feature C"> Feature C<br><br></div><input type="submit" value="Check"></body></html>';
+		UI.Dialog.show_product_configurator_dialog(htmlConfiguration,DeltaUtils.checkConfigurationValidity);
+
 		
-		//Step 2: Precondition, check configuration equation correspond to branch names
-		console.log("step 3");
+   }
+};
+
+var DeltaUtils={};
+
+DeltaUtils.checkConfigurationValidity=function(featureList, featureModel){
+	//Eider: Fama deia hemen sartu. FAMA exekutatzeko script-compiler.js-n garatu beharko duzu funtzioa, eta hemetik deitu.
+	//begiratu zelan egiten dudan runFHComposition funtzioarekin produktua konposatzeko.
+	console.log("in checkConfigurationValidity");
+	if (true) //if validity is correct
+		DeltaUtils.enactProductComposition();
+	return false;
+}
+
+DeltaUtils.enactProductComposition=function(listBranches){//listBranches= array of feature selected
+		//var productBranches=window.prompt("Please enter the configuration equation","");
+		//var listBranches=productBranches.split(" ");
+		//Step 1: Precondition, check configuration equation correspond to branch names
+		console.log("step ");
     	ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
@@ -2669,10 +2685,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 				DeltaUtils.downloadBranches(ghAuthor,ghRepo,configFileContent,productConfig);
           	});
         });
-   }
-};
-
-var DeltaUtils={};
+}
 
 DeltaUtils.getUserAccessToken=function(){
 	return "877f51e5b60ac4fa652c21788d2b2d29a12f4556";
@@ -3257,6 +3270,257 @@ console.log("en iterate dirs for "+dir.name+ "and branhc "+branchName);
     }); 
 
 }
+
+DeltaUtils.showConfigurator=function(){
+	
+
+}
+
+UI = {};
+
+UI.opaque_layer ={
+		layer_css_style : "display:none; position:fixed; top:0px; left:0px; opacity:0.6; filter:alpha(opacity=60); background-color: #000000; z-Index:1000;",
+		
+		create : function(doc){
+			if(!doc) doc = document;
+			win = doc.defaultView;
+			
+			//only create if not created before
+			if(!doc.getElementById("opaque_layer")){
+				//create and add elements
+				var opaque_layer = doc.createElement("div");
+				opaque_layer.setAttribute("id", "opaque_layer");
+				opaque_layer.setAttribute("style", UI.opaque_layer.layer_css_style);
+			
+				doc.body.appendChild(opaque_layer);
+			}
+		},
+		show : function(doc){
+			if(!doc) doc = document;
+			
+			if(!UI.opaque_layer.exists(doc)) UI.opaque_layer.create(doc);
+			
+			UI.opaque_layer.setPosition(doc);				
+	
+			doc.getElementById("opaque_layer").style.display = "block";
+		},
+		hide : function(doc){
+			if(!doc) doc = document;
+	
+			doc.getElementById("opaque_layer").style.display = "none";
+		},
+		setPosition : function(doc){
+			if(!doc) doc = document;
+	
+			var bws = Util.getBrowserSize();
+			
+			var shadow = doc.getElementById("opaque_layer");
+			shadow.style.width = bws.width + "px";
+			shadow.style.height = bws.height + "px";
+		
+		},
+		exists : function(doc){
+			return doc.getElementById("opaque_layer");
+		},
+		visible : function(doc){
+			if(!doc) var doc = document;
+			return (doc.getElementById("opaque_layer") && doc.getElementById("opaque_layer").style.display == "block");
+		}
+	},
+
+UI.Dialog = {
+
+		fontStyle : "font-size: 12px; font-family: Arial, Helvetica, sans-serif;",
+		buttonStyle : "font-size: 12px; font-family: Arial, Helvetica, sans-serif; background: YellowGreen; color: White; margin: 5px; padding: 2px 4px; border: none; border-radius: 3px;",
+	
+		create_dialog : function(elems){			
+			
+		
+			//look for opaque layer
+			UI.opaque_layer.show(document);
+		
+			//if dialog already exists, change its content
+			if(document.getElementById("prompt_wf")){
+				main_div = document.getElementById("prompt_wf");
+				main_div.innerHTML = "";
+			}
+		
+			//else create div
+			else{
+				var main_div = document.createElement("div");
+				main_div.setAttribute("id", "prompt_wf");
+				main_div.setAttribute("style", "position: fixed; max-width: 400px; z-index: 7000; left: 50%; margin-left: -200px; top: 100px; background: white url() bottom right no-repeat; padding: 27px; border: 10px solid white; border-radius: 5px; text-align: center;"
+												+ "font-size: 12px;");
+											
+				document.body.appendChild(main_div);
+			}
+		
+			for(var i = 0; i < elems.length; i++){
+				main_div.appendChild(elems[i]);
+			}
+
+			var div_width = document.getElementById("prompt_wf").offsetWidth;
+			var margin_left = (parseInt(div_width)/2)*-1;
+		
+			document.getElementById("prompt_wf").style.marginLeft = margin_left+"px";
+		},
+	
+		remove_dialog : function(){
+			var documentc = document;
+		
+			//look for prompt div
+			if(documentc.getElementById("prompt_wf")){
+				var div = documentc.getElementById("prompt_wf");
+				div.parentNode.removeChild(div);
+				UI.opaque_layer.hide(documentc);
+			}
+		},
+	
+		/**
+		* This function creates a dialog that shows a string and an image
+		* @param {string} txt
+		* @param {string=} img An image represented as a BASE64 string that will be shown at the bottom of the message (optional)
+		**/
+		show_message : function(txt, img){
+			var documentc = document;
+			var p = documentc.createElement("p");
+			p.innerHTML = txt;
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 10px; text-align: center;");
+		
+			var elements = [p];
+		
+			if(img){
+				var im = documentc.createElement("img");
+				im.setAttribute("title", "Webfeeder message image");
+				im.setAttribute("alt", "Webfeeder message image");
+				im.setAttribute("src", img);
+				im.setAttribute("style", "display: inline; margin: 10px;");
+			
+				elements.push(im);
+			}
+	
+			//create dialog with created elements
+			UI.Dialog.create_dialog(elements);
+		},
+	
+		/**
+		* This function creates a dialog that shows two options: yes or no
+		* @param {string} txt
+		* @param {function} yes_callback
+		* @param {function} no_callback
+		**/
+
+											
+		show_wf_yesno_dialog : function(txt, yes_callback, no_callback){
+			//var document = document;
+		
+			var p = document.createElement("p");
+			p.innerHTML = txt;
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
+			
+			var yes_btn = document.createElement("input");
+			yes_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
+			yes_btn.setAttribute("value", "Yes");
+			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
+		
+			yes_btn.addEventListener("click", function(e){			
+				//delete prompt
+				UI.Dialog.remove_dialog();
+			
+				yes_callback();
+			});
+	
+			var no_btn = document.createElement("input");
+			no_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_no");
+			no_btn.setAttribute("value", "No");
+			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
+			
+			no_btn.addEventListener("click", function(e){			
+				//delete prompt
+				UI.Dialog.remove_dialog();
+		
+				no_callback();
+			});
+			
+			var elements = [p, yes_btn, no_btn];
+	
+			//create dialog with created elements
+			UI.Dialog.create_dialog(elements);
+		},
+		 //yes_callback the function to call when you press yes, and with no_callback when you press no
+		
+		show_product_configurator_dialog : function(txt, yes_callback, no_callback){
+			
+			var p = document.createElement("p");
+			p.innerHTML = txt;
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
+			
+			var yes_btn = document.createElement("input");
+			yes_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
+			yes_btn.setAttribute("value", "Create Product");
+			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
+		
+			yes_btn.addEventListener("click", function(e){	//create Product clickatu denean		
+				
+				//Eider, hemen checkbox-ak  begiratu ze featureak clickatu diren
+				//hona hemen adibidea: zu gero erabaki zelan egin :)
+				console.log(document.getElementById("option1").checked);
+
+				UI.Dialog.remove_dialog();//delete prompt
+			
+				yes_callback(); //call validity function (FAMA)
+			});
+	
+			var no_btn = document.createElement("input");
+			no_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_no");
+			no_btn.setAttribute("value", "Cancel");
+			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
+			
+			no_btn.addEventListener("click", function(e){			
+				//delete prompt
+				UI.Dialog.remove_dialog();
+		
+				no_callback();
+			});
+			
+			var elements = [p, yes_btn, no_btn];
+	
+			//create dialog with created elements
+			UI.Dialog.create_dialog(elements);
+		}
+	},
+
+Util={};
+
+Util.getBrowserSize = function(doc){
+		if(!doc) doc = document;
+		win = doc.defaultView;
+	
+		var intH = 0;
+		var intW = 0;
+	
+		if (typeof win.innerWidth == 'number') {
+			intH = win.innerHeight;
+			intW = win.innerWidth;
+		} else if (doc.documentElement && (doc.documentElement.clientWidth || doc.documentElement.clientHeight)){
+			intH = doc.documentElement.clientHeight;
+			intW = doc.documentElement.clientWidth;
+		} else if (doc.body && (doc.body.clientWidth || doc.body.clientHeight)) {
+			intH = doc.body.clientHeight;
+			intW = doc.body.clientWidth;
+		}
+
+		return {
+			width: parseInt(intW),
+			height: parseInt(intH)
+		};
+	};
+
+
 
 DeltaUtils.getErrorLog=function(){
 	var log=GetLogFileContent();

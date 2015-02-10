@@ -896,6 +896,26 @@ jQuery.noConflict();
 
 		},
 
+		fetchFork : function (callback){
+			var that = this;
+			that.forks = [];
+
+			Gh3.Helper.callHttpApi({
+				service : "repos/"+that.user.login+"/"+that.name+"/forks",
+				success : function(res) {
+					_.each(res.data, function (branch) {
+						that.forks.push(new Gh3.Repostiory(repository.name, that.user) );
+					});
+
+					if (callback) callback(null, that);
+				},
+				error : function (res) {
+					if (callback) callback(new Error(res.responseJSON.message),res);
+				}
+			});
+
+		},
+
 		fetchBranches : function (callback) {
 			var that = this;
 			that.branches = [];
@@ -1082,6 +1102,7 @@ jQuery.noConflict();
 
 		},*/
 		getBranches : function () { return this.branches; },
+		getForks : function () {return this.forks;},
 		getPullRequests : function () { return this.pulls; },
 		getBranchByName : function (name) {
 			return _.find(this.branches, function (branch) {
@@ -1384,11 +1405,13 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						    var tabTemplate=document.createElement("template");
 						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
+
 						    return newTab.querySelector("li");
 						     };
 						   return object;
 						 	}
-						   }; 	  
+						   }; 
+
 	  
 	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
 this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[contains(@class,'js-range-editor is-collapsed ')]/*",supplements:[],                 
@@ -1926,8 +1949,8 @@ LoadEController.prototype.init=function(func){
 
 /*Eider: loadEController funtzioa exekutazen da GitHub Orrian sartzerakoan*/
 LoadEController.prototype.execute=function(){       
-
- console.log("LoadEController dentrooo");
+//EIG: erabili behar diren parametroak editFile funt
+ console.log("LoadEController SCRIPT LOADED");
  var user=GitHub.getUserName(); 
  console.log("user "+user);
  var token=GitHub.getAuthenticityToken(); 
@@ -1996,7 +2019,7 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  }else console.log("not going to retreive for update features");
 
 
-/****API DEIA PROBA EIDERRRENTZAT****/
+/**** Leti: MODEL API DEIA PROBA EIDERRRENTZAT****/
 console.log("API DEIA PROBA ");
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
@@ -2016,15 +2039,21 @@ console.log("API DEIA PROBA ");
 			      	  else{
 			      	  	//Step 2: leer contenido del product config
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
-			      	  		console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
+			      	  	console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
+			      	  	//Step8:Edit content//step 8
+			      	  		var commit=master.getLastCommit().sha;
+			      	  		var token=var token=GitHub.getAuthenticityToken();
+			      	  		DeltaUtils.editFile(author,repo,"master","model.xml",commit,token,"editted content","update model.xml",function(){
+			      	  			console.log("editted file");
+			      	  		});	
+			      	  		
 			      	  	});
 			      	  }
 			      	});
 			    });
 			});
+
 /**API deia proba amaituta*/
-
-
 
 
 /*var botonToAsana=GitHub.getButtonToAsana();
@@ -2530,7 +2559,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 				      	  	return;
 				      	}
 				      	else{
-				      	  	console.log(222);
+				      	  	console.log(222-3);
 				      	  	//step 2: leer el product config
 
 				      	  	productConfigFile.fetchContent(function (err, res){
@@ -2606,65 +2635,522 @@ var InstallEController=function(){
 
 InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 
-	var docTile= document.title;
-	var str=docTile.split("at ");
-	var currentBranch=str[1];
-	if(!currentBranch) currentBranch="master";
+		var docTile= document.title;
+		var str=docTile.split("at ");
+		var currentBranch=str[1];
+		if(!currentBranch) currentBranch="master";
 	
-	if(act=="add"){
-		var obj=this;
-		var install=new ActionView();
-		install.setViewData({click:function(){obj.execute("run");}});
-		var render=install.render();
-		GitHub.injectIntoActions(render);
-	}else if(act=="run"){
-		var user=GitHub.getUserName(); 
-		var author=GitHub.getCurrentAuthor(); 
-		var repo=GitHub.getCurrentRepository();
-		var token=GitHub.getAuthenticityToken(); 	
-		var configFileContent="";
-		var error=false;
-		//clean projetc folder
-	
-		/*step 0: Clean profile folder*/
-		console.log("To erase project folder");
-		CleanProjectFolder();
+		if(act=="add"){
+			var obj=this;
+			var install=new ActionView();
+			install.setViewData({click:function(){obj.execute("run");}});
+			var render=install.render();
+			GitHub.injectIntoActions(render);
+		}else if(act=="run"){
 
-		var ghAuthor = new Gh3.User(author);
-    	var ghRepo = new Gh3.Repository(repo, ghAuthor);
-		console.log(ghRepo);
-    	var productConfig="";
-    	
-
-		/*step 1: Ask for product configuration equation*/
-		//var productBranches=window.prompt("Please enter the configuration equation","");
+			var botonAukera=window.prompt("Insert or Create?","insert");
+			if(botonAukera=="insert"){
+				console.log("insertFeature");
+				DeltaUtils.interfaceOfInsertFeature(1);
+			}else{
+			var user=GitHub.getUserName(); 
+			var author=GitHub.getCurrentAuthor(); 
+			var repo=GitHub.getCurrentRepository();
+			var token=GitHub.getAuthenticityToken(); 	
+			var configFileContent="";
+			var error=false;
+			//clean projetc folder
 		
-		/*Eider: zure kodea hemen joan beharko litzateke. "Konfiguradore" antzeko bat sortu model.xml fitxategian*/
-		 /*dauden feature guztien izenekin. Bezeroak feature hoietan klikatzen doan einean SAT Solver-a jakin beharko du*/
-		 /* kongifurazioa baliagarria den edo ez*/
+			/*step 0: Clean profile folder*/
+			console.log("To erase project folder");
+			CleanProjectFolder();
 
-		var htmlConfiguration='<html><head><title>GitDelta Configurator</title></head><body><div align="center"><br><input type="checkbox" id="option1" value="Feature A"> Feature A<br><input type="checkbox" id="option2" value="Feature B" checked> Feature B<br><input type="checkbox" id="option3" value="Feature C"> Feature C<br><br></div><input type="submit" value="Check"></body></html>';
-		UI.Dialog.show_product_configurator_dialog(htmlConfiguration,DeltaUtils.checkConfigurationValidity);
+			var ghAuthor = new Gh3.User(author);
+	    	var ghRepo = new Gh3.Repository(repo, ghAuthor);
+			console.log(ghRepo);
+
+			
+
+	    	var manual=window.prompt("manual or assited configuration?","assisted");
 
 		
-   }
+		
+			if(manual=="manual"){
+				/*step 1: Ask for product configuration equation*/
+				var productBranches=window.prompt("Please enter the configuration equation","");
+				
+				var listBranches=productBranches.split(" ");
+
+				DeltaUtils.enactProductComposition(listBranches,ghRepo,ghAuthor);//listBranches= array of feature selected
+			}
+			else if(manual=="assisted"){
+			
+				DeltaUtils.createConfigurator(0); 
+			}
+			
+   		}}
+
+   	
 };
 
 var DeltaUtils={};
 
+DeltaUtils.interfaceOfInsertFeature=function(insertoption){
+	var configString='<html><head><title>Insert a Feature</title></head>';
+	if(insertoption==1){
+		configString+=("<div align='center'>");
+		configString+=("<p> What kind of feature you want to add? </p>");
+		configString+=("<input value='mandatory' name='insertType' class='kind' type=radio  /> Mandatory");
+		configString+=("<br>");
+		configString+=("<input value='optional' name='insertType' class='kind' type=radio /> Optional  ");
+		configString+=("<br>");
+		configString+=("<input value='alternative' name='insertType' class='kind' type=radio /> Alternative");
+		configString+=("<br></div></html>");
+
+	}
+	UI.Dialog.show_insertFeatureInterfaze(configString,1);
+
+}
+
+
+DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
+	console.log(222311);
+		  // perform the security-sensitive operation here
+		var checkedValue = null; 
+		var parser = new DOMParser();
+		var html_nodes= docu;// parser.parseFromString(configString,"text/html");
+
+		if(phase==1){
+		var inputElements = html_nodes.getElementsByClassName('kind');
+		}
+
+		if(phase==2){
+		var inputElements = html_nodes.getElementsByClassName('features');
+		}
+
+		//get the checked option
+		var checkedOption = "";
+		for(var i=0; i<inputElements.length; i++){
+			if(inputElements[i].checked){//if checked
+				checkedOption+=inputElements[i].value;
+			}
+		}
+		console.log("Kind of insert: "+checkedOption);
+
+		if(checkedOption==""){
+			window.alert("You have to select one option");
+			DeltaUtils.selectedInsert(docu);
+		}
+
+
+		if(checkedOption=="mandatory" || checkedOption=="optional" ){
+			console.log("mandatory of optional");
+			DeltaUtils.createConfigurator(3,checkedOption);
+
+		}
+		else if(checkedOption=="alternative"){
+			console.log("alternative");
+			DeltaUtils.createConfigurator(4,checkedOption);
+
+		} else{
+			console.log("Ezaugarria aukeratuta");
+
+			//EIG: insert the name of the new feature, valid the name
+			var newName =window.prompt("Name of the new feature");
+			var arraynewName = newName.split(' ');
+			var arrayOfFeatures = allFeatures.split(' ');
+			newName="";
+			for (i=0; i<arraynewName.length;i++){
+				newName+=arraynewName[i];
+				
+			}
+			console.log(newName);
+			console.log("arrayofFEatures:"+arrayOfFeatures);
+			for (i=0; i<arrayOfFeatures.length-1;i++){
+				console.log(arrayOfFeatures[i]);
+				if(newName.toLowerCase()==arrayOfFeatures[i].toLowerCase()){
+					window.alert("The name of two features can not be repeated");
+					DeltaUtils.selectedInsert(docu, phase, allFeatures,kind);
+				}
+			}
+
+			//EIG: if the name is valid, insert in de model.
+			if(kind=="mandatory"){
+				var kindOption=0;
+			}
+			if(kind=="optional"){
+				var kindOption=1;
+			}
+			if(kind=="alternative"){
+				var kindOption=2;
+			}
+			var insertValid=insertFeature(checkedOption, newName,kindOption);
+			var user=GitHub.getUserName(); 
+	 		var token=GitHub.getAuthenticityToken(); 
+	 		var repo=GitHub.getCurrentRepository(); 
+
+			DeltaUtils.createBranch(checkedOption, newName,user,repo,token,function(){
+				if(insertValid!=0){
+				console.log("aldatuuuu");
+				var user=GitHub.getUserName(); 
+	 			var token=GitHub.getAuthenticityToken(); 
+	 			var author=GitHub.getCurrentAuthor(); 
+	 			var repo=GitHub.getCurrentRepository(); 
+	 			var ghUser=new Gh3.User(user);
+				var ghUserRepo=new Gh3.Repository(repo,ghUser);
+				DeltaUtils.sleep(1000);
+				ghUserRepo.fetch(function (err, res) {
+					console.log(ghUserRepo);
+					console.log("lehenengo fetch");
+					if(err) { console.log("ERROR ghRepo.fetch");}
+					ghUserRepo.fetchBranches(function(err,res){
+						console.log("bigarren fetch");
+						var master= ghUserRepo.getBranchByName("master");//master
+						master.fetchCommits(function(err,res){
+							console.log("hirugarren fetch");
+							var commit=master.getLastCommit().sha;
+							console.log("commit for postinf product "+commit);
+							//EIG: Arazoa1 editFile deitzerakoan
+							DeltaUtils.editFile(user, repo, "master","model.xml",commit, token, insertValid, "new model.xml",function(){
+								console.log(insertValid);
+								console.log(kind);
+								DeltaUtils.createConfiguratorForPropagation();
+							});
+						});
+					});
+				});
+			}
+			
+			});
+			
+		}
+
+
+}
+
+DeltaUtils.createConfiguratorForPropagation=function(){
+	var user=GitHub.getUserName(); 
+	var repo=GitHub.getCurrentRepository(); 
+	var ghUser=new Gh3.User(user);
+	var ghUserRepo=new Gh3.Repository(repo,ghUser);
+	DeltaUtils.sleep(1000);
+				ghUserRepo.fetch(function (err, res) {
+					console.log(ghUserRepo);
+					console.log("lehenengo fetch");
+					if(err) { console.log("ERROR ghRepo.fetch");}
+					ghUserRepo.fetchFork(function(err,res){
+						console.log("bigarren fetch");
+						//EIG: Arazoa2 .getForks() ez ditu fork-ak itzultzen
+						var Forks= ghUserRepo.getForks();
+						console.log(Forks);
+					
+	
+					});
+				});
+
+}
+
+DeltaUtils.createConfigurator=function(option, kind){
+	//Irakurri feature Modela
+	var user=GitHub.getUserName(); 
+	var author=GitHub.getCurrentAuthor(); 
+	var ghAuthor= new Gh3.User(author);
+	var repo=GitHub.getCurrentRepository();
+	var token=GitHub.getAuthenticityToken();
+			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
+	    	//1: access repository
+			ghAuthorRepo.fetch(function (err, res) {
+	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+				//2:fetch repository all branches
+				ghAuthorRepo.fetchBranches(function (err, res) {
+					var master=ghAuthorRepo.getBranchByName("master");//3: get master branh
+					master.fetchContents(function (err, res) {//4: get contents (folders and files) for master branch
+			          if(err) { throw "outch ..." }
+			          var featureModelFile = master.getFileByName("model.xml");//5: get model.xml file
+			      	  if(featureModelFile==null){
+			      	  	console.log("Could not reach model.xml file in master branch!\n.");
+			      	  	return;
+			      	  }
+			      	  else{
+			      	  	//Step 2: read model content
+
+			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
+			      	  		var xml=featureModelFile.getRawContent();//xml String with the xml document content
+			      	  		//console.log(xml);//7: gte raw content and display in console
+			      	  		saveFeatureModel(xml,1);
+
+			   
+			      	  		var parser = new DOMParser();
+ 				  			var xmlNodes = parser.parseFromString(xml, "application/xml");
+			      	  		//console.log("Node: \n"+xmlNodes);
+			      	  		
+			      	  		
+			      	  		var configString='<html><head><title>GitDelta Configurator</title></head>';//</body></html>';
+							
+							if(option==0){
+								//EIG: get Core features
+			      	  			validProduct(1);
+								path="//feature/@name | //solitaryFeature/@name | //groupedFeature/@name"
+								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
+								var result=nodes.iterateNext();
+								//configString+=("<center>");
+								//configString+=("<table style='width:100%'><tr>");
+								var arrayofFeatures= readFileForExplanation(3);
+								var kont=0;
+								configString+=("<div align='center'>");
+								configString+=("<p> Select the features for your product </p>");
+								while (result){
+									  configString+=("<input value=");
+									  configString+=(result.nodeValue);
+
+									   if(arrayofFeatures[kont]== result.nodeValue){
+									  	configString+=("  name='features' class='features' type=checkbox  disabled checked/>");
+									  	kont++;
+									  }else{
+									  	configString+=("  name='features' class='features' type=checkbox  />");
+									  }
+									  
+									  configString+=(result.nodeValue);
+									  configString+=("<br>");
+									  result=nodes.iterateNext();
+								}
+								//configString+=("</center>");
+								configString+=("</div>");
+								configString+='</body></html>';
+								UI.Dialog.show_product_configurator_dialog(configString,DeltaUtils.selectedCheck,DeltaUtils.selectedCheck,option);
+							}
+							//EIG: if the product is valid
+							if(option==1){
+
+								configString+=("<td><div align='center'>");
+								configString+=("<p> Your product is valid </p>");
+								var arrayofFeatures= readFileSelectedFeaturesLocal();
+								configString+=("<ul>");
+									for (i=0; i<arrayofFeatures.length-1;i++){
+										configString+=("<li>");
+										configString+=(arrayofFeatures[i]);
+										configString+=("</li>");
+									}
+									configString+=("</ul>");
+									configString+=("</div></td>");
+								configString+='</body></html>';
+								UI.Dialog.show_product_configurator_dialog(configString,DeltaUtils.selectedCheck,DeltaUtils.selectedCheck,option);
+							}
+
+
+							//EIG: if the product is invalid
+							if(option==2){
+								configString+=("<table style='width:100%''>");
+								configString+=("<tr><th  style='bold' colspan='3'>Your porduct is NOT valid </td></tr>");
+								configString+=("<tr><td  width='30%'>Selected features </td><td width='30%'>Features to deselect </td><td width='30%'> Proposed product</td></tr>");
+								
+								//EIG: checkbox-ak
+								configString+=("<tr><td   width='30%'><div align='center'>");
+								path="//feature/@name | //solitaryFeature/@name | //groupedFeature/@name"
+								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
+								var result=nodes.iterateNext();
+								var arrayofFeatures= readFileForExplanation(2);
+								var arrayofFeaturesEvery= readFileForExplanation(3);
+								var kont=0;
+								var kontEvery=0;
+								while (result){
+									  configString+=("<input value=");
+									  configString+=(result.nodeValue);
+									  
+									  if(arrayofFeaturesEvery[kontEvery]== result.nodeValue){
+									  	configString+=("  name='features' class='features' type=checkbox  disabled checked/>");
+									  	kont++;
+									  	kontEvery++;
+									  }
+									  else if(arrayofFeatures[kont]== result.nodeValue){
+									  	configString+=("  name='features' class='features' type=checkbox   checked/>");
+									  	kont++;
+									  }
+									  
+									  else{
+									  	configString+=("  name='features' class='features' type=checkbox  />");
+									  }
+									  configString+=(result.nodeValue);
+									  configString+=("<br>");
+									  result=nodes.iterateNext();
+								}
+
+								configString+=("</div></td>");
+								
+
+
+								//EIG: Features to deselect
+								configString+=("<td width='30%'><div align='center'>");
+								var arrayofFeatures= readFileForExplanation(0);
+								configString+=("<ul>");
+									for (i=0; i<arrayofFeatures.length-1;i++){
+										configString+=("<li>");
+										configString+=(arrayofFeatures[i]);
+										configString+=("</li>");
+									}
+
+								configString+=("</ul>");
+								configString+=("</div></td>");
+
+								//EIG: Proposed product
+								configString+=("<td width='30%'><div align='center'>");
+								//configString+=("<p> Proposed product </p>");
+								var arrayofFeatures= readFileForExplanation(1);
+								configString+=("<ul>");
+									for (i=0; i<arrayofFeatures.length-1;i++){
+										configString+=("<li>");
+										configString+=(arrayofFeatures[i]);
+										configString+=("</li>");
+									}
+									
+								configString+=("</ul>");
+								configString+=("</div></td>");
+ 
+								configString+=("</tr></table>");
+
+								configString+='</body></html>';
+								UI.Dialog.show_product_configurator_dialog(configString,DeltaUtils.selectedCheck,DeltaUtils.selectedCheck,option);
+							}
+
+							//EIG: all features to select one (insertFeature)
+							if(option==3){
+								saveFeatureModel(xml,2);
+								path="//feature/@name | //solitaryFeature/@name | //groupedFeature/@name"
+								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
+								var result=nodes.iterateNext();
+								var allFeatures = "";
+								configString+=("<div align='center'>");
+								configString+=("<p> Where you want to insert the new feature ? </p>");
+								while (result){
+									  configString+=("<input value=");
+									  configString+=(result.nodeValue);
+									  configString+=("  name='features' class='features' type=radio />");
+									  configString+=(result.nodeValue);
+									  configString+=("<br>");
+									  allFeatures+=result.nodeValue+" ";
+									  result=nodes.iterateNext();
+								}
+								configString+=("</div>");
+								configString+='</body></html>';
+								console.log(allFeatures);
+								UI.Dialog.show_insertFeatureInterfaze(configString,2,allFeatures,kind);
+							}
+							//EIG: features with alternative (insertFeature)
+							if(option==4){
+								saveFeatureModel(xml,2);
+								console.log("option4");
+								path="//solitaryFeature[setRelation/cardinality]/@name | //groupedFeature[setRelation/cardinality]/@name"
+								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
+								var result=nodes.iterateNext();
+								var allFeatures = "";
+								configString+=("<div align='center'>");
+								configString+=("<p> Where you want to insert the new feature ? </p>");
+								while (result){
+									  configString+=("<input value=");
+									  configString+=(result.nodeValue);
+									  configString+=("  name='features' class='features' type=radio />");
+									  configString+=(result.nodeValue);
+									  configString+=("<br>");
+									  allFeatures+=result.nodeValue+" ";
+									  result=nodes.iterateNext();
+								}
+								configString+=("</div>");
+								configString+='</body></html>';
+								console.log(allFeatures);
+								UI.Dialog.show_insertFeatureInterfaze(configString,2,allFeatures,kind);
+							}
+			
+							//configString+='</body></html>';
+							
+
+							//UI.Dialog.show_product_configurator_dialog(configString,DeltaUtils.selectedCheck,DeltaUtils.selectedCheck,option);
+			      	  	});
+			      	  }
+			      	});
+			    });
+			});
+}
+
+DeltaUtils.selectedCheck=function(docu){
+	console.log(222311);
+		  // perform the security-sensitive operation here
+		var checkedValue = null; 
+		var parser = new DOMParser();
+	//	console.log(configString);
+		var html_nodes= docu;// parser.parseFromString(configString,"text/html");
+		//console.log(html_nodes);
+		var inputElements = html_nodes.getElementsByClassName('features');
+		//console.log("inputElements "+inputElements.length);
+		//console.log(inputElements);
+		var featuresSelected = "";
+		for(var i=0; i<inputElements.length; i++){
+			//console.log(inputElements[i].value);
+			console.log(i);
+			if(inputElements[i].checked){//if checked
+				featuresSelected+=inputElements[i].value+" ";
+			}
+		}
+		console.log("selected features: "+featuresSelected);
+
+		//EIG: save SelectedFeatures
+		saveSelectedFeatures(featuresSelected);
+	
+	
+		//EIG: read selectedFeaturesLocal
+		//readFileSelectedFeaturesLocal();
+
+		DeltaUtils.checkConfigurationValidity();
+		//call FAMA to check validity of featuresSelected and model.xml
+		//1.Download Model.xml to local folder
+		//2.Call Fama to check validity
+		//3.If 
+}
+
+
 DeltaUtils.checkConfigurationValidity=function(featureList, featureModel){
-	//Eider: Fama deia hemen sartu. FAMA exekutatzeko script-compiler.js-n garatu beharko duzu funtzioa, eta hemetik deitu.
-	//begiratu zelan egiten dudan runFHComposition funtzioarekin produktua konposatzeko.
-	console.log("in checkConfigurationValidity");
-	if (true) //if validity is correct
-		DeltaUtils.enactProductComposition();
+
+
+	//EIG: the product is valid?
+	validProduct(2);
+	//EIG: read isValid.txt, is valid de selected product
+	var isValid=readFileIsValid();
+	console.log("The product is valid:"+isValid);
+
+	if (isValid==1){ //if validity is correct
+		
+		DeltaUtils.createConfigurator(1);
+		//DeltaUtils.enactProductComposition();
+	}
+	else{
+		
+		DeltaUtils.createConfigurator(2);
+	}
 	return false;
 }
 
-DeltaUtils.enactProductComposition=function(listBranches){//listBranches= array of feature selected
+
+//EIG: function to create the product whith the valid configuration
+//option=1 --> create product from proposedProductFile.txt
+//option=2 --> create product from selectedFeaturesLocal.txt
+DeltaUtils.createProduct=function(option){
+	var author=GitHub.getCurrentAuthor();
+	var user=GitHub.getUserName(); 
+	var repo=GitHub.getCurrentRepository();
+
+	var ghUser=new Gh3.User(user);
+	var ghAuthor= new Gh3.User(author);
+	var ghRepo= new Gh3.Repository(repo, ghUser);
+
+	var listBranches=readFileForExplanation(option);
+	DeltaUtils.enactProductComposition(listBranches,ghRepo,ghAuthor);
+	
+}
+//EIG:productua sortu!
+DeltaUtils.enactProductComposition=function(listBranches,ghRepo,ghAuthor){//listBranches= array of feature selected
 		//var productBranches=window.prompt("Please enter the configuration equation","");
 		//var listBranches=productBranches.split(" ");
 		//Step 1: Precondition, check configuration equation correspond to branch names
+		var productConfig, configFileContent="";
 		console.log("step ");
     	ghRepo.fetch(function (err, res){
           if(err) { console.log("ERROR ghRepo.fetch"); }
@@ -2879,14 +3365,16 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 }
 
 
-DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
+DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg,func){
+	console.log(" start in Edit File");
 	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
 			Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
-
+				func();
 			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
 		},"POST","authenticity_token="+encodeURIComponent(token));
 	},"GET");
+	console.log(" start in Edit File");
 }
 
 
@@ -2920,10 +3408,11 @@ DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fil
 		},"POST","authenticity_token="+encodeURIComponent(token));
 	},"GET");
 }
-
-DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f){
+//EIG
+DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f_callback){
 	console.log("createBranch "+newBranchName);
 	Utils.XHR("/"+user+"/"+repo+"/tree/"+parent,function(res){
+		f_callback();
 		Utils.XHR("/"+user+"/"+repo+"/branches",function(res){
 		},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+parent+"&name="+newBranchName+"&path=");	
 	},"GET");
@@ -2984,6 +3473,8 @@ DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featu
 DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha,isProductFork,isForwardProp){//tiene set timeOut para el post product
 	console.log("isForwardProp= "+isForwardProp);
 	if(content.type=="file"){ 
+
+
 		console.log("contnet "+content.name);
 		console.log(content);
 		console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
@@ -3057,8 +3548,10 @@ DeltaUtils.downloadBranches=function(ghAuthor,ghRepo,configFileContent,productCo
 	}
 }
 
+//eig:
 DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig){
 	//step 4: compose branches content with the config file (branch names)
+
 	console.log("inside product fork");
 	var user=GitHub.getUserName(); 
 	var author=GitHub.getCurrentAuthor(); 
@@ -3169,7 +3662,7 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 	ghRepo.fetch(function (err,res){
 		console.log(res);
 		ghRepo.fetchBranches(function(err,res){
-			console.log(222);
+			console.log(222-2);
 			var branch=ghRepo.getBranchByName("seeds");
 			branch.fetchContents(function (err, res) {//for master branch only
 				if(err) { throw "outch ..." }
@@ -3191,7 +3684,6 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 					},"POST","authenticity_token="+encodeURIComponent(token));
 				},"GET");
 			});
-
 		});
 
 	});
@@ -3409,7 +3901,45 @@ UI.Dialog = {
 		* @param {function} yes_callback
 		* @param {function} no_callback
 		**/
-
+		show_insertFeatureInterfaze : function(txt, phase, allFeatures,kind){
+			//var document = document;
+		
+			var p = document.createElement("p");
+			p.innerHTML = txt;
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
+			
+			var yes_btn = document.createElement("input");
+			yes_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
+			yes_btn.setAttribute("value", "Acept");
+			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
+		
+			yes_btn.addEventListener("click", function(e){			
+				//delete prompt
+				DeltaUtils.selectedInsert(p,phase,allFeatures,kind);
+				UI.Dialog.remove_dialog();
+			
+				yes_callback();
+			});
+	
+			var no_btn = document.createElement("input");
+			no_btn.setAttribute("type", "button");
+			yes_btn.setAttribute("id", "general_FFD_dialog_no");
+			no_btn.setAttribute("value", "Cancel");
+			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
+			
+			no_btn.addEventListener("click", function(e){			
+				//delete prompt
+				UI.Dialog.remove_dialog();
+		
+				no_callback();
+			});
+			
+			var elements = [p, yes_btn, no_btn];
+	
+			//create dialog with created elements
+			UI.Dialog.create_dialog(elements);
+		},
 											
 		show_wf_yesno_dialog : function(txt, yes_callback, no_callback){
 			//var document = document;
@@ -3451,7 +3981,7 @@ UI.Dialog = {
 		},
 		 //yes_callback the function to call when you press yes, and with no_callback when you press no
 		
-		show_product_configurator_dialog : function(txt, yes_callback, no_callback){
+		show_product_configurator_dialog : function(txt, yes_callback, no_callback,option){
 			
 			var p = document.createElement("p");
 			p.innerHTML = txt;
@@ -3460,34 +3990,75 @@ UI.Dialog = {
 			var yes_btn = document.createElement("input");
 			yes_btn.setAttribute("type", "button");
 			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
-			yes_btn.setAttribute("value", "Create Product");
+			//yes_btn.setAttribute("value", "Create Product");
+			if(option==1){
+				yes_btn.setAttribute("value", "Create Your Product");
+			}else if(option==2){
+				yes_btn.setAttribute("value", "Create Proposed Product");
+			}
 			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
 		
 			yes_btn.addEventListener("click", function(e){	//create Product clickatu denean		
-				
-				//Eider, hemen checkbox-ak  begiratu ze featureak clickatu diren
-				//hona hemen adibidea: zu gero erabaki zelan egin :)
-				console.log(document.getElementById("option1").checked);
-
+				console.log("yes_btn");
+				if(option==1){
+					console.log("Your product is created");
+					DeltaUtils.createProduct(2);
+				}else if (option==2){
+					console.log("Proposed product is created");
+					DeltaUtils.createProduct(1);
+				}
 				UI.Dialog.remove_dialog();//delete prompt
-			
-				yes_callback(); //call validity function (FAMA)
 			});
 	
 			var no_btn = document.createElement("input");
 			no_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_no");
-			no_btn.setAttribute("value", "Cancel");
+			no_btn.setAttribute("id", "general_FFD_dialog_no");
+			if(option==0){
+				no_btn.setAttribute("value", "Check validity");
+			}else if(option==2){
+				no_btn.setAttribute("value", "Check validity again");
+			}
+			
 			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
 			
 			no_btn.addEventListener("click", function(e){			
 				//delete prompt
 				UI.Dialog.remove_dialog();
-		
-				no_callback();
+				DeltaUtils.selectedCheck(p);
 			});
 			
-			var elements = [p, yes_btn, no_btn];
+			var calcel_btn = document.createElement("input");
+			calcel_btn.setAttribute("type", "button");
+			calcel_btn.setAttribute("id", "general_FFD_dialog_cancel");
+			calcel_btn.setAttribute("value", "Cancel");
+			calcel_btn.setAttribute("style", UI.Dialog.buttonStyle);
+			
+			calcel_btn.addEventListener("click", function(e){			
+				//delete prompt
+				UI.Dialog.remove_dialog();
+			});
+
+			var start_btn = document.createElement("input");
+			start_btn.setAttribute("type", "button");
+			start_btn.setAttribute("id", "general_FFD_dialog_start");
+			start_btn.setAttribute("value", "Check Validity of another Product");
+			start_btn.setAttribute("style", UI.Dialog.buttonStyle);
+			
+			start_btn.addEventListener("click", function(e){			
+				//delete prompt
+				console.log("botoia");
+				DeltaUtils.createConfigurator(0);
+				UI.Dialog.remove_dialog();
+			});
+
+			if(option==0){
+				var elements = [p,no_btn, calcel_btn];
+			}else if (option==1){
+				var elements = [p,  yes_btn, start_btn, calcel_btn];
+			}else if(option==2){
+				var elements = [p,no_btn, yes_btn,calcel_btn];
+			}
+			//var elements = [p, yes_btn, no_btn, calcel_btn];
 	
 			//create dialog with created elements
 			UI.Dialog.create_dialog(elements);

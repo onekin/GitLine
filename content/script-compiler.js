@@ -25,6 +25,147 @@ scxmlResolver: function(ns){
 	if(ns=="scxml") 	return "http://www.w3.org/2005/07/scxml";
 },
 
+//EIG: readFileSelectedFeaturesLocal
+readFileForExplanation: function(option){
+
+	try{
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+
+	if(option==0){
+		if(osString=="Darwin")
+				theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "featuresToDeselect.txt";
+		else if (osString=="WINNT")
+				theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"featuresToDeselect.txt";
+	}
+
+	if(option==1){
+		if(osString=="Darwin")
+				theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "proposedProductFile.txt";
+		else if (osString=="WINNT")
+				theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"proposedProductFile.txt";
+	}
+
+	if(option==2){
+		if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "selectedFeaturesLocal.txt";
+		else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"selectedFeaturesLocal.txt";
+	}
+
+	if(option==3){
+		if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "featuresOnEvery.txt";
+		else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"featuresOnEvery.txt";
+	}
+
+	file.initWithPath( theFilePath );
+
+	var data = "";
+	var fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+	var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].createInstance(Components.interfaces.nsIConverterInputStream);
+	fstream.init(file, -1, 0, 0);
+	cstream.init(fstream, "UTF-8", 0, 0); // you can use another encoding here if you wish
+	
+	let (str = {}) {
+ 		let read = 0;
+  		do { 
+    		read = cstream.readString(0xffffffff, str); // read as much as we can and put it in str.value
+    		data += str.value;
+    		//alert(data);
+  		} while (read != 0);
+	}
+	
+	var arrayOfFeatures = data.split(' ');
+	//alert( option+'The array has ' + arrayOfFeatures.length + ' elements: ' + arrayOfFeatures.join(' / '));
+	return arrayOfFeatures;
+
+	}catch (err){
+		alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		alert("Parameters: "+parameters);
+	}
+},
+
+//EIG: readFileSelectedFeaturesLocal
+readFileSelectedFeaturesLocal: function(){
+
+	try{
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+
+	if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "selectedFeaturesLocal.txt";
+	else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"selectedFeaturesLocal.txt";
+
+	file.initWithPath( theFilePath );
+
+	var data = "";
+	var fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+	var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].createInstance(Components.interfaces.nsIConverterInputStream);
+	fstream.init(file, -1, 0, 0);
+	cstream.init(fstream, "UTF-8", 0, 0); // you can use another encoding here if you wish
+
+	let (str = {}) {
+ 		let read = 0;
+  		do { 
+    		read = cstream.readString(0xffffffff, str); // read as much as we can and put it in str.value
+    		data += str.value;
+    		//alert(data);
+  		} while (read != 0);
+	}
+	
+	var arrayOfFeatures = data.split(' ');
+	//alert('The array has ' + arrayOfFeatures.length + ' elements: ' + arrayOfFeatures.join(' / '));
+	return arrayOfFeatures;
+
+	}catch (err){
+		alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		alert("Parameters: "+parameters);
+	}
+},
+
+
+//EIG: readFileIsValid
+readFileIsValid: function(){
+
+	try{
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
+
+	if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "isValid.txt";
+	else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"isValid.txt";
+
+	file.initWithPath( theFilePath );
+
+	var data = "";
+	var fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+	var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].createInstance(Components.interfaces.nsIConverterInputStream);
+	fstream.init(file, -1, 0, 0);
+	cstream.init(fstream, "UTF-8", 0, 0); // you can use another encoding here if you wish
+
+	let (str = {}) {
+ 		let read = 0;
+  		do { 
+    		read = cstream.readString(0xffffffff, str); // read as much as we can and put it in str.value
+    		data += str.value;
+  		} while (read != 0);
+	}
+	return data;
+
+
+	}catch (err){
+		alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		alert("Parameters: "+parameters);
+	}
+},
+
 runFHComposition: function(configFileContent){
  	//alert("run FH");
 
@@ -94,7 +235,346 @@ runFHComposition: function(configFileContent){
 
 },
 
+//EIG: validProduct
+insertFeature: function(parent, newFeature, option){
+ 	alert("in insertar");
+ 	//alert(option);
+ 	 try{
 
+
+ 	 	//EIG: call JAR
+	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS; 
+		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+		var famaHome, famaJar, productFile, modelFile;
+		var path;  
+		if(option==0){
+			//if mac
+			if(osString == "Darwin"){ 
+				path= "/extensions/scxmlGitDelta@onekin.org/Fama/famaMandatory.sh"
+				famaHome=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama";
+			}
+				//if Windows	
+			else if (osString == "WINNT"){         
+				path="\\extensions\\scxmlGitDelta@onekin.org\\Fama\\famaMandatory.bat";
+				famaHome=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama";
+			}
+		}
+		if(option==1){
+			//if mac
+			if(osString == "Darwin"){ 
+				path= "/extensions/scxmlGitDelta@onekin.org/Fama/famaOptional.sh"
+				famaHome=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama";
+			}
+				//if Windows	
+			else if (osString == "WINNT"){         
+				path="\\extensions\\scxmlGitDelta@onekin.org\\Fama\\famaOptional.bat";
+				famaHome=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama";
+			}
+		}
+		if(option==2){
+			//if mac
+			alert("in option2");
+			if(osString == "Darwin"){ 
+				path= "/extensions/scxmlGitDelta@onekin.org/Fama/famaAlternative.sh"
+				famaHome=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama";
+			}
+				//if Windows	
+			else if (osString == "WINNT"){         
+				path="\\extensions\\scxmlGitDelta@onekin.org\\Fama\\famaAlternative.bat";
+				famaHome=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama";
+			}
+		}
+
+
+		shell.initWithPath(ProfilePath+ path);
+		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
+		proc.init(shell);
+		var parameters= [famaHome, parent, newFeature]
+		proc.run(true, parameters, parameters.length)
+
+		//EIG: get content of modelLocalInsertChanbe
+		var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+		if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "modelLocalInsertChange.xml";
+		else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"modelLocalInsertChange.xml";
+
+
+
+		file.initWithPath( theFilePath );
+		if(file.exists() == false) //check to see if file exists
+		{
+
+
+		    return 0;
+		}else{
+
+			alert("infileexist");
+			var data = "";
+			var fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+			var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].createInstance(Components.interfaces.nsIConverterInputStream);
+            fstream.init(file, -1, 0, 0);
+			cstream.init(fstream, "UTF-8", 0, 0); // you can use another encoding here if you wish
+
+			let (str = {}) {
+  				let read = 0;
+  				do { 
+   					 read = cstream.readString(0xffffffff, str); // read as much as we can and put it in str.value
+   					 data += str.value;
+  				} while (read != 0);
+			}
+			cstream.close(); // this closes fstream
+
+			alert(data);
+			return data;
+		}
+	}catch (err){
+		alert("ERROR in Running insertFeature!:"+err.message);
+		alert("Parameters: "+parameters);
+	}
+},
+
+//EIG: validProduct
+validProduct: function(option){
+ 	//alert("run validProduct");
+ 	//console.log("validProduct barnean");
+ 	 
+ 	 try{
+	    var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+		var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS; 
+		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
+		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+		var famaHome, famaJar, productFile, modelFile;
+		var path;  
+
+		if(option==1){
+			//if mac
+			if(osString == "Darwin"){ 
+				path= "/extensions/scxmlGitDelta@onekin.org/content/scripts/famaCore.sh"
+				famaHome=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama";
+				//famaJar=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/Balioztapena.jar";
+				//productFile= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/selectedFeaturesLocal.txt";
+				//modelFile= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/modelLocal.xml"
+			}
+			//if Windows	
+			else if (osString == "WINNT"){         
+				path="\\extensions\\scxmlGitDelta@onekin.org\\Fama\\famaCore.bat";
+				famaHome=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama";
+				//famaJar=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama\\Balioztapena.jar";
+				//productFile= ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\selectedFeaturesLocal.txt";
+				//modelFile= ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\modelLocal.xml"
+				
+			}
+		}
+
+		if(option==2){
+			//if mac
+			if(osString == "Darwin"){ 
+				path= "/extensions/scxmlGitDelta@onekin.org/content/scripts/famaValid.sh"
+				famaHome=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama";
+				famaJar=  ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/Balioztapena.jar";
+				productFile= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/selectedFeaturesLocal.txt";
+				modelFile= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/Fama/modelLocal.xml"
+			}
+			//if Windows	
+			else if (osString == "WINNT"){         
+				path="\\extensions\\scxmlGitDelta@onekin.org\\Fama\\famaValid.bat";
+				famaHome=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama";
+				//famaJar=  ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\Fama\\Balioztapena.jar";
+				//productFile= ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\selectedFeaturesLocal.txt";
+				//modelFile= ProfilePath+"\\extensions\\scxmlGitDelta@onekin.org\\content\\modelLocal.xml"
+				
+			}
+		}
+
+
+		shell.initWithPath(ProfilePath+ path);
+		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
+		proc.init(shell);
+
+		//var parameters =[configFile, fhHome, fhJar,productHome];//project home
+		//var parameters= [famaJar, modelFile, productFile, famaHome]
+		var parameters= [famaHome]
+		//alert("Parameters "+parameters );
+		proc.run(true, parameters, parameters.length)
+		//alert("Exekuzioa amaitu da" );
+	}catch (err){
+		alert("ERROR in Running ValidProduct!:"+err.message);
+		alert("Parameters: "+parameters);
+	}
+},
+
+//EIG: saveSelectedFeatures
+saveSelectedFeatures: function(checkedFeatures){
+	//alert("in saveSelectedFeatures");
+	try{
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+	var theFilePath;
+
+	if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "selectedFeaturesLocal.txt";
+	else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"selectedFeaturesLocal.txt";
+	
+	file.initWithPath( theFilePath );
+	if(file.exists() == false) //check to see if file exists
+	{
+	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
+	}
+	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+		
+	foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
+
+	var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
+	converter.init(foStream, "UTF-8", 0, 0);
+	converter.writeString(checkedFeatures);
+	converter.close(); // this closes foStream
+	}catch(e){
+		window.alert("ERROR:"+e);
+	}
+},
+
+//EIG: saveFeatureModel
+saveFeatureModel: function(featureModel, option){
+	//alert("in saveFeatureModel");
+	try{
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+	var theFilePath;
+
+	if(option==1){
+		if(osString=="Darwin")
+				theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "modelLocal.xml";
+		else if (osString=="WINNT")
+				theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"modelLocal.xml";
+	}
+	if(option==2){
+		if(osString=="Darwin")
+				theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "modelLocalInsert.xml";
+		else if (osString=="WINNT")
+				theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"modelLocalInsert.xml";
+	}
+	file.initWithPath( theFilePath );
+	if(file.exists() == false) //check to see if file exists
+	{
+	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
+	}
+	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+		
+	foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
+
+	var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
+	converter.init(foStream, "UTF-8", 0, 0);
+	converter.writeString(featureModel);
+	converter.close(); // this closes foStream
+	}catch(e){
+		window.alert("ERROR:"+e);
+	}
+},
+
+//EIG: add mandatory feature
+addMandatoryFeature: function(featureModel, featurechange, featurename){
+	//alert("in saveFeatureModel");
+	alert(featurechange);
+	alert(featurename);
+	try{
+
+	//save the model
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
+	var osString = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;  
+	var theFilePath;
+
+	if(osString=="Darwin")
+			theFilePath=ProfilePath + "/extensions/scxmlGitDelta@onekin.org/Fama/"+ "modelLocalInsert.xml";
+	else if (osString=="WINNT")
+			theFilePath=ProfilePath + "\\extensions\\scxmlGitDelta@onekin.org\\Fama\\"+"modelLocalInsert.xml";
+	
+	file.initWithPath( theFilePath );
+	if(file.exists() == false) //check to see if file exists
+	{
+	    file.create( Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 420);
+	}
+	var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+		
+	foStream.init(file, 0x02 | 0x08 | 0x20, 0666, 0); 
+
+	var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].createInstance(Components.interfaces.nsIConverterOutputStream);
+	converter.init(foStream, "UTF-8", 0, 0);
+	converter.writeString(featureModel);
+	converter.close(); // this closes foStream
+
+	//insert a new feature
+	var parser = new DOMParser();
+ 	var xmlNodes = parser.parseFromString(featureModel, "application/xml");
+	//path="//feature[@name] | //solitaryFeature/[@name] | //groupedFeature/[@name]"
+	path="//feature[@name='"+featurechange+"'] | //solitaryFeature[@name='"+featurechange+"']| //groupedFeature[@name='"+featurechange+"']";
+	var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
+	var result=nodes.iterateNext();
+	while(result){
+
+		if(result.hasAttributes){
+			alert("Attribute name:"+result.getAttribute("name"));
+			alert("Node name:"+result.nodeName);
+
+			//binaryRelation element
+			var binary = document.createElement("binaryRelation");
+			var nameB= document.createAttribute("name");
+			nameB.value="R-"+featurename;
+			binary.setAttributeNode(nameB);
+			alert(binary.getAttribute("name"));
+			
+
+			//cardinality element
+			var card = document.createElement("cardinality");
+			var max= document.createAttribute("max");
+			max.value="1";
+			var min= document.createAttribute("min");
+			min.value="1";
+			card.setAttributeNode(max);
+
+			//solitaryFeature element
+			var solitary= document.createElement("solitaryFeature");
+			var nameS= document.createAttribute("name");
+			nameS.value=featurename;
+			solitary.setAttributeNode(nameS);
+			//alert(solitary.getAttribute("name"));
+
+
+			// umeak txertatu
+
+			binary.appendChild(card);
+			binary.appendChild(solitary);
+
+			if ( binary.hasChildNodes() ) { 
+  				alert( binary.childNodes[0].nodeName );
+  				alert( binary.childNodes[1].nodeName );
+			}
+
+			if ( result.hasChildNodes() ) { 
+  				alert( result.childNodes[0].nodeName );
+  				alert( result.childNodes[1].nodeName );
+  				result.removeChild(result.childNodes[1]);
+  				
+			}
+
+			//result.appendChild(binary);
+			//alert(card.getAttribute("max"));
+			
+
+		}
+		result=nodes.iterateNext();
+	}
+
+	}catch(e){
+		window.alert("ERROR:"+e);
+	}
+},
 
 /*
 callShellScript: function(){
@@ -375,7 +855,32 @@ injectScript: function(script, url, unsafeContentWin) {
 	
 	//mi variable para descargarme los archivos de los branches
 	sandbox.SaveToDisk=githubdeltas_gmCompiler.hitch(this, "saveToDisk");
+	
+	//mi variable para validar producto
+	sandbox.validProduct=githubdeltas_gmCompiler.hitch(this, "validProduct");
 
+
+	//mi variable para insertar feature
+	sandbox.insertFeature=githubdeltas_gmCompiler.hitch(this, "insertFeature");
+
+	//mi variable para guardar las "features" seleccionadas
+	sandbox.saveSelectedFeatures=githubdeltas_gmCompiler.hitch(this, "saveSelectedFeatures");
+
+	//mi variable para guardar el "model"
+	sandbox.saveFeatureModel=githubdeltas_gmCompiler.hitch(this, "saveFeatureModel");
+
+	//mi variable para leer isValid.txt
+	sandbox.readFileIsValid=githubdeltas_gmCompiler.hitch(this, "readFileIsValid");
+
+	//mi variable para leer selectedFeatures.txt
+	sandbox.readFileSelectedFeaturesLocal=githubdeltas_gmCompiler.hitch(this, "readFileSelectedFeaturesLocal");
+
+	//mi variable para leer proposedProductFile.txt y featuresToDeselect.txt
+	sandbox.readFileForExplanation=githubdeltas_gmCompiler.hitch(this, "readFileForExplanation");
+	
+
+	//mi variable para leer proposedProductFile.txt y featuresToDeselect.txt
+	sandbox.addMandatoryFeature=githubdeltas_gmCompiler.hitch(this, "addMandatoryFeature");
 
 	//clean project folder
 	sandbox.CleanProjectFolder=githubdeltas_gmCompiler.hitch(this, "cleanProjectFolder");

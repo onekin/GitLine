@@ -903,10 +903,9 @@ jQuery.noConflict();
 			Gh3.Helper.callHttpApi({
 				service : "repos/"+that.user.login+"/"+that.name+"/forks",
 				success : function(res) {
-					_.each(res.data, function (branch) {
-						that.forks.push(new Gh3.Repostiory(repository.name, that.user) );
+					_.each(res.data, function (fork) {
+						that.forks.push(new Gh3.Repository(fork.name, fork.owner.login, fork.infos) );
 					});
-
 					if (callback) callback(null, that);
 				},
 				error : function (res) {
@@ -1403,7 +1402,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></div></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></div><div><a rel="assemble1"  title="Assemble1" class="minibutton" href=""><span class="text">InsertFeature</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("li");
@@ -1950,7 +1949,7 @@ LoadEController.prototype.init=function(func){
 /*Eider: loadEController funtzioa exekutazen da GitHub Orrian sartzerakoan*/
 LoadEController.prototype.execute=function(){       
 //EIG: erabili behar diren parametroak editFile funt
- console.log("LoadEController SCRIPT LOADED");
+ console.log("LoadEController dentrooo");
  var user=GitHub.getUserName(); 
  console.log("user "+user);
  var token=GitHub.getAuthenticityToken(); 
@@ -1978,13 +1977,14 @@ if (GitHub.getForkedFrom()!=null)
  console.log(actions);
  console.log(fo);
 
- if(user!=null&&repo!=null&&actions!=null&&fo!=user){
- 	if(user!=author){
+ //control buttons visibility
+ //if(user!=null&&repo!=null&&actions!=null&&fo!=user){
+ 	//if(user!=author){
 		var install=new InstallEController();
 		console.log("adding product fork");
   		install.execute("add");
-	}
- }
+	//}
+ //}
 
 try{
 var compareSummary=GitHub.getCompareSummary();  
@@ -2019,7 +2019,8 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  }else console.log("not going to retreive for update features");
 
 
-/**** Leti: MODEL API DEIA PROBA EIDERRRENTZAT****/
+/****API DEIA PROBA EIDERRRENTZAT***/
+/*
 console.log("API DEIA PROBA ");
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
@@ -2039,14 +2040,7 @@ console.log("API DEIA PROBA ");
 			      	  else{
 			      	  	//Step 2: leer contenido del product config
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
-			      	  	console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
-			      	  	//Step8:Edit content//step 8
-			      	  		var commit=master.getLastCommit().sha;
-			      	  		var token=var token=GitHub.getAuthenticityToken();
-			      	  		DeltaUtils.editFile(author,repo,"master","model.xml",commit,token,"editted content","update model.xml",function(){
-			      	  			console.log("editted file");
-			      	  		});	
-			      	  		
+			      	  		console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
 			      	  	});
 			      	  }
 			      	});
@@ -2054,6 +2048,57 @@ console.log("API DEIA PROBA ");
 			});
 
 /**API deia proba amaituta*/
+/*
+console.log("Arazo 1 konponduta");
+			DeltaUtils.createBranch("base", "brachBerria1",user,repo,token,function(){
+			//lehenengo brach-a sortzen da eta ondoren modela aldatu egiten da
+				//if(insertValid!=0){
+				console.log("aldatuuuu");
+	 			var token=GitHub.getAuthenticityToken(); 
+	 			var author=GitHub.getCurrentAuthor(); 
+	 			var repo=GitHub.getCurrentRepository(); 
+	 			var ghUser=new Gh3.User(user);
+				var ghUserRepo=new Gh3.Repository(repo,ghUser);
+				DeltaUtils.sleep(1000);
+				ghUserRepo.fetch(function (err, res) {
+					console.log(ghUserRepo);
+					console.log("lehenengo fetch");
+					if(err) { console.log("ERROR ghRepo.fetch");}
+					ghUserRepo.fetchBranches(function(err,res){
+						console.log("bigarren fetch");
+						var master= ghUserRepo.getBranchByName("master");//master
+						master.fetchCommits(function(err,res){
+							console.log("hirugarren fetch");
+							var commit=master.getLastCommit().sha;
+							console.log("commit for postinf product "+commit);
+							//EIG: Arazoa1 editFile deitzerakoan
+							DeltaUtils.editFile(user, repo, "master","model.xml",commit, token, 'xml eduki berria2', "new model.xml",null);
+						});
+					});
+				});
+			//}
+		});
+*/
+
+// 	2.arazoa konponduta
+	
+	console.log("Fetching forks for repo: "+repo+" and author: "+author);
+	var ghUser=new Gh3.User(author);
+	var ghUserRepo=new Gh3.Repository(repo,ghUser);
+				ghUserRepo.fetch(function (err, res) {
+					console.log(ghUserRepo);
+					console.log("lehenengo fetch");
+					if(err) { console.log("ERROR ghRepo.fetch");}
+					ghUserRepo.fetchFork(function(err,res){
+						console.log("bigarren fetch");
+						//EIG: Arazoa2 .getForks() ez ditu fork-ak itzultzen
+						var Forks= ghUserRepo.getForks();
+						console.log("Forks!!");
+						console.log(Forks);
+	
+					});
+				});
+
 
 
 /*var botonToAsana=GitHub.getButtonToAsana();
@@ -2789,7 +2834,7 @@ DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
 	 		var token=GitHub.getAuthenticityToken(); 
 	 		var repo=GitHub.getCurrentRepository(); 
 
-			DeltaUtils.createBranch(checkedOption, newName,user,repo,token,function(){
+			DeltaUtils.createBranch(checkedOption, newName,user,repo,token,function(){//lehenengo brach-a sortzen da eta ondoren modela aldatu egiten da
 				if(insertValid!=0){
 				console.log("aldatuuuu");
 				var user=GitHub.getUserName(); 
@@ -2811,18 +2856,16 @@ DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
 							var commit=master.getLastCommit().sha;
 							console.log("commit for postinf product "+commit);
 							//EIG: Arazoa1 editFile deitzerakoan
-							DeltaUtils.editFile(user, repo, "master","model.xml",commit, token, insertValid, "new model.xml",function(){
-								console.log(insertValid);
-								console.log(kind);
-								DeltaUtils.createConfiguratorForPropagation();
-							});
+							DeltaUtils.editFile(user, repo, "master","model.xml",commit, token, insertValid, "new model.xml");
 						});
 					});
 				});
 			}
-			
+			console.log(insertValid);
+			console.log(kind);
+			//DeltaUtils.createConfiguratorForPropagation();
 			});
-			
+
 		}
 
 
@@ -2842,6 +2885,7 @@ DeltaUtils.createConfiguratorForPropagation=function(){
 						console.log("bigarren fetch");
 						//EIG: Arazoa2 .getForks() ez ditu fork-ak itzultzen
 						var Forks= ghUserRepo.getForks();
+						console.log(Forks)
 						console.log(Forks);
 					
 	
@@ -3174,7 +3218,8 @@ DeltaUtils.enactProductComposition=function(listBranches,ghRepo,ghAuthor){//list
 }
 
 DeltaUtils.getUserAccessToken=function(){
-	return "877f51e5b60ac4fa652c21788d2b2d29a12f4556";
+	//eider token=877f51e5b60ac4fa652c21788d2b2d29a12f4556
+	return "a01d3a39eb682d60cc1354162ed59689566b6867";
 }
 DeltaUtils.getAssanaApiToken=function(){
 	return "2kDOdTDX.8lAUnLWS0V6UIPizPdQhMeI";
@@ -3365,12 +3410,12 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 }
 
 
-DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg,func){
+DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
 	console.log(" start in Edit File");
+	console.log("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName);
 	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
-			Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
-				func();
+			Utils.XHR("/"+user+"/"+repo+"/tree-save/"+branchName+"/"+fileName,function(res){
 			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
 		},"POST","authenticity_token="+encodeURIComponent(token));
 	},"GET");
@@ -3409,10 +3454,10 @@ DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fil
 	},"GET");
 }
 //EIG
-DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f_callback){
+DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,callback){
 	console.log("createBranch "+newBranchName);
 	Utils.XHR("/"+user+"/"+repo+"/tree/"+parent,function(res){
-		f_callback();
+			callback();
 		Utils.XHR("/"+user+"/"+repo+"/branches",function(res){
 		},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+parent+"&name="+newBranchName+"&path=");	
 	},"GET");

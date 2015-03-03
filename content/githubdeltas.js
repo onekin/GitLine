@@ -1706,7 +1706,7 @@ GitHubWrapper.prototype.getInsertFeature=function(){
 
 GitHubWrapper.prototype.getInsertFeatureTemplate=function(){
  return this.nodes.insertFeature.template();
-};*/
+};
 
 GitHubWrapper.prototype.injectIntoAsana=function(node,position){
 	//window.console.log("in injectIntoAsana ");
@@ -2072,8 +2072,6 @@ LoadEController.prototype.execute=function(){
  var repo=GitHub.getCurrentRepository(); 
  var button=GitHub.getForkButton(); 
 
-
- 
  var currentBranch=GitHub.getCurrentBranch();
 /* NO CAPTURAR EL FORK
  if(user!=null&&token!=null&&author!=null&&repo!=null&&button!=null){
@@ -2101,6 +2099,9 @@ if (GitHub.getForkedFrom()!=null)
   		var install2= new IssueEController();
   		window.console.log("adding forwardPRopagation");
   		install2.execute("add");
+
+  		var insertFeature= new InsertFeatureEController();
+  		insertFeature.execute("add");
 	//}
 // }
 
@@ -2802,7 +2803,7 @@ InsertFeatureEController.prototype.execute=function(act){ //compose product and 
 		if(act=="add"){
 			window.console.log("in InsertFeatureEController!!!!!");
 			var obj=this;
-			var install=new InsertfeatureView();
+			var install=new InsertFeatureView();
 			install.setViewData({click:function(){obj.execute("run");}});
 			var render=install.render();
 			GitHub.injectIntoInsertFeature(render);

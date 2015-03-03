@@ -1422,7 +1422,7 @@ this.nodes.selectedIssues={nodes:[],values:[],listeners:{},xpath:"//*[@class='li
  
 // this.nodes.issuePropagation
 
-/*this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
+this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
@@ -1434,7 +1434,7 @@ this.nodes.selectedIssues={nodes:[],values:[],listeners:{},xpath:"//*[@class='li
 						     };
 						   return object;
 						 	}
-						   }; */
+						   }; 
 
 //EIG:Botoia
 this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
@@ -1696,15 +1696,15 @@ GitHubWrapper.prototype.getIssueTemplate=function(){
  return this.nodes.issuePropagation.template();
 };
 //EIG: insertFeature botoia
-/*GitHubWrapper.prototype.injectIntoInsert=function(node,position){
+GitHubWrapper.prototype.injectIntoInsertFeature=function(node,position){
 this._addSibling(this.nodes.insertFeature,node,position);
 };
 
-GitHubWrapper.prototype.getInsert=function(){
+GitHubWrapper.prototype.getInsertFeature=function(){
  return this.nodes.insertFeature.nodes;
 };
 
-GitHubWrapper.prototype.getActionInsert=function(){
+GitHubWrapper.prototype.getInsertFeatureTemplate=function(){
  return this.nodes.insertFeature.template();
 };*/
 
@@ -1935,6 +1935,23 @@ tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
 return tab;
 };
 
+var InsertFeatureView=function(){
+this.click=null;
+};
+InsertFeatureView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+InsertFeatureView.prototype.render=function(){
+var obj=this;
+var tabTemplate=GitHub.getInsertFeatureTemplate();
+var tab=GitHub.applyTemplate(tabTemplate,null);
+tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+ ev.preventDefault();
+ ev.stopPropagation();
+ obj.click(ev);
+},true);
+return tab;
+};
 
 var toAsanaView=function(){
 this.click=null;
@@ -2770,6 +2787,33 @@ IssueEController.prototype.execute=function(act){ //compose product and create a
 
  };
 
+var InsertFeatureEController=function(){
+ if (InsertFeatureEController.prototype._singletonInstance) {
+  return InsertFeatureEController.prototype._singletonInstance;
+ }
+ InsertFeatureEController.prototype._singletonInstance = this;        
+};
+
+
+//EIG:Botoia
+InsertFeatureEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
+
+	
+		if(act=="add"){
+			window.console.log("in InsertFeatureEController!!!!!");
+			var obj=this;
+			var install=new InsertfeatureView();
+			install.setViewData({click:function(){obj.execute("run");}});
+			var render=install.render();
+			GitHub.injectIntoInsertFeature(render);
+		}else if(act=="run"){
+
+			window.console.log("in InsertFeatureEController");
+   		}
+
+ };
+
+
  var InstallEController=function(){
  if (InstallEController.prototype._singletonInstance) {
   return InstallEController.prototype._singletonInstance;
@@ -2795,7 +2839,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 			var botonAukera=window.prompt("Insert or Create?","issue");
 			if(botonAukera=="insert"){
 				window.console.log("insertFeature");
-				DeltaUtils.interfaceOfInsertFeature(1);
+			//	DeltaUtils.interfaceOfInsertFeature(1);
 			}else if(botonAukera=="create"){
 			var user=GitHub.getUserName(); 
 			var author=GitHub.getCurrentAuthor(); 

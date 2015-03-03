@@ -1391,7 +1391,7 @@ var GitHubWrapper=function(){
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
  this.nodes.currentRepository={node:null,listeners:{},xpath:"//*[contains(@class,'js-current-repository')]",supplements:[],regexp:/([^ \n]+)/}; 
- this.nodes.issueTitle=
+// this.nodes.issueTitle=
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.pullId={node:null,listeners:{},xpath:"//*[@type='text/x-diff']/@href",supplements:[],regexp:/([0-9]+)\.diff$/};  
  this.nodes.forkButton={node:null,listeners:{},xpath:"//a[contains(@class,'fork-button')]",supplements:[],regexp:/([^ \n]+)/};  
@@ -1692,7 +1692,7 @@ GitHubWrapper.prototype.getIssue=function(){
  return this.nodes.issuePropagation.nodes;
 };
 
-GitHubWrapper.prototype.getActionIssue=function(){
+GitHubWrapper.prototype.getIssueTemplate=function(){
  return this.nodes.issuePropagation.template();
 };
 //EIG: insertFeature botoia
@@ -1917,7 +1917,7 @@ return tab;
 };
 
 //EIG: Botoia
-/*var ForwardView=function(){
+var ForwardView=function(){
 this.click=null;
 };
 ForwardView.prototype.setViewData=function(params){
@@ -1925,7 +1925,7 @@ this.click=params.click;
 };
 ForwardView.prototype.render=function(){
 var obj=this;
-var tabTemplate=GitHub.getActionTemplate();
+var tabTemplate=GitHub.getIssueTemplate();
 var tab=GitHub.applyTemplate(tabTemplate,null);
 tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
  ev.preventDefault();
@@ -1933,7 +1933,7 @@ tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
  obj.click(ev);
 },true);
 return tab;
-};*/
+};
 
 
 var toAsanaView=function(){
@@ -2081,9 +2081,9 @@ if (GitHub.getForkedFrom()!=null)
 		window.console.log("adding product fork");
   		install.execute("add");
   		//EIG:Botoia
-  		/*var install2= new IssueEController();
+  		var install2= new IssueEController();
   		window.console.log("adding forwardPRopagation");
-  		install2.execute("add");*/
+  		install2.execute("add");
 	//}
 // }
 
@@ -2719,12 +2719,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 
 //
 
-var InstallEController=function(){
- if (InstallEController.prototype._singletonInstance) {
-  return InstallEController.prototype._singletonInstance;
- }
- InstallEController.prototype._singletonInstance = this;        
-};
+
 
 /*Eider: InstallEcontroller funtzioa executatzen da "ProductFork" botoia klikatzeakoan**/
 /*
@@ -2749,16 +2744,20 @@ InsertEController.prototype.execute=function(act){
 	}
 };*/
 
+ var IssueEController=function(){
+ if (IssueEController.prototype._singletonInstance) {
+  return IssueEController.prototype._singletonInstance;
+ }
+ IssueEController.prototype._singletonInstance = this;        
+};
+
 
 //EIG:Botoia
-/*IssueEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
+IssueEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 
-		var docTile= document.title;
-		var str=docTile.split("at ");
-		var currentBranch=str[1];
-		if(!currentBranch) currentBranch="master";
 	
 		if(act=="add"){
+			window.console.log("in issueEcontroller!!!!!");
 			var obj=this;
 			var install=new ForwardView();
 			install.setViewData({click:function(){obj.execute("run");}});
@@ -2766,10 +2765,17 @@ InsertEController.prototype.execute=function(act){
 			GitHub.injectIntoIssue(render);
 		}else if(act=="run"){
 
-			window.console.log("in forwardPropagation");
+			window.console.log("in eider Forward propagation");
    		}
 
- }  */	
+ };
+
+ var InstallEController=function(){
+ if (InstallEController.prototype._singletonInstance) {
+  return InstallEController.prototype._singletonInstance;
+ }
+ InstallEController.prototype._singletonInstance = this;        
+};
 
 InstallEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob
 

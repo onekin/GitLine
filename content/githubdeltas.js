@@ -234,8 +234,8 @@ jQuery.noConflict();
 		protocol : "https",
 		domain : "api.github.com",
 		callHttpApi : function (apiParams) {
-			//console.log("api params");
-			//console.log(apiParams);
+			//window.console.log("api params");
+			//window.console.log(apiParams);
 			apiParams.url = Gh3.Helper.protocol + "://" + Gh3.Helper.domain + "/" + apiParams.service+"?access_token="+DeltaUtils.getUserAccessToken();
 			//apiParams.access_token=DeltaUtils.getUserAccessToken;
 
@@ -476,8 +476,8 @@ jQuery.noConflict();
 
 	Gh3.Commit = Kind.extend({
 		constructor : function (commitInfos) {
-			//console.log("commitInfos");
-			//console.log(commitInfos);
+			//window.console.log("commitInfos");
+			//window.console.log(commitInfos);
 			this.author = commitInfos.author;
 			this.author.email = commitInfos.commit.author.email;
 			this.author.name = commitInfos.commit.author.name;
@@ -513,7 +513,7 @@ jQuery.noConflict();
 				data : {ref:that.sha },
 				success : function(res) {
 					_.each(res.data, function (item) {
-					//console.log("item "+item);
+					//window.console.log("item "+item);
 					if (item.type == "file") that.contents.push(new Gh3.File(item, that.author, repositoryName, that.sha));
 					if (item.type == "dir") that.contents.push(new Gh3.Dir(item, that.author, repositoryName, that.sha));
 					});
@@ -552,8 +552,8 @@ jQuery.noConflict();
 					that.content = res.data.content;
 
 					that.rawContent = Base64.decode(res.data.content);
-					//console.log("rawContent for: " +that.branchName);
-					//console.log(that.rawContent);
+					//window.console.log("rawContent for: " +that.branchName);
+					//window.console.log(that.rawContent);
 					if (callback) callback(null, that);
 				},
 				error : function (res) {
@@ -695,15 +695,15 @@ jQuery.noConflict();
 
 
 			error : function (res) {
-				console.log("ERROR re:"+res);
-				console.log(res);
+				window.console.log("ERROR re:"+res);
+				window.console.log(res);
 			if (callback) callback(new Error(res.responseJSON.message),res);
 			}
 			});
 
 		},
 		fetchCommits : function (callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("fetch commits for branch "+this.name+" and sha:"+this.sha);
+			window.console.log("fetch commits for branch "+this.name+" and sha:"+this.sha);
 			var that = this;
 			that.commits = [];
 
@@ -723,7 +723,7 @@ jQuery.noConflict();
 
 		},
 		fetchSingleCommitBySha : function (sha, callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("fetch commits from Sha Gh3 Repository");
+			window.console.log("fetch commits from Sha Gh3 Repository");
 			var that = this;
 			that.commits = [];
 
@@ -743,7 +743,7 @@ jQuery.noConflict();
 
 		},
 		getCommits : function () { 
-			console.log("branch "+this.name+" returning commits");
+			window.console.log("branch "+this.name+" returning commits");
 			return this.commits; },
 		getLastCommit : function () {
 			return this.commits[0];
@@ -881,15 +881,15 @@ jQuery.noConflict();
 			Gh3.Helper.callHttpApi({
 				service : "repos/"+that.user.login+"/"+that.name,
 				success : function(res) {
-					console.log("success fetching repo api "+res);
+					window.console.log("success fetching repo api "+res);
 					for(var prop in res.data) {
 						that[prop] = res.data[prop];
 					}
 					if (callback) callback(null, that);
 				},
 				error : function (res) {
-					console.log("erorr in fetching repo api "+res);
-					console.log(res);
+					window.console.log("erorr in fetching repo api "+res);
+					window.console.log(res);
 					if (callback) callback(new Error(res.responseJSON.message),res);
 				}
 			});
@@ -1020,7 +1020,7 @@ jQuery.noConflict();
 
 		},
 		fetchCommits : function (callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("dentroooo fetchCommits para Gh3 Repository "+this.name);
+			window.console.log("dentroooo fetchCommits para Gh3 Repository "+this.name);
 			var that = this;
 			that.commits = [];
 
@@ -1040,7 +1040,7 @@ jQuery.noConflict();
 
 		},
 		fetchSingleCommitBySha : function (sha, callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("fetch commits from Sha Gh3 Repository");
+			window.console.log("fetch commits from Sha Gh3 Repository");
 			var that = this;
 			that.commits = [];
 
@@ -1060,7 +1060,7 @@ jQuery.noConflict();
 
 		},
 		fetchCommitsFromSha : function (sha, callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("fetch commits for repo "+this.name+ " with sha:"+sha);
+			window.console.log("fetch commits for repo "+this.name+ " with sha:"+sha);
 			var that = this;
 			that.commits=[];
 
@@ -1070,7 +1070,7 @@ jQuery.noConflict();
 				success : function(res) {
 					_.each(res.data, function (commit) {
 						that.commits.push(new Gh3.Commit(commit));
-						//console.log(commit);
+						//window.console.log(commit);
 						//return (new Gh3.Commit(commit));
 					});
 					if (callback) callback(null, that);
@@ -1082,7 +1082,7 @@ jQuery.noConflict();
 
 		},
 		fetchBlob: function(sha, callback){
-			console.log("fetch blob");
+			window.console.log("fetch blob");
 			var that = this;
 			that.blob=[];
 
@@ -1102,7 +1102,7 @@ jQuery.noConflict();
 
 		},
 		/*getCommitsFromShaSinceUntil : function (sha,since,until, callback) {//http://developer.github.com/v3/repos/commits/
-			console.log("getCommitsFromShaSinceUntil Gh3 Repository");
+			window.console.log("getCommitsFromShaSinceUntil Gh3 Repository");
 			var that = this;
 			that.commits = [];
 
@@ -1258,7 +1258,7 @@ jQuery.noConflict();
 				data : pagesInfo,
 				//beforeSend: function (xhr) { xhr.setRequestHeader ("rel", paginationInfo); },
 				success : function(res) {
-					//console.log("*** : ", res);
+					//window.console.log("*** : ", res);
 					_.each(res.data.repositories, function (repository) {
 						Gh3.Repositories.repositories.push(new Gh3.Repository(repository.name, new Gh3.User(repository.owner), repository));
 						//owner & login : same thing ???
@@ -1514,7 +1514,7 @@ this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='is
 
 this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons button-wrap']/*",supplements:[],                 
                      template: function(){
-                     	//console.log("en template")
+                     	//window.console.log("en template")
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
@@ -1533,7 +1533,7 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-l
                          var object={};
 						 object.executeTemplate=function(parameter){//parameter es feature list!!
 						    var tabTemplate=document.createElement("template");
-							console.log("Executing template with config:"+parameter[0]);
+							window.console.log("Executing template with config:"+parameter[0]);
 						   // var features= DeltaUtils.getUpdatedFeatures();
 						    var list=parameter[0].split("\n");
 						    var user=parameter[1];
@@ -1580,8 +1580,8 @@ GitHubWrapper.prototype._populateObj=function(){
  	 if(node.regexp!=null){	 
 	  var val;
 	  if(typeof node.regexp=="function"){
-	  	//console.log("Noooode");
-	  	//console.log(node);
+	  	//window.console.log("Noooode");
+	  	//window.console.log(node);
 	   val=node.regexp(nod[i]);
 	  }else{
 	   val=this._getFirstMatch(nod[i].textContent,node.regexp);
@@ -1627,15 +1627,15 @@ GitHubWrapper.prototype._addChild=function(node,toAdd){
 };										//node= this.nodes.toasaba, toAdd=
 GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  var n=node.nodes;
- /*console.log("N: "+n);
- console.log(node)
- console.log("to add: " +toAdd);
- console.log(toAdd);
+ /*window.console.log("N: "+n);
+ window.console.log(node)
+ window.console.log("to add: " +toAdd);
+ window.console.log(toAdd);
 */
  if(position==null){position=n.length;} 
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
- // 	console.log("N: "+n);
+ // 	window.console.log("N: "+n);
    var last=n[position-1];
    last.parentNode.appendChild(toAdd);          
   }else{
@@ -1709,9 +1709,9 @@ GitHubWrapper.prototype.getActionInsert=function(){
 };*/
 
 GitHubWrapper.prototype.injectIntoAsana=function(node,position){
-	//console.log("in injectIntoAsana ");
-	//console.log(node);
-	//console.log("to asana button");
+	//window.console.log("in injectIntoAsana ");
+	//window.console.log(node);
+	//window.console.log("to asana button");
 this._addSibling(this.nodes.toAsanaButton,node,position);
 };
 //new showFeatureUpdates
@@ -1889,7 +1889,7 @@ GitHubWrapper.prototype.setUpdatedFeatures=function(value){
 
 
 GitHubWrapper.prototype.getUpdatedFeatures=function(){
-	console.log("Returning updated features");
+	window.console.log("Returning updated features");
 	return this.nodes.updatedFeatures;
 }
 
@@ -1943,13 +1943,13 @@ toAsanaView.prototype.setViewData=function(params){
 this.click=params.click;
 };
 toAsanaView.prototype.render=function(){
-	//console.log("into asana render");
+	//window.console.log("into asana render");
 var obj=this;
 var tabTemplate=GitHub.getButtonToAsanaTemplate();
 
 var tab=GitHub.applyTemplate(tabTemplate,null);
 tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
-	console.log(2222);
+	window.console.log(2222);
 	 ev.preventDefault();
 	 ev.stopPropagation();
 	 obj.click(ev);
@@ -1978,8 +1978,8 @@ tab.getElementsByTagName("button")[0].addEventListener("click",function(ev){
 
 /*
 tab.getElementsByTagName("a")[0].addEventListener("mouseover",function(ev){//on mouseOver
-	 console.log("event a");
-	 console.log(ev);
+	 window.console.log("event a");
+	 window.console.log(ev);
 	 var forwardPropagation=new ForwardPropagationEController();
   	 forwardPropagation.execute("help");
 	 ev.preventDefault();
@@ -2017,7 +2017,7 @@ ShowFeatureUpdatesView.prototype.setViewData=function(params){
 this.click=params.click;
 };
 ShowFeatureUpdatesView.prototype.render=function(features){
- console.log("En render ShowFeatureUpdatesView: "+features);
+ window.console.log("En render ShowFeatureUpdatesView: "+features);
 var obj=this;
 var tabTemplate=GitHub.getShowFeatureUpdatesTemplate();
 
@@ -2047,9 +2047,9 @@ LoadEController.prototype.init=function(func){
 /*Eider: loadEController funtzioa exekutazen da GitHub Orrian sartzerakoan*/
 LoadEController.prototype.execute=function(){       
 //EIG: erabili behar diren parametroak editFile funt
- console.log("LoadEController dentrooo");
+ window.console.log("LoadEController dentrooo");
  var user=GitHub.getUserName(); 
- console.log("user "+user);
+ window.console.log("user "+user);
  var token=GitHub.getAuthenticityToken(); 
  var author=GitHub.getCurrentAuthor(); 
  var repo=GitHub.getCurrentRepository(); 
@@ -2068,21 +2068,21 @@ LoadEController.prototype.execute=function(){
 var fo;
 if (GitHub.getForkedFrom()!=null)
  fo=GitHub.getForkedFrom().split("/")[0];
-//console.log("Fo: "+fo);
+//window.console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
- console.log(user);
- console.log(repo);
- console.log(actions);
- console.log(fo);
+ window.console.log(user);
+ window.console.log(repo);
+ window.console.log(actions);
+ window.console.log(fo);
 
 // if(user!=null&&repo!=null&&actions!=null&&fo!=user){
  //	if(user!=author){
 		var install=new InstallEController();
-		console.log("adding product fork");
+		window.console.log("adding product fork");
   		install.execute("add");
   		//EIG:Botoia
   		/*var install2= new IssueEController();
-  		console.log("adding forwardPRopagation");
+  		window.console.log("adding forwardPRopagation");
   		install2.execute("add");*/
 	//}
 // }
@@ -2091,12 +2091,12 @@ try{
 var compareSummary=GitHub.getCompareSummary();  
 var button2=GitHub.getPullRequestButton(); 
  if(compareSummary!=null){//&&button2!=null){
- 	  console.log("dentro fordward add");
+ 	  window.console.log("dentro fordward add");
  	  var forwardPropagation=new ForwardPropagationEController();
       forwardPropagation.execute("add");
  }}catch(e){
- 	console.log("error compare summary");
- 	//console.log(e);
+ 	window.console.log("error compare summary");
+ 	//window.console.log(e);
  }
 
  var brackwardProp=GitHub.getBrackward();
@@ -2111,22 +2111,22 @@ var button2=GitHub.getPullRequestButton();
  }
 
 var showFeatureUpdate=GitHub.getShowFeatureUpdates();
- //console.log("https://github.com/"+user+"/"+repo+"/pulls"+"--Es igual a---"+window.location.href);
+ //window.console.log("https://github.com/"+user+"/"+repo+"/pulls"+"--Es igual a---"+window.location.href);
  if(window.location.href=="https://github.com/"+user+"/"+repo+"/issues"){
  	  if(window.location.href!="https://github.com/"+user+"/"+repo+"/issues")
  	  	return;
  	  var  featureButton=new ShowFeatureUpdatesEController();//Trigger en it is in the pull request section
   	  featureButton.execute("add");
- }else console.log("not going to retreive for update features");
+ }else window.console.log("not going to retreive for update features");
 
 
 /****API DEIA PROBA EIDERRRENTZAT****/
-console.log("API DEIA PROBA ");
+window.console.log("API DEIA PROBA ");
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 	    	//1: access repository
 			ghAuthorRepo.fetch(function (err, res) {
-	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+	          if(err) { window.console.log("ERROR 3 ghRepo.fetch"); }
 				//2:fetch repository all branches
 				ghAuthorRepo.fetchBranches(function (err, res) {
 					var master=ghAuthorRepo.getBranchByName("master");//3: get master branh
@@ -2134,13 +2134,13 @@ console.log("API DEIA PROBA ");
 			          if(err) { throw "outch ..." }
 			          var featureModelFile = master.getFileByName("model.xml");//5: get model.xml file
 			      	  if(featureModelFile==null){
-			      	  	console.log("Could not reach model.xml file in master branch!\n.");
+			      	  	window.console.log("Could not reach model.xml file in master branch!\n.");
 			      	  	return;
 			      	  }
 			      	  else{
 			      	  	//Step 2: leer contenido del product config
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
-			      	  		console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
+			      	  		window.console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
 			      	  	});
 			      	  }
 			      	});
@@ -2156,7 +2156,7 @@ if(tasksToAsanaEController!="undefined"){
 	 if(window.location.href.indexOf("https://github.com/"+user+"/"+repo+"/issues")!=-1){
 	 	  var  toAsana=new tasksToAsanaEController();
 	  	  toAsana.execute("add");
-	 }else console.log("not going to add ");
+	 }else window.console.log("not going to add ");
 }
 */
 
@@ -2173,7 +2173,7 @@ GM_xmlhttpRequest ({
   	},
     onload:     function (response) {
     				var jsonResp = JSON.parse(response.responseText);
-                    console.log (   response.status,
+                    window.console.log (   response.status,
                                     response.responseText,
                                     jsonResp
                                 );
@@ -2195,7 +2195,7 @@ GM_xmlhttpRequest({
   },
   onreadystatechange: function(response) {
   		var jsonResp = JSON.parse(response.responseText);
-        console.log (response.status,response.responseText, jsonResp);
+        window.console.log (response.status,response.responseText, jsonResp);
   		if(response.readyState === 4)
       		window.location.href = "https://asana.com";
   }
@@ -2216,12 +2216,12 @@ GM_xmlhttpRequest({
   		if(response.readyState === 4){
       		//window.location.href = "https://asana.com";
       		var jsonResp = JSON.parse(response.responseText);
-        	console.log (jsonResp);
+        	window.console.log (jsonResp);
         	var listWorkspaces=jsonResp.data;
-        	//console.log(listWorkspaces);
+        	//window.console.log(listWorkspaces);
         	for (var i=0; i<listWorkspaces.length;i++){
         		if(listWorkspaces[i].name==workspaceName){
-        			console.log(listWorkspaces[i].id);//return
+        			window.console.log(listWorkspaces[i].id);//return
         		}
         	}
 
@@ -2235,21 +2235,21 @@ GM_xmlhttpRequest({
 
 
 /*
-console.log("before");
+window.console.log("before");
  jQuery.ajax({type: "GET", url: "https://api.github.com/repos/github/linguist",dataType: "json"}).done(function(data){
- 	console.log("hola");
- 	console.log(data);
+ 	window.console.log("hola");
+ 	window.console.log(data);
  });
-console.log("after");
+window.console.log("after");
 
 var lem = new Gh3.User("lemome88");
-console.log(lem);
+window.console.log(lem);
 var lemlog = new Gh3.Repository("notepad-spl", lem);
     lemlog.fetch(function (err, res) {
       if(err) { throw "outch ..." }
-      console.log(lemlog);
+      window.console.log(lemlog);
        lemlog.fetchPullRequest(function(err,res){
-       	console.log(lemlog.getPullRequests());
+       	window.console.log(lemlog.getPullRequests());
        });
 	});
 */
@@ -2257,17 +2257,17 @@ var lemlog = new Gh3.Repository("notepad-spl", lem);
 
 
 
-//console.log("FORKED FROM: "+GitHub.getForkedFrom());
-//console.log(GitHub.getPullRequestList());
-//console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
-//console.log(GitHub.getNewPullRequestButton());
+//window.console.log("FORKED FROM: "+GitHub.getForkedFrom());
+//window.console.log(GitHub.getPullRequestList());
+//window.console.log("getNewPullRequestButton: "+GitHub.getNewPullRequestButton());
+//window.console.log(GitHub.getNewPullRequestButton());
 
 /* De momento no uso la semantica del branching
 ///branch semantics
  try{
  var button3=GitHub.getBranchButton();
- }catch(e){console.log(e);}
-//console.log("Button branch:"+button3);
+ }catch(e){window.console.log(e);}
+//window.console.log("Button branch:"+button3);
 if(user!=null&&token!=null&&repo!=null&&button3!=null){
   var branching=new BranchEController();
   GitHub.listenToBranchButton("click",function(ev){ev.preventDefault();ev.stopPropagation();branching.execute(ev,ev.currentTarget.firstElementChild.textContent);});
@@ -2276,16 +2276,16 @@ if(user!=null&&token!=null&&repo!=null&&button3!=null){
 
 
  var button4=GitHub.getBranchFilter();
-//console.log("Form branch:"+button4);//.submit
+//window.console.log("Form branch:"+button4);//.submit
 if(user!=null&&token!=null&&repo!=null&&button4!=null){
   //var branchFilter=new BranchFilterEController();
   var branching= new BranchEController();
   GitHub.listenToBranchFilter("keydown",function(ev){
-  	//console.log(ev.keyCode);
+  	//window.console.log(ev.keyCode);
   	if(ev.keyCode==13){
   		ev.preventDefault();
   		ev.stopPropagation();  
-  		console.log("KEYPRESS for "+ev.currentTarget.value);
+  		window.console.log("KEYPRESS for "+ev.currentTarget.value);
   		branching.execute(ev,ev.currentTarget.value);
   		//branchFilter.execute(ev,GitHub.getParentBranch(),ev.currentTarget.value);
   	}
@@ -2303,7 +2303,7 @@ var tasksToAsanaEController=function(){
 };
 
 tasksToAsanaEController.prototype.execute=function(act){ //compose product and create a repository for the user + config.blob	
-	console.log("tasksToAsanaEController");
+	window.console.log("tasksToAsanaEController");
 	if(act=="add"){
 		var obj=this;
 		var toAsana=new toAsanaView();
@@ -2312,7 +2312,7 @@ tasksToAsanaEController.prototype.execute=function(act){ //compose product and c
 		GitHub.injectIntoAsana(render);
 		
 	}else if(act=="run"){
-		console.log("To Asana RUUUN");		
+		window.console.log("To Asana RUUUN");		
 		//recorrer que
 		
 		//var worskpaceName=window.prompt("Select the workspace","<ul><li></li></ul>");
@@ -2321,25 +2321,25 @@ tasksToAsanaEController.prototype.execute=function(act){ //compose product and c
 	
 		GitHub.init();
 		var issues=GitHub.getSelectedIssues();
-		console.log("issue: "+issues);
-		console.log(issues);
+		window.console.log("issue: "+issues);
+		window.console.log(issues);
 
 		var gh3_issues=[];
 		var user=GitHub.getUserName(); 
 		var repo=GitHub.getCurrentRepository();
 		var ghUser= new Gh3.User(user);
-		console.log(ghUser);
+		window.console.log(ghUser);
 		var ghRepo= new Gh3.Repository(repo,ghUser);
 		
 		ghRepo.fetch(function(err, res){
 			ghRepo.fetchIssues(function(err, res){
-				console.log(ghRepo);
+				window.console.log(ghRepo);
 				for(var i=0; i< issues.length;i++){
-					console.log(issues[i].id);
-					console.log(ghRepo.getIssues());
+					window.console.log(issues[i].id);
+					window.console.log(ghRepo.getIssues());
 					var number=issues[i].id.split("issue_")[1];
 					var issue=ghRepo.getIssueByNumber(number);
-					console.log(issue);
+					window.console.log(issue);
 					DeltaUtils.issueToAsana(issue);
 				}
 			});
@@ -2368,7 +2368,7 @@ var BranchEController=function(){
 
 BranchEController.prototype.execute=function(ev, newb){
 
-	console.log("New Branch ...");	
+	window.console.log("New Branch ...");	
 	var user=GitHub.getUserName(); 
 	var repo=GitHub.getCurrentRepository(); 
 	var par=GitHub.getParentBranch();
@@ -2380,8 +2380,8 @@ BranchEController.prototype.execute=function(ev, newb){
 			var createBranch=newb.split(': ');
 			nBranch=createBranch[1];
 		} 
-		console.log("parent: "+par);
-		console.log("new one: "+nBranch);
+		window.console.log("parent: "+par);
+		window.console.log("new one: "+nBranch);
 		var token=GitHub.getAuthenticityToken();
 	    var commit;
 
@@ -2399,9 +2399,9 @@ BranchEController.prototype.execute=function(ev, newb){
 			Utils.XHR("/"+user+"/"+repo+"/blob/"+nBranch+"/"+DeltaUtils.viewArtefactName,function(res){
 				//get here class line content!!!
 				var prevContent=jQuery(res).find("div[class='line']").map(function() {return jQuery(this).text();}).toArray().join("\n");
-				console.log("previous content: "+prevContent);
+				window.console.log("previous content: "+prevContent);
 				var updatedContent=prevContent+"\n"+viewContent;
-				console.log("updated content: "+updatedContent);
+				window.console.log("updated content: "+updatedContent);
 				Utils.XHR("/"+user+"/"+repo+"/edit/"+nBranch+"/"+DeltaUtils.viewArtefactName,function(res){
 					commit = jQuery(res).find("input[name='commit']").attr("value");
 					Utils.XHR("/"+user+"/"+repo+"/tree-save/"+nBranch+"/"+DeltaUtils.viewArtefactName,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
@@ -2425,7 +2425,7 @@ var BranchFilterEController=function(){
 BranchFilterEController.prototype.execute=function(ev,parentBranch,newBranch){
 	var key=ev.keyCode || e.which;
 	//ALWAYS!!
-		console.log("NEW BRANCH ");
+		window.console.log("NEW BRANCH ");
 };
 
 var ForkEController=function(){
@@ -2459,14 +2459,14 @@ var PullRequestEController=function(){
 
 PullRequestEController.prototype.execute=function(){
 	try{  
-		 console.log("EXECUTING PULL REQUEST...");
+		 window.console.log("EXECUTING PULL REQUEST...");
 		 var user=GitHub.getUserName(); 
 		 var repo=GitHub.getCurrentRepository(); 
 		 var token=GitHub.getAuthenticityToken();
 		 var pullId=GitHub.getPullId();   
 		 
 		 var diff=GitHub.getDiffCode().join("\n");   
-		 console.log("1");
+		 window.console.log("1");
 		 Utils.XHR("/"+user+"/"+repo+"/blob/master/"+DeltaUtils.BaseXMLName,function(res){
 		 	
 		 var baseXML=jQuery(res).find("div[class='line']").map(function() {return jQuery(this).text();}).toArray().join("\n");
@@ -2482,10 +2482,10 @@ PullRequestEController.prototype.execute=function(){
 		 },"POST","authenticity_token="+encodeURIComponent(token));
 		 },"GET");
 		 },"GET");
-		 console.log("PULL REQUEST EXECUTED");
+		 window.console.log("PULL REQUEST EXECUTED");
 		 //InstallEController.prototype.execute=function("run");//compose files and create result
 	}catch(e){
-		console.log("ERROR IN EXECUTING PULL REQUEST "+e);
+		window.console.log("ERROR IN EXECUTING PULL REQUEST "+e);
 		}
 }; 
 
@@ -2528,7 +2528,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 		 var forked=GitHub.getForkedFrom().split("/");
 		 var author=forked[0]; 
 		 var obj=this;
-		 console.log("ShowFeatureUpdatesEController triggered");
+		 window.console.log("ShowFeatureUpdatesEController triggered");
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 			var ghUser = new Gh3.User(user);
@@ -2538,9 +2538,9 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 	    	var featuresChanged="";
 	    
 			ghRepo.fetch(function (err, res) {
-	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+	          if(err) { window.console.log("ERROR 3 ghRepo.fetch"); }
 				ghRepo.fetchBranches(function (err, res) {
-					//console.log(ghRepo);
+					//window.console.log(ghRepo);
 					var master=ghRepo.getBranchByName("develop");
 					master.fetchContents(function (err, res) {//step1: fetch product.config
 			          if(err) { throw "outch ..." }
@@ -2560,7 +2560,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 	           				var bsha;
 	           				var branches,commits;
 	           				ghAuthorRepo.fetch(function (err, res) {//Step 3: fetch author repo
-	         				if(err) { console.log("ERROR ghRepo.fetch"); }
+	         				if(err) { window.console.log("ERROR ghRepo.fetch"); }
 	         				else{
 	         					 	ghAuthorRepo.fetchBranches(function (err, res){//fetch author branches
 	         					 		//for each branch get commit messages
@@ -2573,7 +2573,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 				         					 	if(branch.sha!=commits){//is not up to date?
 				         					 		bsha=branch.sha;
 				         					 	  	featuresChanged+=branches+" "+commits+"\n";
-				         					 	  	console.log( branch.name+" changed to sha: "+bsha);
+				         					 	  	window.console.log( branch.name+" changed to sha: "+bsha);
 				         					 	  	var tope=commits;
 				         					 	  	//fetch and display commit messages for features not up-to
 				         					 	  	DeltaUtils.fetchMessagesForFeature(branch,tope);
@@ -2590,7 +2590,7 @@ ShowFeatureUpdatesEController.prototype.execute=function(act){
 			});
 			
 	}else if(act=="run"){
-		console.log("BUTTON CLICK!");
+		window.console.log("BUTTON CLICK!");
 	}
 };
 
@@ -2609,25 +2609,25 @@ ForwardPropagationEController.prototype.execute=function(act){
 		var user=GitHub.getUserName(); 
 		var author=GitHub.getCurrentAuthor(); 
 		var repo=GitHub.getCurrentRepository();
-		console.log("HELPi");
+		window.console.log("HELPi");
 		//DeltaUtils.searchUpdatedFeatures(repo, user, author);//+DeltaUtils.searchUpdatedFeatures(repo,user,author));
 	}
 
 	else{
 		if(act=="add"){
-			console.log("adding fordward propagation button");
+			window.console.log("adding fordward propagation button");
 			var obj=this;
 			var forward=new CompareSummaryView();
 			forward.setViewData({click:function(){obj.execute("run");}});
 			//forward.setViewData({mouseover:function(){obj.execute("help");}});
 			var render=forward.render();
-			//console.log(render);
+			//window.console.log(render);
 			GitHub.injectIntoCompareSummary(render);
 		}
 		else if(act=="run"){
 			var fordwardFeature=GitHub.getCompareHead();
 			var ok=window.confirm("You are going to forward-propagate: "+ fordwardFeature);
-				console.log(ok);
+				window.console.log(ok);
 				if(!ok){
 				return;
 			}
@@ -2643,7 +2643,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 
 			//step 1: Comprobar que existe el product.config
 			ghRepo.fetch(function (err, res){
-	          if(err) { console.log("ERROR ghRepo.fetch"); }
+	          if(err) { window.console.log("ERROR ghRepo.fetch"); }
 				ghRepo.fetchBranches(function (err, res) {
 					var master=ghRepo.getBranchByName("master");
 					master.fetchContents(function (err, res){
@@ -2654,28 +2654,28 @@ ForwardPropagationEController.prototype.execute=function(act){
 				      	  	return;
 				      	}
 				      	else{
-				      	  	console.log(222-3);
+				      	  	window.console.log(222-3);
 				      	  	//step 2: leer el product config
 
 				      	  	productConfigFile.fetchContent(function (err, res){
 		            			if(err) { throw "outch ..." }
-		           				console.log("Config File Content: "+productConfigFile.getRawContent());
+		           				window.console.log("Config File Content: "+productConfigFile.getRawContent());
 		           			 	var ghAuthor= new Gh3.User(author);
 								var authorRepo = new Gh3.Repository(repo, ghAuthor);
 		           				authorRepo.fetch(function (err, res){
-							        if(err) { console.log("ERROR authorRepo.fetch"); }
+							        if(err) { window.console.log("ERROR authorRepo.fetch"); }
 								    authorRepo.fetchBranches(function (err, res){ //ir a las branches del author
 								    //Step 2.1 parse productConfig File
 				           				var lines=productConfigFile.getRawContent().split("\n");
-				           				console.log(lines);
+				           				window.console.log(lines);
 				           				var colums;
 				           				var branches=[];
 				           				var commits=[];
 				           				var i;
-				           				console.log(444);
-				           				console.log("fordwardFeature: "+fordwardFeature);
+				           				window.console.log(444);
+				           				window.console.log("fordwardFeature: "+fordwardFeature);
 				           				var featureSplit=fordwardFeature.split(":")[1];
-				           				//console.log("featureSplit: "+featureSplit);
+				           				//window.console.log("featureSplit: "+featureSplit);
 				           				var configFileContent="";//file for featureHouse composition
 				           				
 
@@ -2683,13 +2683,13 @@ ForwardPropagationEController.prototype.execute=function(act){
 				           				for (i=0; i<lines.length-1; i++){
 				           					var l=lines[i];
 				           					colums=l.split(" ");
-				           					console.log("analyzing product feature: "+l);
+				           					window.console.log("analyzing product feature: "+l);
 				           					branches.push(colums[0]);//branch-feature
 				           					//step 3: descargarse los branches con el commit adecuado y el updated branch actual //https://github.com/lemome88/stack/tree/3d6d53d2c77bb06e5de6c9f90953dd3e0eadfb81
 				           					configFileContent+=branches[i]+"\n";
-				           					console.log(fordwardFeature +"!="+colums[0]);
+				           					window.console.log(fordwardFeature +"!="+colums[0]);
 				           					if(fordwardFeature!=colums[0]){//si no es la feature to update
-				           					  console.log("feature "+ branches[i]+ " remains equal");
+				           					  window.console.log("feature "+ branches[i]+ " remains equal");
 				           					  commits.push(colums[1]);
 				           					  DeltaUtils.newSeedConfig+=colums[0]+" "+colums[1]+"\n";
 				           					  var shaToFetch=colums[1];
@@ -2697,7 +2697,7 @@ ForwardPropagationEController.prototype.execute=function(act){
 				           					}
 				           					else{ //para la feature que se tiene que actualizar
 				           					  //get updated files!!
-				           					  console.log("get updated files for "+ branches[i]+" and commit sha:"+colums[1]);
+				           					  window.console.log("get updated files for "+ branches[i]+" and commit sha:"+colums[1]);
 				           					  commits.push(colums[1]);
 				           					 var fetchBranch=authorRepo.getBranchByName(branches[i]);
 				           					 DeltaUtils.newSeedConfig+=colums[0]+" "+fetchBranch.sha+"\n";
@@ -2766,7 +2766,7 @@ InsertEController.prototype.execute=function(act){
 			GitHub.injectIntoIssue(render);
 		}else if(act=="run"){
 
-			console.log("in forwardPropagation");
+			window.console.log("in forwardPropagation");
    		}
 
  }  */	
@@ -2788,7 +2788,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 
 			var botonAukera=window.prompt("Insert or Create?","issue");
 			if(botonAukera=="insert"){
-				console.log("insertFeature");
+				window.console.log("insertFeature");
 				DeltaUtils.interfaceOfInsertFeature(1);
 			}else if(botonAukera=="create"){
 			var user=GitHub.getUserName(); 
@@ -2800,12 +2800,12 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 			//clean projetc folder
 		
 			/*step 0: Clean profile folder*/
-			console.log("To erase project folder");
+			window.console.log("To erase project folder");
 			CleanProjectFolder();
 
 			var ghAuthor = new Gh3.User(author);
 	    	var ghRepo = new Gh3.Repository(repo, ghAuthor);
-			console.log(ghRepo);
+			window.console.log(ghRepo);
 
 			
 
@@ -2861,7 +2861,7 @@ DeltaUtils.interfaceOfPropagation=function(){
 	configString+=("<div align='center'>");
 	configString+=("<p> What issue do you want to close?</p>");
 
-	console.log("issue");
+	window.console.log("issue");
    	var token=GitHub.getAuthenticityToken();
 	var user=GitHub.getUserName();  
 	var author=GitHub.getCurrentAuthor(); 
@@ -2870,8 +2870,8 @@ DeltaUtils.interfaceOfPropagation=function(){
 	var ghUserRepo=new Gh3.Repository(repo,ghUser);
 	DeltaUtils.sleep(1000);
 	ghUserRepo.fetch(function (err, res) {
-		console.log(ghUserRepo);
-		if(err) { console.log("ERROR ghRepo.fetch");}
+		window.console.log(ghUserRepo);
+		if(err) { window.console.log("ERROR ghRepo.fetch");}
 		ghUserRepo.fetchIssues(function(err,res){
 			var issues= ghUserRepo.getIssues();
 			for (i=0; i<issues.length;i++){
@@ -2895,7 +2895,7 @@ DeltaUtils.interfaceOfPropagation=function(){
 
 DeltaUtils.selectedCheckIssue=function(docu){
 		  // perform the security-sensitive operation here
-		  console.log("in check issue");
+		  window.console.log("in check issue");
 		var checkedValue = null; 
 		var parser = new DOMParser();
 		var html_nodes= docu;// parser.parseFromString(configString,"text/html");
@@ -2918,18 +2918,18 @@ DeltaUtils.selectedCheckIssue=function(docu){
 		var ghUserRepo=new Gh3.Repository(repo,ghUser);
 		DeltaUtils.sleep(1000);
 		ghUserRepo.fetch(function (err, res) {
-			console.log(ghUserRepo);
-			if(err) { console.log("ERROR ghRepo.fetch");}
+			window.console.log(ghUserRepo);
+			if(err) { window.console.log("ERROR ghRepo.fetch");}
 			ghUserRepo.fetchIssues(function(err,res){
 				var issues= ghUserRepo.getIssueByNumber(issueSelected);
-				console.log("selected forks: "+issueSelected);
-				console.log(issues.state);
+				window.console.log("selected forks: "+issueSelected);
+				window.console.log(issues.state);
 				var arrayOfFeatures = issues.title.split('_');
-				console.log(arrayOfFeatures);
+				window.console.log(arrayOfFeatures);
 				var parent= arrayOfFeatures[4];
 				var newFeature= arrayOfFeatures[5].substring(1,arrayOfFeatures[5].length-1);
 				var kind= arrayOfFeatures[1];
-				console.log("Parent: "+parent+" ------> New Feature: "+ newFeature+"---> Kind: "+kind);
+				window.console.log("Parent: "+parent+" ------> New Feature: "+ newFeature+"---> Kind: "+kind);
 				DeltaUtils.createConfiguratorForPropagation(kind,parent);
 		
 			});
@@ -2939,7 +2939,7 @@ DeltaUtils.selectedCheckIssue=function(docu){
  
 }
 DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
-	console.log(222311);
+	window.console.log(222311);
 		  // perform the security-sensitive operation here
 		var checkedValue = null; 
 		var parser = new DOMParser();
@@ -2960,7 +2960,7 @@ DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
 				checkedOption+=inputElements[i].value;
 			}
 		}
-		console.log("Kind of insert: "+checkedOption);
+		window.console.log("Kind of insert: "+checkedOption);
 
 		if(checkedOption==""){
 			window.alert("You have to select one option");
@@ -2969,17 +2969,17 @@ DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
 
 
 		if(checkedOption=="mandatory" || checkedOption=="optional" ){
-			console.log("mandatory of optional");
+			window.console.log("mandatory of optional");
 			DeltaUtils.createConfigurator(3,checkedOption);
 
 		}
 		else if(checkedOption=="alternative"){
-			console.log("alternative");
+			window.console.log("alternative");
 			DeltaUtils.createConfigurator(4,checkedOption);
 
 		} else{
 			
-			console.log("Ezaugarria aukeratuta");
+			window.console.log("Ezaugarria aukeratuta");
 
 			DeltaUtils.validNameOfNewFeature(allFeatures,checkedOption,kind);
 			
@@ -3000,10 +3000,10 @@ DeltaUtils.selectedInsert=function(docu,phase,allFeatures, kind){
 				DeltaUtils.selectedInsert(docu, phase, allFeatures,kind);
 
 			}
-			console.log(newName);
-			console.log("arrayofFEatures:"+arrayOfFeatures);
+			window.console.log(newName);
+			window.console.log("arrayofFEatures:"+arrayOfFeatures);
 			for (i=0; i<arrayOfFeatures.length-1;i++){
-				console.log(arrayOfFeatures[i]);
+				window.console.log(arrayOfFeatures[i]);
 				if(newName.toLowerCase()==arrayOfFeatures[i].toLowerCase()){
 					window.alert("The name of two features can not be repeated");
 					DeltaUtils.selectedInsert(docu, phase, allFeatures,kind);
@@ -3055,10 +3055,10 @@ DeltaUtils.validNameOfNewFeature=function(allFeatures,checkedOption,kind){
 		valid=0;
 		DeltaUtils.validNameOfNewFeature(allFeatures,checkedOption,kind);
 	}
-	console.log(newName);
-	console.log("arrayofFEatures:"+arrayOfFeatures);
+	window.console.log(newName);
+	window.console.log("arrayofFEatures:"+arrayOfFeatures);
 	for (i=0; i<arrayOfFeatures.length-1;i++){
-		console.log(arrayOfFeatures[i]);
+		window.console.log(arrayOfFeatures[i]);
 		if(newName.toLowerCase()==arrayOfFeatures[i].toLowerCase()){
 			window.alert("The name of two features can not be repeated");
 			valid=0;
@@ -3067,7 +3067,7 @@ DeltaUtils.validNameOfNewFeature=function(allFeatures,checkedOption,kind){
 	}
 
 	if(valid==1){
-		console.log("return 1");
+		window.console.log("return 1");
 		DeltaUtils.createFeature(checkedOption,kind,newName);
 	}
 
@@ -3107,20 +3107,20 @@ DeltaUtils.editModelFile=function(kind,insertValid,newName,checkedOption){
 	var ghUserRepo=new Gh3.Repository(repo,ghUser);
 	DeltaUtils.sleep(1000);
 	ghUserRepo.fetch(function (err, res) {
-		console.log(ghUserRepo);
-		console.log("lehenengo fetch");
-		if(err) { console.log("ERROR ghRepo.fetch");}
+		window.console.log(ghUserRepo);
+		window.console.log("lehenengo fetch");
+		if(err) { window.console.log("ERROR ghRepo.fetch");}
 		ghUserRepo.fetchBranches(function(err,res){
 			var master= ghUserRepo.getBranchByName("master");
 			master.fetchCommits(function(err,res){
 				var commit=master.getLastCommit().sha;
-				console.log("commit for postinf product "+commit);
+				window.console.log("commit for postinf product "+commit);
 				DeltaUtils.editFile(user, repo, "master","model.xml",commit, token, insertValid, "new model.xml",null);
 			});
 		});
 	});
 
-	console.log("CreateIssue");
+	window.console.log("CreateIssue");
 	DeltaUtils.createIssue(newName,"You have to propagate '"+newName+"' feature",checkedOption,kind);
 	
 	//DeltaUtils.createConfiguratorForPropagation(kind);
@@ -3132,12 +3132,12 @@ DeltaUtils.readProductConfig=function(Forks,parent,configString,kind,kont){
 		//var kont=0;
 	//for (j=0; j<Forks.length;j++){
 		var fork = Forks[kont];
-		console.log("Fork.fetch!!!!!!");
-		console.log(fork);
+		window.console.log("Fork.fetch!!!!!!");
+		window.console.log(fork);
 		var user=GitHub.getUserName(); 
 		var ghUserRepo=new Gh3.Repository(fork.name,fork.user);
 		var repo=GitHub.getCurrentRepository(); 
-		console.log("Fetching forks for repo: "+fork.name+" and author: "+fork.user);
+		window.console.log("Fetching forks for repo: "+fork.name+" and author: "+fork.user);
 		DeltaUtils.sleep(1000);
 		fork.fetch(function(err,res){
 			fork.fetchBranches(function (err, res) {
@@ -3146,7 +3146,7 @@ DeltaUtils.readProductConfig=function(Forks,parent,configString,kind,kont){
 		       		if(err) { throw "outch ..." }
 		       		var productConfig = master.getFileByName("product.config");
 		   	  		if(productConfig==null){
-		   	  			console.log("Could not reach product.config file in master branch!\n.");
+		   	  			window.console.log("Could not reach product.config file in master branch!\n.");
 		      	  		return;
 		   	  		}
 		   	  		else{
@@ -3154,10 +3154,10 @@ DeltaUtils.readProductConfig=function(Forks,parent,configString,kind,kont){
 		  	  				var content=productConfig.getRawContent();
 			   	  			var arrayOfFeatureConfig = content.split('\n');
 			   	  			for (i=0; i<arrayOfFeatureConfig.length;i++){		
-								console.log(arrayOfFeatureConfig[i]);
+								window.console.log(arrayOfFeatureConfig[i]);
 								var featureName = arrayOfFeatureConfig[i].split(' ');
 									if(featureName[0]==parent){
-										console.log("badago ezaugarria"+fork.user.login);
+										window.console.log("badago ezaugarria"+fork.user.login);
 										//return 1;
 										configString+=("<input value=");
 										configString+=(fork.user);
@@ -3169,14 +3169,14 @@ DeltaUtils.readProductConfig=function(Forks,parent,configString,kind,kont){
 										configString+=( "Name of de repository: "+fork.name+ " ----> Owner: "+fork.user.login);
 										configString+=("<br>");
 								
-										console.log(configString);
+										window.console.log(configString);
 			   							
 									}							
 
 							}
-							console.log("kont: "+kont+"length: "+Forks.length);
+							window.console.log("kont: "+kont+"length: "+Forks.length);
 							if(kont==Forks.length-1){
-								console.log("bukatu");
+								window.console.log("bukatu");
 								UI.Dialog.show_ForksOfRepository (configString);
 								//DeltaUtils.readProductConfig(Forks,parent,configString,kind,1);	
 			      	  		}else{
@@ -3207,18 +3207,18 @@ DeltaUtils.createConfiguratorForPropagation=function(kind,parent){
 	var repo=GitHub.getCurrentRepository(); 
 	var author=GitHub.getCurrentAuthor();
 
-	console.log("Fetching forks for repo: "+repo+" and author: "+author);
+	window.console.log("Fetching forks for repo: "+repo+" and author: "+author);
 	var ghUser=new Gh3.User(author);
 	var ghUserRepo=new Gh3.Repository(repo,ghUser);
 
 	ghUserRepo.fetch(function (err, res) {
-		console.log(ghUserRepo);
-		if(err) { console.log("ERROR ghRepo.fetch");}
+		window.console.log(ghUserRepo);
+		if(err) { window.console.log("ERROR ghRepo.fetch");}
 		ghUserRepo.fetchFork(function(err,res){
 			var Forks= ghUserRepo.getForks();
-			console.log("Forks!!");
-			console.log(Forks);
-			console.log("Forks length:"+ Forks.length);
+			window.console.log("Forks!!");
+			window.console.log(Forks);
+			window.console.log("Forks length:"+ Forks.length);
 			var configString='<html><head><title>GitDelta Configurator</title></head>'
 			configString+=("<div align='center'>");
 			configString+=("<p> Forks of the repository </p>");
@@ -3235,9 +3235,9 @@ DeltaUtils.createConfiguratorForPropagation=function(kind,parent){
 			//for (i=0; i<Forks.length;i++){
 
 				//var conf=DeltaUtils.readProductConfig(Forks[i],parent,configString,kind);
-				//console.log(conf);
+				//window.console.log(conf);
 				DeltaUtils.readProductConfig(Forks,parent,configString,kind,0);
-				/*console.log(isParent);
+				/*window.console.log(isParent);
 				configString+=("<input value=");
 			   	configString+=(Forks[i].user);
 				if(kind=="mandatory"){
@@ -3260,7 +3260,7 @@ DeltaUtils.createConfiguratorForPropagation=function(kind,parent){
 }
 
 DeltaUtils.selectedCheckForks=function(docu){
-	console.log("in selectedCheckForks");
+	window.console.log("in selectedCheckForks");
 		  // perform the security-sensitive operation here
 		var checkedValue = null; 
 		var parser = new DOMParser();
@@ -3269,13 +3269,13 @@ DeltaUtils.selectedCheckForks=function(docu){
 		var forkSelected = "";
 
 		for(var i=0; i<inputElements.length; i++){
-			console.log(inputElements[i].value);
-			console.log(i);
+			window.console.log(inputElements[i].value);
+			window.console.log(i);
 			if(inputElements[i].checked){//if checked
 				forkSelected+=inputElements[i].value+" ";
 			}
 		}
-		console.log("selected forks: "+forkSelected);
+		window.console.log("selected forks: "+forkSelected);
  
 }
 
@@ -3289,7 +3289,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 	    	//1: access repository
 			ghAuthorRepo.fetch(function (err, res) {
-	          if(err) { console.log("ERROR 3 ghRepo.fetch"); }
+	          if(err) { window.console.log("ERROR 3 ghRepo.fetch"); }
 				//2:fetch repository all branches
 				ghAuthorRepo.fetchBranches(function (err, res) {
 					var master=ghAuthorRepo.getBranchByName("master");//3: get master branh
@@ -3297,7 +3297,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 			          if(err) { throw "outch ..." }
 			          var featureModelFile = master.getFileByName("model.xml");//5: get model.xml file
 			      	  if(featureModelFile==null){
-			      	  	console.log("Could not reach model.xml file in master branch!\n.");
+			      	  	window.console.log("Could not reach model.xml file in master branch!\n.");
 			      	  	return;
 			      	  }
 			      	  else{
@@ -3305,13 +3305,13 @@ DeltaUtils.createConfigurator=function(option, kind){
 
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
 			      	  		var xml=featureModelFile.getRawContent();//xml String with the xml document content
-			      	  		//console.log(xml);//7: gte raw content and display in console
+			      	  		//window.console.log(xml);//7: gte raw content and display in console
 			      	  		saveFeatureModel(xml,1);
 
 			   
 			      	  		var parser = new DOMParser();
  				  			var xmlNodes = parser.parseFromString(xml, "application/xml");
-			      	  		//console.log("Node: \n"+xmlNodes);
+			      	  		//window.console.log("Node: \n"+xmlNodes);
 			      	  		
 			      	  		
 			      	  		var configString='<html><head><title>GitDelta Configurator</title></head>';//</body></html>';
@@ -3341,7 +3341,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 									  var core=0;
 									  configString+=("<input value=");
 									  configString+=(result.nodeValue);
-									  console.log("Uneko ezaugarria:"+ result.nodeValue+ "Kontadore: "+kont);
+									  window.console.log("Uneko ezaugarria:"+ result.nodeValue+ "Kontadore: "+kont);
 									  for (i=0; i<arrayofFeaturesReverse.length-1;i++){
 
 											if(arrayofFeaturesReverse[i]==result.nodeValue){
@@ -3353,7 +3353,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 
 									   /*if(arrayofFeatures[kont]== result.nodeValue){
 									  	configString+=("  name='features' class='features' type=checkbox  disabled checked/>");
-									  	console.log("in DISABLED:"+result.nodeValue+kont);
+									  	window.console.log("in DISABLED:"+result.nodeValue+kont);
 									  	kont=kont+1;
 									  }else{
 									  	configString+=("  name='features' class='features' type=checkbox  />");
@@ -3361,7 +3361,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 
 									  if(core==1){
 									  	configString+=("  name='features' class='features' type=checkbox  disabled checked/>");
-									  	console.log("in DISABLED:"+result.nodeValue+kont);
+									  	window.console.log("in DISABLED:"+result.nodeValue+kont);
 									  	kont=kont+1;
 									  }else{
 									  	configString+=("  name='features' class='features' type=checkbox  />");
@@ -3438,7 +3438,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 
 									  if(core==1){
 									  	configString+=("  name='features' class='features' type=checkbox  disabled checked/>");
-									  	console.log("in DISABLED:"+result.nodeValue+kont);
+									  	window.console.log("in DISABLED:"+result.nodeValue+kont);
 									  	kont=kont+1;
 									  }else if(arrayofFeatures[kont]== result.nodeValue){
 									  	configString+=("  name='features' class='features' type=checkbox   checked/>");
@@ -3522,13 +3522,13 @@ DeltaUtils.createConfigurator=function(option, kind){
 								}
 								configString+=("</div>");
 								configString+='</body></html>';
-								console.log(allFeatures);
+								window.console.log(allFeatures);
 								UI.Dialog.show_insertFeatureInterfaze(configString,2,allFeatures,kind);
 							}
 							//EIG: features with alternative (insertFeature)
 							if(option==4){
 								saveFeatureModel(xml,2);
-								console.log("option4");
+								window.console.log("option4");
 								path="//solitaryFeature[setRelation/cardinality]/@name | //groupedFeature[setRelation/cardinality]/@name"
 								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
 								var result=nodes.iterateNext();
@@ -3546,7 +3546,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 								}
 								configString+=("</div>");
 								configString+='</body></html>';
-								console.log(allFeatures);
+								window.console.log(allFeatures);
 								UI.Dialog.show_insertFeatureInterfaze(configString,2,allFeatures,kind);
 							}
 			
@@ -3562,25 +3562,25 @@ DeltaUtils.createConfigurator=function(option, kind){
 }
 
 DeltaUtils.selectedCheck=function(docu){
-	console.log(222311);
+	window.console.log(222311);
 		  // perform the security-sensitive operation here
 		var checkedValue = null; 
 		var parser = new DOMParser();
-	//	console.log(configString);
+	//	window.console.log(configString);
 		var html_nodes= docu;// parser.parseFromString(configString,"text/html");
-		//console.log(html_nodes);
+		//window.console.log(html_nodes);
 		var inputElements = html_nodes.getElementsByClassName('features');
-		//console.log("inputElements "+inputElements.length);
-		//console.log(inputElements);
+		//window.console.log("inputElements "+inputElements.length);
+		//window.console.log(inputElements);
 		var featuresSelected = "";
 		for(var i=0; i<inputElements.length; i++){
-			//console.log(inputElements[i].value);
-			console.log(i);
+			//window.console.log(inputElements[i].value);
+			window.console.log(i);
 			if(inputElements[i].checked){//if checked
 				featuresSelected+=inputElements[i].value+" ";
 			}
 		}
-		console.log("selected features: "+featuresSelected);
+		window.console.log("selected features: "+featuresSelected);
 
 		//EIG: save SelectedFeatures
 		saveSelectedFeatures(featuresSelected);
@@ -3604,7 +3604,7 @@ DeltaUtils.checkConfigurationValidity=function(featureList, featureModel){
 	validProduct(2);
 	//EIG: read isValid.txt, is valid de selected product
 	var isValid=readFileIsValid();
-	console.log("The product is valid:"+isValid);
+	window.console.log("The product is valid:"+isValid);
 
 	if (isValid==1){ //if validity is correct
 		
@@ -3641,9 +3641,9 @@ DeltaUtils.enactProductComposition=function(listBranches,ghRepo,ghAuthor){//list
 		//var listBranches=productBranches.split(" ");
 		//Step 1: Precondition, check configuration equation correspond to branch names
 		var productConfig, configFileContent="";
-		console.log("step ");
+		window.console.log("step ");
     	ghRepo.fetch(function (err, res){
-          if(err) { console.log("ERROR ghRepo.fetch"); }
+          if(err) { window.console.log("ERROR ghRepo.fetch"); }
 			ghRepo.fetchBranches(function (err, res) {
 				var ghBranch;
 				for (i=0; i<listBranches.length;i++){
@@ -3686,7 +3686,7 @@ DeltaUtils.sleep=function(millis){
 }
 
 DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
-	console.log("To Asana Issue: "+ghIssue);
+	window.console.log("To Asana Issue: "+ghIssue);
 
 
 	GM_xmlhttpRequest({//POST Task in workspace ONEKIN y project 
@@ -3699,7 +3699,7 @@ DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
 	  },
 	  onreadystatechange: function(response) {
 	  		var jsonResp = JSON.parse(response.responseText);
-	        console.log (response.status,response.responseText, jsonResp);
+	        window.console.log (response.status,response.responseText, jsonResp);
 
 	  		//if(response.readyState === 4)
 	      		//window.open("https://asana.com","_blank");
@@ -3714,27 +3714,27 @@ DeltaUtils.issueToAsana=function(ghIssue, workspaceId, projectId){
 
 
 DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
-	console.log("retrieving commit messages for feature: "+branch.name);
+	window.console.log("retrieving commit messages for feature: "+branch.name);
 	var user=GitHub.getUserName(); 
 	var repo=GitHub.getCurrentRepository();
 	var forked=GitHub.getForkedFrom().split("/");
 	var author=forked[0]; 
 	branch.fetchCommits(function (err, res) {				         					 	  												
-		//console.log("commits for branch"+ res.name);//res=branch
-		//console.log(res.getCommits());
+		//window.console.log("commits for branch"+ res.name);//res=branch
+		//window.console.log(res.getCommits());
 		var com=res.getCommits()[0];//.getLastCommit();//res.getCommitBySha(bsha); branch.getLastCommit()
-		console.log("commit for "+branch.name);
-		//console.log(com);
+		window.console.log("commit for "+branch.name);
+		//window.console.log(com);
 		var j=1;
 		var msg="";
 		//msg="<div id='commits_bucket' class='tab-content'><thead><tr><th class='timeline-commits-header' colspan='4'><span class='octicon octicon-calendar'></span>"+branch.name+"</th></thead><tbody>";
 		msg='<h3 class="commit-group-heading">'+'Feature '+branch.name+' new commits</h3>';
 		msg=msg+'<ol class="commit-group">';
 		while(sinceCommit!=com.sha){//get all commits messages for a feature
-			console.log("com");
-			console.log(com);
-			console.log("Message:");
-			console.log(com.message);
+			window.console.log("com");
+			window.console.log(com);
+			window.console.log("Message:");
+			window.console.log(com.message);
 			//original
 			//msg=msg+"<h5>Update "+j+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
 		
@@ -3747,8 +3747,8 @@ DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
 			msg=msg+'</li>';
 
 			com=branch.getCommitBySha(com.parents[0].sha);
-			console.log("new commit:"+com.sha);//res.getCommitBySha(com.parents[0].sha);
-			console.log(branch.name+"  message "+j+" "+msg);
+			window.console.log("new commit:"+com.sha);//res.getCommitBySha(com.parents[0].sha);
+			window.console.log(branch.name+"  message "+j+" "+msg);
 			j++;	
 		}
 		var params;
@@ -3776,16 +3776,16 @@ DeltaUtils.getProductShadowBranchName=function(){
 DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged){
 	var nb=b;
 	nb.fetchCommits(function (err, res) {				         					 	  		
-		console.log("Lengh "+len+" and loop number: "+iteration);
-		console.log(nb);
-		console.log(nb.getCommits());
+		window.console.log("Lengh "+len+" and loop number: "+iteration);
+		window.console.log(nb);
+		window.console.log(nb.getCommits());
 		var com=nb.getCommitBySha(bsha);
-		console.log("com: "+com);
+		window.console.log("com: "+com);
 		var i=1;
 		var msg;
 		while(tope!=com.sha){//get all commits messages for a feature
-			console.log("Message:");
-			console.log(com.message);
+			window.console.log("Message:");
+			window.console.log(com.message);
 			msg=msg+"<h5>Update "+i+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
 			com=nb.getCommitBySha(com.parents[0].sha);
 			i++;
@@ -3800,36 +3800,36 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 	if (window.navigator.appVersion.indexOf("Win")!=-1) OSName="win";
 	if (window.navigator.appVersion.indexOf("Mac")!=-1) OSName="mac";
 
-	console.log("Listo para hacer POST del producto en la branch: "+branchName);
+	window.console.log("Listo para hacer POST del producto en la branch: "+branchName);
 	var listFiles=[];
 	if(OSName=="mac")
 		listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
 	else if (OSName=="win")
 			listFiles=SearchFilesInLocalFolder("content\\product\\features",listFiles);
-	console.log("lis files: "+listFiles);
+	window.console.log("lis files: "+listFiles);
 	var createBranches,createPullRequest=false;
 	var ghUser=new Gh3.User(user);
 	var ghUserRepo=new Gh3.Repository(repo,ghUser);
 	DeltaUtils.sleep(1000);
 	ghUserRepo.fetch(function (err, res) {
-		console.log(ghUserRepo);
-		if(err) { console.log("ERROR ghRepo.fetch");}
+		window.console.log(ghUserRepo);
+		if(err) { window.console.log("ERROR ghRepo.fetch");}
 		ghUserRepo.fetchBranches(function(err,res){
 			var master= ghUserRepo.getBranchByName(branchName);//master
 			master.fetchCommits(function(err,res){
 				var commit=master.getLastCommit().sha;
-				console.log("commit for postinf product "+commit);
-				console.log("listFile len: "+listFiles.length);
+				window.console.log("commit for postinf product "+commit);
+				window.console.log("listFile len: "+listFiles.length);
 				for (i=0; i<listFiles.length; i++){
 					var file=listFiles[i];//file path
-					console.log("file: "+file);
+					window.console.log("file: "+file);
 					var splitPath;
 					//if (OSName=="mac")
 					  splitPath=file.split("/");
 					//else if(OSName=="win") 
 						//splitPath=file.split("\\");
 					var fileName=splitPath[(splitPath.length-1)];
-					console.log("ahora "+fileName+ " for path file "+file);
+					window.console.log("ahora "+fileName+ " for path file "+file);
 					var fileContent;
 					if (OSName=="mac")
 						fileContent= ReadFilesFromLocal("content/product/features/"+listFiles[i]);	
@@ -3846,7 +3846,7 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 					if (branchName=="master") commitMesage="New derived product";
 					else commitMessage="Propagated change";
 					var fileWithbarOk=file.replace(/\\/g, "/");
-					console.log("fileWithbarOk "+fileWithbarOk );
+					window.console.log("fileWithbarOk "+fileWithbarOk );
 					DeltaUtils.postFile(user,repo,branchName,fileName,fileWithbarOk,commit,token,fileContent,createBranches,createPullRequest,commitMessage);
 				}
 			});
@@ -3855,25 +3855,25 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 }
 
 DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
-	console.log(" start in Edit File");
-	console.log("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName);
+	window.console.log(" start in Edit File");
+	window.console.log("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName);
 	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
 			Utils.XHR("/"+user+"/"+repo+"/tree-save/"+branchName+"/"+fileName,function(res){
 			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
 		},"POST","authenticity_token="+encodeURIComponent(token));
 	},"GET");
-	console.log(" end in Edit File");
+	window.console.log(" end in Edit File");
 }
 /*DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
-	console.log(" start in Edit File");
-	console.log("User"+user );
-	console.log("Repo"+repo );
-	console.log("branchname"+branchName );
-	console.log("filename"+fileName);
-	console.log("commit"+commit);
-	console.log("token"+token );
-	console.log("fileContent"+fileContent);
+	window.console.log(" start in Edit File");
+	window.console.log("User"+user );
+	window.console.log("Repo"+repo );
+	window.console.log("branchname"+branchName );
+	window.console.log("filename"+fileName);
+	window.console.log("commit"+commit);
+	window.console.log("token"+token );
+	window.console.log("fileContent"+fileContent);
 	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
 			Utils.XHR("/"+user+"/"+repo+"/tree-save/"+branchName+"/"+fileName,function(res){
@@ -3881,7 +3881,7 @@ DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileCont
 			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
 		},"POST","authenticity_token="+encodeURIComponent(token));
 	},"GET");
-	console.log(" start in Edit File");
+	window.console.log(" start in Edit File");
 }*/
 
 
@@ -3917,7 +3917,7 @@ DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fil
 }
 //EIG
 DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f){
-	console.log("createBranch "+newBranchName);
+	window.console.log("createBranch "+newBranchName);
 	Utils.XHR("/"+user+"/"+repo+"/tree/"+parent,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/branches",function(res){
 		},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+parent+"&name="+newBranchName+"&path=");	
@@ -3927,59 +3927,59 @@ DeltaUtils.createBranch=function(parent, newBranchName,user,repo,token,f){
 DeltaUtils.createIssue=function(newName,body,checkedOption,kind){
 
 	var title="New_"+kind+"_feature_of_"+checkedOption+"_("+newName+")";
-	console.log(title);
+	window.console.log(title);
 	var user=GitHub.getUserName(); 
 	var repo=GitHub.getCurrentRepository(); 
 	var token=GitHub.getAuthenticityToken();
-	console.log("createIsue "+title);
-	console.log(user+repo+token);
+	window.console.log("createIsue "+title);
+	window.console.log(user+repo+token);
 	Utils.XHR("/"+user+"/"+repo+"/issues/new",function(res){
 		Utils.XHR("/"+user+"/"+repo+"/issues",function(res){
 		},"POST","authenticity_token="+encodeURIComponent(token)+"&issue[title]="+title+"&issue[body]="+body);	
 	},"GET");
-	console.log("finish issue");
+	window.console.log("finish issue");
 }
 
 DeltaUtils.editIssue=function(number){
 
 	
-	console.log("Issue number to edit: "+number);
+	window.console.log("Issue number to edit: "+number);
 	var user=GitHub.getUserName(); 
 	var repo=GitHub.getCurrentRepository(); 
 	var token=GitHub.getAuthenticityToken();
-	console.log(user+repo+token);
+	window.console.log(user+repo+token);
 	Utils.XHR("/"+user+"/"+repo+"/issues/"+number,function(res){
-		console.log("lehenengo utils");
+		window.console.log("lehenengo utils");
 		Utils.XHR("/"+user+"/"+repo+"/issue_comments",function(res){
 		},"POST","authenticity_token="+encodeURIComponent(token)+"&comment_and_close=1&issue="+number+"&comment[body]=");	
 	},"GET");
-	console.log("finish issue");
+	window.console.log("finish issue");
 }
 
 
 DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featureName,configFileContent,productConfig,isForwardProp){
-	console.log("en getCommitContent");
-	console.log("shaToFetch "+shaToFetch);
+	window.console.log("en getCommitContent");
+	window.console.log("shaToFetch "+shaToFetch);
 
 	var featureBranch=authorRepo.getBranchByName(featureName);
 
 	featureBranch.fetchCommits(function(err,res){
 		if (err){ 
-			console.log("error on getCommitContent");
-			console.log(err);
+			window.console.log("error on getCommitContent");
+			window.console.log(err);
 		}
 		else{
-			console.log("author repo Commits ");
-			console.log(res);//el commit
+			window.console.log("author repo Commits ");
+			window.console.log(res);//el commit
 
 			var commit=featureBranch.getCommitBySha(shaToFetch);//authorRepo.getCommitBySha
 			//
-			console.log("commit ");
-			console.log(commit);
-			//console.log(authorRepo);
+			window.console.log("commit ");
+			window.console.log(commit);
+			//window.console.log(authorRepo);
 			commit.fetchContents(authorRepo.name, function(err,res){
-				console.log("commit object");
-				console.log(commit);
+				window.console.log("commit object");
+				window.console.log(commit);
 				commit.eachContent(function(content){
 					if (content.type=='file'){
 		        		var file=commit.getFileByName(content.name);
@@ -3996,7 +3996,7 @@ DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featu
 							SaveToDisk(file.getRawContent(),file.name,featureName);
 						});
 			   	 	}else{
-			         	console.log(content.name+" is a dir");
+			         	window.console.log(content.name+" is a dir");
 			         	var dir=commit.getDirByName(content.name);
 			         	DeltaUtils.iterateDirs(dir,featureName,ghAuthor,authorRepo,configFileContent,productConfig,false,isForwardProp);//dir,branch.name,ghAuthor,ghRepo,configFileContent,productConfig
 		        	}
@@ -4008,25 +4008,25 @@ DeltaUtils.getCommitContent=function(ghAuthor,authorRepo,ghuser,shaToFetch,featu
 
 
 DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token, commitSha,isProductFork,isForwardProp){//tiene set timeOut para el post product
-	console.log("isForwardProp= "+isForwardProp);
+	window.console.log("isForwardProp= "+isForwardProp);
 	if(content.type=="file"){ 
 
 
-		console.log("contnet "+content.name);
-		console.log(content);
-		console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
+		window.console.log("contnet "+content.name);
+		window.console.log(content);
+		window.console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
 		var file= branch.getFileByName(content.name);
-		console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
+		window.console.log("comparing file names: "+file.name+" and "+DeltaUtils.getProductConfigName());
 		if(file.name!= DeltaUtils.getProductConfigName()){
 			Utils.XHR("/"+user+"/"+repo+"/tree/"+branch.name,function(res){
-				console.log("The sha:"+commitSha);
+				window.console.log("The sha:"+commitSha);
 				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){					
 				},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commitSha+"&placeholder_message=remove file");
 				commitSha=ghUserRepo.getLastCommit().sha;
-				console.log("new commit sha:"+commitSha);
+				window.console.log("new commit sha:"+commitSha);
 			},"GET");
 		}
-		else console.log(file.name+" not deleted");		
+		else window.console.log(file.name+" not deleted");		
 		
 		if(isProductFork==true){
 			if(DeltaUtils.postProductTimeOut!="undefined")
@@ -4036,11 +4036,11 @@ DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token
 			},3000);
 		}
 		else if(isForwardProp==true){
-				console.log("isForwardProp");
+				window.console.log("isForwardProp");
 				if(DeltaUtils.postProductTimeOut!="undefined")
 					window.clearTimeout(DeltaUtils.postProductTimeOut);
 				DeltaUtils.postProductTimeOut=window.setTimeout(function(){
-					console.log("AAAAAAAAAAAAAAAAAAAAAAAA");
+					window.console.log("AAAAAAAAAAAAAAAAAAAAAAAA");
 					DeltaUtils.postNewProduct("seeds",user,repo,token);//......
 				},3000);
 			}
@@ -4053,16 +4053,16 @@ DeltaUtils.deleteContent=function(ghUserRepo, content, branch, user, repo, token
 }
 
 DeltaUtils.deleteDirectories=function(dir,user, repo, token, commit, branch){
-console.log("en deleteDirectories dirs for "+dir.name);
-//console.log(dir);
+window.console.log("en deleteDirectories dirs for "+dir.name);
+//window.console.log(dir);
 	dir.fetchContents(function (err, res) {
 		if(err) { throw "outch ..." }
 		dir.eachContent(function (content) {
 			if(content.type=="file"){ 
-				console.log("contnet "+content.name);
-				console.log(content);
+				window.console.log("contnet "+content.name);
+				window.console.log(content);
 				//var file=branch.getFileByName(content.name);
-				console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
+				window.console.log("Inside deleteBranchContents for "+branch.name+"  for file"+content.path);
 				Utils.XHR("/"+user+"/"+repo+"/blob/"+branch.name+"/"+content.path,function(res){
 			    },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+commit+"&placeholder_message=remove file");
 			}
@@ -4077,7 +4077,7 @@ console.log("en deleteDirectories dirs for "+dir.name);
 DeltaUtils.downloadBranches=function(ghAuthor,ghRepo,configFileContent,productConfig){
 	var branchToFetch;
 	var listBranches=configFileContent.split("\n");
-	console.log("downloading branches. List branches:"+listBranches.length);// 3 for master and underFlow
+	window.console.log("downloading branches. List branches:"+listBranches.length);// 3 for master and underFlow
 	for(var i=0; i<listBranches.length-1;i++){//2 vueltas
 		branchToFetch=ghRepo.getBranchByName(listBranches[i]);
 		DeltaUtils.extractBranchContents(branchToFetch,ghAuthor,ghRepo,configFileContent,productConfig,true,false);
@@ -4089,7 +4089,7 @@ DeltaUtils.downloadBranches=function(ghAuthor,ghRepo,configFileContent,productCo
 DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig){
 	//step 4: compose branches content with the config file (branch names)
 
-	console.log("inside product fork");
+	window.console.log("inside product fork");
 	var user=GitHub.getUserName(); 
 	var author=GitHub.getCurrentAuthor(); 
 	var repo=GitHub.getCurrentRepository();
@@ -4105,56 +4105,56 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 				OSName="mac";
 				listFiles=SearchFilesInLocalFolder("content/product/features",listFiles);
 			}
-			console.log("Files in feature folder to post:"+listFiles);
+			window.console.log("Files in feature folder to post:"+listFiles);
 
 			if(listFiles==null) {
 				window.alert("Error composing with FeatureHouse\n"+DeltaUtils.getErrorLog());
 				return;
 			}
-			console.log("step 5");
+			window.console.log("step 5");
 			//Step5: create PRODUCT REPOSITORY
 			Utils.XHR("/"+author+"/"+repo+"/fork",function(res){//FORK & delete all branches + post the product + seed and develop branches
 				var productBranch=ghRepo.default_branch;//Master branch
 				var develop_branch="develop";
 				var seeds_branch = "seeds";				
-					console.log("the files: "+listFiles);
-					console.log("product config:"+productConfig);
+					window.console.log("the files: "+listFiles);
+					window.console.log("product config:"+productConfig);
 					var len= listFiles.length;
 					//Step 6: create the product.config  file
-					console.log("step 6");
+					window.console.log("step 6");
 					var ghUser = new Gh3.User(user);
 					var ghUserRepo = new Gh3.Repository(repo, ghUser);
 					ghUserRepo.fetch(function (err, res) {
-						console.log(ghUserRepo);
-						if(err) { console.log("ERROR ghRepo.fetch");}
+						window.console.log(ghUserRepo);
+						if(err) { window.console.log("ERROR ghRepo.fetch");}
 						ghUserRepo.fetchCommits(function(err,res){//get the last commit
-							console.log(res);
+							window.console.log(res);
 							var commit1=res.getLastCommit();//ghUserRepo, ghRepo.getLastCommit
-							//console.log(ghUserRepo.getCommits());
-							console.log("last commit :"+commit1);
+							//window.console.log(ghUserRepo.getCommits());
+							window.console.log("last commit :"+commit1);
 							//var commitSha=commit1.sha;
 								ghUserRepo.fetchBranches(function (err, res){
-									if(err) console.log("error on fetch branches: "+err);
+									if(err) window.console.log("error on fetch branches: "+err);
 									var branches= ghUserRepo.getBranches();
-									console.log(branches);
+									window.console.log(branches);
 									ghUserRepo.eachBranch(function (branch){
 										if(branch.name!="master"){ //delete branches except default_branch
 											Utils.XHR("/"+user+"/"+repo+"/branches/"+branch.name,function(res){
-												console.log("deleted branch "+branch.name);
+												window.console.log("deleted branch "+branch.name);
 											},"DELETE",token);
 										}else{
-											console.log("deleteBranchContents for: "+branch.name);
+											window.console.log("deleteBranchContents for: "+branch.name);
 											branch.fetchContents(function (err, res) {//for master branch only
 										        if(err) { throw "outch ..." }
 										    		var commit=branch.sha; 
-													console.log("new commmit (not used): "+commit);
+													window.console.log("new commmit (not used): "+commit);
 											    	Utils.XHR("/"+user+"/"+repo+"/tree/"+productBranch,function(res){    //POST product config
 														Utils.XHR("/"+user+"/"+repo+"/new/"+productBranch,function(res){
 																Utils.XHR("/"+user+"/"+repo+"/create/"+productBranch,function(res){
 															        branch.eachContent(function(content){//DELETE EACH CONTENT
 															       		branch.fetchCommits(function(err,res){
 															       			var lastCommit=branch.getLastCommit();
-															       			console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
+															       			window.console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
 															       			DeltaUtils.deleteContent(ghUserRepo,content,branch,user, repo, token ,lastCommit.sha,true,false);
 															       		});
 																    });
@@ -4172,7 +4172,7 @@ DeltaUtils.productFork=function(ghAuthor,ghRepo,configFileContent,productConfig)
 
 
 DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,productConfig){
-	console.log("In forwardPropagation operation");
+	window.console.log("In forwardPropagation operation");
 		
 	//1. Delete contents from seed branch
 	//2. Update new config file
@@ -4182,9 +4182,9 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 	//Compare which content changed 
 	//edit File
 	
-	console.log("configFileContent: "+configFileContent);
-	console.log("productConfig:"+productConfig);
-	console.log("new seed: "+DeltaUtils.newSeedConfig);
+	window.console.log("configFileContent: "+configFileContent);
+	window.console.log("productConfig:"+productConfig);
+	window.console.log("new seed: "+DeltaUtils.newSeedConfig);
 	
 	var user=GitHub.getUserName(); 	
 	var repo=GitHub.getCurrentRepository();
@@ -4192,27 +4192,27 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 
 	var ghUser= new Gh3.User(user);
 	var ghRepo= new Gh3.Repository(repo,ghUser);
-	console.log(ghUser);
-	console.log(ghRepo);
+	window.console.log(ghUser);
+	window.console.log(ghRepo);
 	DeltaUtils.sleep(500);
 
 	ghRepo.fetch(function (err,res){
-		console.log(res);
+		window.console.log(res);
 		ghRepo.fetchBranches(function(err,res){
-			console.log(222-2);
+			window.console.log(222-2);
 			var branch=ghRepo.getBranchByName("seeds");
 			branch.fetchContents(function (err, res) {//for master branch only
 				if(err) { throw "outch ..." }
-				console.log("res: "+res);
+				window.console.log("res: "+res);
 				var commit=res.sha; 
-				console.log("new commmit: "+commit);
+				window.console.log("new commmit: "+commit);
 				Utils.XHR("/"+user+"/"+repo+"/blob/seeds/"+DeltaUtils.getProductConfigName(),function(res){
 					Utils.XHR("/"+user+"/"+repo+"/edit/seeds/"+DeltaUtils.getProductConfigName(),function(res){
 						Utils.XHR("/"+user+"/"+repo+"/tree-save/seeds/"+DeltaUtils.getProductConfigName(),function(res){
 							branch.eachContent(function(content){//DELETE EACH CONTENT
 								branch.fetchCommits(function(err,res){
 									var lastCommit=branch.getLastCommit();
-										console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
+										window.console.log("branch "+branch.name +" last commit: "+lastCommit.sha);
 																//ghUserRepo, content, branch, user, repo, token, commitSha,isProductFork,isForwardProp
 										DeltaUtils.deleteContent(ghRepo,content,branch,user, repo, token ,lastCommit.sha,false,true);
 								});
@@ -4227,15 +4227,15 @@ DeltaUtils.forwardPropagation=function(ghAuthor,ghRepo,configFileContent,product
 }
 
 DeltaUtils.extractBranchContents=function(branch, ghAuthor,ghRepo,configFileContent,productConfig,isProductFork,isForwardProp){
-	console.log("extractBranchContents for "+branch.name);
+	window.console.log("extractBranchContents for "+branch.name);
 	branch.fetchContents(function (err, res) {
         if(err) { throw "outch ..." }
         branch.eachContent(function(content){
 	        if (content.type=='file'){
 	        	var file=branch.getFileByName(content.name);
 	         	file.fetchContent(function (err, res) {
-					if(err) { console.log( "outch extractBranchContents..."); }
-					 console.log("saving: "+file.path);
+					if(err) { window.console.log( "outch extractBranchContents..."); }
+					 window.console.log("saving: "+file.path);
 					if(isProductFork==true){
 						if(DeltaUtils.productForkTimeOut!="undefined")//clear timeout
 							window.clearTimeout(DeltaUtils.productForkTimeOut);
@@ -4263,8 +4263,8 @@ DeltaUtils.extractBranchContents=function(branch, ghAuthor,ghRepo,configFileCont
 }
 
 DeltaUtils.iterateDirs=function(dir,branchName,ghAuthor,ghRepo,configFileContent,productConfig,isProductFork,isForwardProp){
-console.log("en iterate dirs for "+dir.name+ "and branhc "+branchName);
-//console.log(dir);
+window.console.log("en iterate dirs for "+dir.name+ "and branhc "+branchName);
+//window.console.log(dir);
 	dir.fetchContents(function (err, res) {
 		if(err) { throw "outch ..." }
 		dir.eachContent(function (content) {
@@ -4480,7 +4480,7 @@ UI.Dialog = {
 
 		show_issueInterface : function(txt){
 			//var document = document;
-			console.log("issueinterface");
+			window.console.log("issueinterface");
 			var p = document.createElement("p");
 			p.innerHTML = txt;
 			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
@@ -4534,7 +4534,7 @@ UI.Dialog = {
 		
 			yes_btn.addEventListener("click", function(e){			
 				//delete prompt
-				console.log("Forward progagation for selected forks");
+				window.console.log("Forward progagation for selected forks");
 				DeltaUtils.selectedCheckForks(p);
 				UI.Dialog.remove_dialog();
 			
@@ -4618,12 +4618,12 @@ UI.Dialog = {
 			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
 		
 			yes_btn.addEventListener("click", function(e){	//create Product clickatu denean		
-				console.log("yes_btn");
+				window.console.log("yes_btn");
 				if(option==1){
-					console.log("Your product is created");
+					window.console.log("Your product is created");
 					DeltaUtils.createProduct(2);
 				}else if (option==2){
-					console.log("Proposed product is created");
+					window.console.log("Proposed product is created");
 					DeltaUtils.createProduct(1);
 				}
 				UI.Dialog.remove_dialog();//delete prompt
@@ -4665,7 +4665,7 @@ UI.Dialog = {
 			
 			start_btn.addEventListener("click", function(e){			
 				//delete prompt
-				console.log("botoia");
+				window.console.log("botoia");
 				DeltaUtils.createConfigurator(0);
 				UI.Dialog.remove_dialog();
 			});
@@ -4714,7 +4714,7 @@ Util.getBrowserSize = function(doc){
 
 DeltaUtils.getErrorLog=function(){
 	var log=GetLogFileContent();
-	console.log("LOG CONTENT:\n"+log);
+	window.console.log("LOG CONTENT:\n"+log);
 	return log;
 }
 
@@ -4724,10 +4724,10 @@ Utils.XHR=function(url,f,method,params){
  var xhr = new XMLHttpRequest();
 
  if(method=="DELETE"){
- //	console.log("method delete "+url+"   "+params);
+ //	window.console.log("method delete "+url+"   "+params);
  	xhr.open("DELETE", url, true);
  	if(params!=null){
- 		console.log(params);
+ 		window.console.log(params);
         xhr.setRequestHeader("X-CSRF-Token",params);
         xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
         xhr.setRequestHeader("Pragma","no-cache");
@@ -4762,15 +4762,15 @@ Utils.XHR=function(url,f,method,params){
  };
 /*  xhr.onreadystatechange = function() {
   if(this.readyState == 2) {
-  	console.log("READYYYYYYYY!");
-    console.log(xhr.getAllResponseHeaders());
+  	window.console.log("READYYYYYYYY!");
+    window.console.log(xhr.getAllResponseHeaders());
   }
 };*/
  xhr.onerror = function (e) {
      debugger;
   f(null,xhr);
-  console.log("XHR ONERROR for method "+ method+" url "+url+" and params" +params);
-  console.log(e);
+  window.console.log("XHR ONERROR for method "+ method+" url "+url+" and params" +params);
+  window.console.log(e);
   console.error(xhr.statusText);
  };
 
@@ -4799,13 +4799,13 @@ var MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
                 return true;
               }
          });
-        console.log(list_values);
+        window.console.log(list_values);
         var back=GitHub.getBrackward();
-        console.log("back: "+back);
+        window.console.log("back: "+back);
         var pullReq=GitHub.getPullRequestButton();
-        console.log("pull: "+pullReq);
+        window.console.log("pull: "+pullReq);
         if( back!=null ){
-        	console.log("dentro");
+        	window.console.log("dentro");
         	window.location.reload();
         }
       }

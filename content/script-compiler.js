@@ -83,8 +83,8 @@ readFileForExplanation: function(option){
 	return arrayOfFeatures;
 
 	}catch (err){
-		alert("ERROR in Running FeatureHouse composition!:"+err.message);
-		alert("Parameters: "+parameters);
+		//alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		//alert("Parameters: "+parameters);
 	}
 },
 
@@ -123,8 +123,8 @@ readFileSelectedFeaturesLocal: function(){
 	return arrayOfFeatures;
 
 	}catch (err){
-		alert("ERROR in Running FeatureHouse composition!:"+err.message);
-		alert("Parameters: "+parameters);
+	//	alert("ERROR in Running FeatureHouse composition!:"+err.message);
+	//	alert("Parameters: "+parameters);
 	}
 },
 
@@ -161,8 +161,8 @@ readFileIsValid: function(){
 
 
 	}catch (err){
-		alert("ERROR in Running FeatureHouse composition!:"+err.message);
-		alert("Parameters: "+parameters);
+		//alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		//alert("Parameters: "+parameters);
 	}
 },
 
@@ -228,8 +228,8 @@ runFHComposition: function(configFileContent){
 		proc.run(true, parameters, parameters.length);
 
 	}catch (err){
-		alert("ERROR in Running FeatureHouse composition!:"+err.message);
-		alert("Parameters: "+parameters);
+		//alert("ERROR in Running FeatureHouse composition!:"+err.message);
+		//alert("Parameters: "+parameters);
 	}
 
 

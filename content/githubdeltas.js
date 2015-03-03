@@ -2784,6 +2784,7 @@ IssueEController.prototype.execute=function(act){ //compose product and create a
 		}else if(act=="run"){
 
 			window.console.log("in eider Forward propagation");
+			DeltaUtils.interfaceOfPropagation();
    		}
 
  };
@@ -2810,6 +2811,7 @@ InsertFeatureEController.prototype.execute=function(act){ //compose product and 
 		}else if(act=="run"){
 
 			window.console.log("in InsertFeatureEController");
+			DeltaUtils.interfaceOfInsertFeature(1);
    		}
 
  };
@@ -2837,11 +2839,11 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 			GitHub.injectIntoActions(render);
 		}else if(act=="run"){
 
-			var botonAukera=window.prompt("Insert or Create?","issue");
-			if(botonAukera=="insert"){
-				window.console.log("insertFeature");
+			//var botonAukera=window.prompt("Insert or Create?","issue");
+			//if(botonAukera=="insert"){
+			//	window.console.log("insertFeature");
 			//	DeltaUtils.interfaceOfInsertFeature(1);
-			}else if(botonAukera=="create"){
+			//}else if(botonAukera=="create"){
 			var user=GitHub.getUserName(); 
 			var author=GitHub.getCurrentAuthor(); 
 			var repo=GitHub.getCurrentRepository();
@@ -2873,13 +2875,13 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 				DeltaUtils.enactProductComposition(listBranches,ghRepo,ghAuthor);//listBranches= array of feature selected
 			}
 			else if(manual=="assisted"){
-			
+
 				DeltaUtils.createConfigurator(0); 
 			}
 			
-   		}else if(botonAukera="issue"){
-   			DeltaUtils.interfaceOfPropagation();
-   		}
+   		//}else if(botonAukera="issue"){
+   			//DeltaUtils.interfaceOfPropagation();
+   		//}
    	}
 
    	

@@ -1391,7 +1391,7 @@ var GitHubWrapper=function(){
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
  this.nodes.currentRepository={node:null,listeners:{},xpath:"//*[contains(@class,'js-current-repository')]",supplements:[],regexp:/([^ \n]+)/}; 
-// this.nodes.issueTitle=
+ this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-number']",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.pullId={node:null,listeners:{},xpath:"//*[@type='text/x-diff']/@href",supplements:[],regexp:/([0-9]+)\.diff$/};  
  this.nodes.forkButton={node:null,listeners:{},xpath:"//a[contains(@class,'fork-button')]",supplements:[],regexp:/([^ \n]+)/};  
@@ -1437,7 +1437,7 @@ this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-act
 						   }; 
 
 //EIG:Botoia
-this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
+/*this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
@@ -1449,7 +1449,23 @@ this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-
 						     };
 						   return object;
 						 	}
-						   }; 
+						   }; */
+//ul[@class='sunken-menu-group']/li
+
+this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//div[@class='form-actions']/div",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						    tabTemplate.innerHTML='<div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></a>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+
+						    return newTab.querySelector("div");
+						     };
+						   return object;
+						 	}
+						   };
+
 
 
 this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
@@ -1802,6 +1818,11 @@ GitHubWrapper.prototype.getCurrentBranch=function(){
 GitHubWrapper.prototype.getCurrentRepository=function(){
  return this.nodes.currentRepository.value;
 };
+
+GitHubWrapper.prototype.getissueTitle=function(){
+ return this.nodes.issueTitle.value;
+};
+
 
 GitHubWrapper.prototype.getAuthenticityToken=function(){
  return this.nodes.authenticityToken.value;
@@ -2784,7 +2805,12 @@ IssueEController.prototype.execute=function(act){ //compose product and create a
 		}else if(act=="run"){
 
 			window.console.log("in eider Forward propagation");
-			DeltaUtils.interfaceOfPropagation();
+			window.console.log("title lortzen....");
+			var titleIssue= GitHub.getissueTitle();
+			window.console.log(titleIssue);
+			titleIssue=titleIssue.substring(1,titleIssue.length);
+			//DeltaUtils.interfaceOfPropagation();
+			DeltaUtils.selectedCheckIssue("aa",titleIssue);
    		}
 
  };
@@ -2946,9 +2972,9 @@ DeltaUtils.interfaceOfPropagation=function(){
 	
 }
 
-DeltaUtils.selectedCheckIssue=function(docu){
+DeltaUtils.selectedCheckIssue=function(docu,title){
 		  // perform the security-sensitive operation here
-		  window.console.log("in check issue");
+		/*window.console.log("in check issue");
 		var checkedValue = null; 
 		var parser = new DOMParser();
 		var html_nodes= docu;// parser.parseFromString(configString,"text/html");
@@ -2960,9 +2986,9 @@ DeltaUtils.selectedCheckIssue=function(docu){
 				issueSelected+=inputElements[i].value+" ";
 				//var numOfissue= inputElement[i]
 			}
-		}
+		}*/
 
-		//DeltaUtils.editIssue(issueSelected);
+		//DeltaUtils.editIssue(title);
 		var token=GitHub.getAuthenticityToken();
 		var user=GitHub.getUserName();  
 		var author=GitHub.getCurrentAuthor(); 
@@ -2974,8 +3000,8 @@ DeltaUtils.selectedCheckIssue=function(docu){
 			window.console.log(ghUserRepo);
 			if(err) { window.console.log("ERROR ghRepo.fetch");}
 			ghUserRepo.fetchIssues(function(err,res){
-				var issues= ghUserRepo.getIssueByNumber(issueSelected);
-				window.console.log("selected forks: "+issueSelected);
+				var issues= ghUserRepo.getIssueByNumber(title);
+				window.console.log("selected forks: "+title);
 				window.console.log(issues.state);
 				var arrayOfFeatures = issues.title.split('_');
 				window.console.log(arrayOfFeatures);
@@ -3355,7 +3381,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 			      	  }
 			      	  else{
 			      	  	//Step 2: read model content
-
+			      	  	window.console.log("in cofigurator\n.");
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
 			      	  		var xml=featureModelFile.getRawContent();//xml String with the xml document content
 			      	  		//window.console.log(xml);//7: gte raw content and display in console
@@ -3375,6 +3401,7 @@ DeltaUtils.createConfigurator=function(option, kind){
 								path="//feature/@name | //solitaryFeature/@name | //groupedFeature/@name"
 								var nodes=xmlNodes.evaluate(path, xmlNodes, null, XPathResult.ANY_TYPE, null);
 								var result=nodes.iterateNext();
+								window.console.log("before readFileForExplanation 3");
 								var arrayofFeaturesReverse= readFileForExplanation(3);
 								/*var arrayofFeatures = [];
 								var size= arrayofFeaturesReverse.length-1;

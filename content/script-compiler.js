@@ -800,13 +800,14 @@ isGreasemonkeyable: function(url) {
 	var scheme=Components.classes["@mozilla.org/network/io-service;1"]
 		.getService(Components.interfaces.nsIIOService)
 		.extractScheme(url);
+		//alert((scheme == "http" || scheme == "https" || scheme == "file") );
 	return (
-		(scheme == "http" || scheme == "https" || scheme == "file") &&
-		!/hiddenWindow\.html$/.test(url)
+		(scheme == "http" || scheme == "https" || scheme == "file") 
+		// && !/hiddenWindow\.html$/.test(url)
 	);
 },
 
-contentLoad: function(e) {
+contentLoad: function(e) { //pages github.com and http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=
 	var unsafeWin=e.target.defaultView;
 	if (unsafeWin.wrappedJSObject) unsafeWin=unsafeWin.wrappedJSObject;
 
@@ -815,9 +816,11 @@ contentLoad: function(e) {
 
 	if (
 		githubdeltas_gmCompiler.isGreasemonkeyable(href)
-		&& ( /^https:\/\/github\.com\/.*$/i.test(href) )
+		&& ( (/^https:\/\/github\.com\/.*$/i.test(href)) || (href.contains('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action')) ) 
 		&& true
 	) {
+	//	alert("git: "+(/^https:\/\/github\.com\/.*$/i.test(href)));
+	//	alert("waterloo: "+ href.contains('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action'));
 		var script=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/githubdeltas.js');
 		//var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
 		
@@ -825,6 +828,7 @@ contentLoad: function(e) {
 		//githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
 		githubdeltas_gmCompiler.injectScript(script, href, unsafeWin);
 	}
+	//else alert(href + "\nnot greaseamonleable ");
 },
 
 injectScript: function(script, url, unsafeContentWin) {

@@ -2,6 +2,7 @@
 // @name           GitHub Deltas
 // @namespace      letiiiii
 // @include        https://github.com/*
+// @include        http://gsd.uwaterloo.ca:8088/SPLOT/*
 // @description    My description
 // ==/UserScript== */
 
@@ -17,7 +18,7 @@ jQuery.noConflict();
 
 /**********************************************************************/
 /**********************************************************************/
-/*******   GitHub API v3   ********************************************/
+/*******   GitHub API v3   splot
 //				https://github.com/k33g/gh3/
 /**********************************************************************/
 
@@ -1420,22 +1421,10 @@ this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-nu
  this.nodes.diffCode={nodes:[],values:[],listeners:{},xpath:"//*[contains(@class,'file-diff-line js-file-line')]//*[@class='diff-line-code']",supplements:[],regexp:function(node){return node.textContent.trim();}}; 
  
 this.nodes.selectedIssues={nodes:[],values:[],listeners:{},xpath:"//*[@class='list-group issue-list-group']/li[contains(@class,'selected')]",supplements:[], regexp:function(node){return node;}}; 
- 
+
 // this.nodes.issuePropagation
 
-this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble1"  title="Assemble1" class="minibutton" href=""><span class="text">InsertFeature</span></a></div></li>';
-						    var newTab=tabTemplate.content.cloneNode(true);
 
-						    return newTab.querySelector("li");
-						     };
-						   return object;
-						 	}
-						   };
 
 //EIG:Botoia
 /*this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
@@ -1458,7 +1447,7 @@ this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//div[@class='form-act
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></a>';
+						    tabTemplate.innerHTML='<div><button rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></button>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("div");
@@ -1471,7 +1460,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);"  href=""><span class="text">Update Propagation</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("li");
@@ -1500,7 +1489,7 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="backward"  title="Backwards" class="minibutton" href=""><span class="text">Backward Propagation</span></a></div></li>';
+						   // tabTemplate.innerHTML='<li><div><a rel="backward"  title="Backwards" class="minibutton" href=""><span class="text">Product Fork</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("li");
 						     };
@@ -1541,6 +1530,37 @@ this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons 
 					}
 };
 
+//insertFEature
+this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						   tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);"  href=""><span class="text">Update Propagation</span></a></div></li>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+
+						    return newTab.querySelector("li");
+						     };
+						   return object;
+						 	}
+						   };
+
+
+						   //este es el boton de SPLOT
+this.nodes.insertFeature2={nodes:[],listeners:{},xpath:"//*[@class='nihilo']/div",supplements:[],                 
+                     template: function(){
+                         var object={};
+						 object.executeTemplate=function(parameter){
+						    var tabTemplate=document.createElement("template");
+						   tabTemplate.innerHTML='<div><a rel="createProduct"  title="createProduct" class="button"><span class="text">Create GitHub Repository</span></a></div>';
+						    var newTab=tabTemplate.content.cloneNode(true);
+
+						    return newTab.querySelector("div");
+						     };
+						   return object;
+						 	}
+						   };
+
 
 this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-listing']/*",supplements:[],                 
                      template: function(){
@@ -1567,8 +1587,6 @@ this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-l
 						   return object;
 						 	}
 						   };
-
-
 };
 
 
@@ -2883,7 +2901,7 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 
 			
 
-	    	var manual=window.prompt("manual or assited configuration?","assisted");
+	    	var manual=window.prompt("manual or assited or splot?","splot");
 
 		
 		
@@ -2898,6 +2916,12 @@ InstallEController.prototype.execute=function(act){ //compose product and create
 			else if(manual=="assisted"){
 			
 				DeltaUtils.createConfigurator(0); 
+			}
+			else if(manual=="splot"){
+				window.open('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
+				//GM_openInTab(window.document, 'http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
+				//UI.Dialog.show_wf_yesno_dialog("<iframe src='http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml'> </ iframe> ",1);
+
 			}
 			
    		//}else if(botonAukera="issue"){
@@ -3105,19 +3129,40 @@ DeltaUtils.enactForwardPropagation=function(ghUser,ghRepo,fordwardFeature, isNew
 
 DeltaUtils.interfaceOfInsertFeature=function(insertoption){
 	
-	var configString='<html><head><title>Insert a Feature</title></head>';
+	var configString= "You are enacting Forward propagation" ;
+		configString+="<div align='center'>";
+		configString+=("<p> Summary of the changes: </p>");
+		configString+=("<table><tr><th>Feature</th><th>Click to see diff in a new tab</th></tr><tr><td>Table</td><td><a href='https://github.com/letimome/pokerSPL-assets/commits/develop?path=table'>Table</a></td></tr><tr><td>Player</td><td><a href='https://github.com/letimome/pokerSPL-assets/commits/develop?path=Player'>Player</a></td></tr></table> ");
+
+	//	configString+=("<p>New version for Core Asset <a href='https://github.com/letimome/pokerSPL-assets/commits/develop?path=table'>Table</a>");
+		//configString+=("<br>2 files changed and 10 new commits</p> ");
+		//configString+=("<p>New version for Core Asset <a href='https://github.com/letimome/pokerSPL-assets/commits/develop?path=player'>Player</a>");
+		//configString+=(" <br>1 file changed and 5 new commits</p>");
+	//	configString+=("<p>Are you sure yo want to pull these changes to forward branch?</p>");
+	
+	
+	/*var configString= "You are enacting Full- Feedback propagation.";
 	if(insertoption==1){
-		configString+=("<div align='center'>");
-		configString+=("<p> What kind of feature do you want to add? </p>");
-		configString+=("<input value='mandatory' name='insertType' class='kind' type=radio  /> Mandatory");
-		configString+=("<br>");
-		configString+=("<input value='optional' name='insertType' class='kind' type=radio /> Optional  ");
-		configString+=("<br>");
-		configString+=("<input value='alternative' name='insertType' class='kind' type=radio /> Alternative");
+	
 		configString+=("<br></div></html>");
 
-	}
-	UI.Dialog.show_insertFeatureInterfaze(configString,1);
+	}*/
+	/*var configString= "You are enacting Feedback propagation";
+	if(insertoption==1){
+		configString+=("<div align='center'>");
+		configString+=("<p> Select customizations to feedback? </p>");
+		configString+=("<input value='base' name='insertType' class='kind' type=checkbox  /> custom1");
+		configString+=("<br>");
+		configString+=("<input value='optional' name='insertType' class='kind' type=checkbox /> custom2  ");
+		configString+=("<br>");
+		configString+=("<input value='alternative' name='insertType' class='kind' type=checkbox /> custom3");
+		configString+=("<br></div></html>");
+
+	}*/
+	UI.Dialog.show_wf_yesno_dialog(configString,1);	//window.confirm("You are enacting Backward propagation.\n <br>Propagating to CAR: 'restForHAnds'.\n Are you sure?");
+	//UI.Dialog.show_wf_yesno_dialog("You are enacting Backward propagation.<br> <p>Propagating to CAR: <ul> <li>'restFor2HAnds' </li></ul> </p> <p>Are you sure?</p>",1);
+
+
 
 }
 
@@ -4800,6 +4845,8 @@ UI.Dialog = {
 		**/
 		show_insertFeatureInterfaze : function(txt, phase, allFeatures,kind){
 			//var document = document;
+
+
 		
 			var p = document.createElement("p");
 			p.innerHTML = txt;

@@ -1428,7 +1428,7 @@ this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-act
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble1"  title="Assemble1" class="minibutton" href=""><span class="text">InsertFeature</span></a></div></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="assemble1"  title="Assemble1" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);" href=""><span class="text">InsertFeature</span></a></div></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("li");
@@ -1443,7 +1443,7 @@ this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-act
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></a></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);" href=""><span class="text">ForwardPropagation</span></a></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("li");
@@ -1458,7 +1458,7 @@ this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//div[@class='form-act
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></a>';
+						    tabTemplate.innerHTML='<div><a rel="assemble"  title="Assemble" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);" href=""><span class="text">ForwardPropagation</span></a>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("div");
@@ -1471,7 +1471,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
                          var object={};
 						 object.executeTemplate=function(parameter){
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ProductFork</span></a></li>';
+						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class=" btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black);" href=""><span class="text">ProductFork</span></a></li>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 
 						    return newTab.querySelector("li");
@@ -2160,6 +2160,9 @@ var showFeatureUpdate=GitHub.getShowFeatureUpdates();
  	  var  featureButton=new ShowFeatureUpdatesEController();//Trigger en it is in the pull request section
   	  featureButton.execute("add");
  }else window.console.log("not going to retreive for update features");
+ 
+ 
+
 
 
 /****API DEIA PROBA EIDERRRENTZAT****/
@@ -2433,7 +2436,7 @@ BranchEController.prototype.execute=function(ev, newb){
 			Utils.XHR("/"+user+"/"+repo+"/new/"+nBranch,function(res){//create a new artefact.txt file
 			 var commit = jQuery(res).find("input[name='commit']").attr("value");
 			 Utils.XHR("/"+user+"/"+repo+"/create/"+nBranch,function(res){
-			 window.location.href="/"+user+"/"+repo+"/tree/"+nBranch;
+			// window.location.href="/"+user+"/"+repo+"/tree/"+nBranch;
 			 },"POST","authenticity_token="+encodeURIComponent(token)+"&commit="+commit+"&filename="+DeltaUtils.viewArtefactName+"&new_filename="+DeltaUtils.viewArtefactName+"&pr=&content_changed=true&value="+viewContent+"&message=&placeholder_message=&description=");    
 			 },"POST","authenticity_token="+encodeURIComponent(token));
 		}//end if
@@ -2447,7 +2450,7 @@ BranchEController.prototype.execute=function(ev, newb){
 				Utils.XHR("/"+user+"/"+repo+"/edit/"+nBranch+"/"+DeltaUtils.viewArtefactName,function(res){
 					commit = jQuery(res).find("input[name='commit']").attr("value");
 					Utils.XHR("/"+user+"/"+repo+"/tree-save/"+nBranch+"/"+DeltaUtils.viewArtefactName,function(res){//https://github.com/letimome/miRepo/tree-save/nuevo/resultado.xml			
-					  window.location.href="/"+user+"/"+repo+"/tree/"+nBranch;
+					//  window.location.href="/"+user+"/"+repo+"/tree/"+nBranch;
 					},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.viewArtefactName+"&new_filename="+DeltaUtils.viewArtefactName+"&commit="+commit+"&value="+updatedContent+"&placeholder_message=updated view Artefact");					
 				},"GET");
 			},"GET");
@@ -2486,7 +2489,7 @@ ForkEController.prototype.execute=function(){
  Utils.XHR("/"+user+"/"+repo+"/new/master",function(res){
  var commit = jQuery(res).find("input[name='commit']").attr("value");
  Utils.XHR("/"+user+"/"+repo+"/create/master",function(res){
- window.location.href="/"+user+"/"+repo;
+ //window.location.href="/"+user+"/"+repo;
  },"POST","authenticity_token="+encodeURIComponent(token)+"&commit="+commit+"&filename="+DeltaUtils.DeltaXMLName+"&new_filename="+DeltaUtils.DeltaXMLName+"&pr=&content_changed=true&value="+DeltaUtils.createDeltaXML(author,repo)+"&message=&placeholder_message=&description=");    
  },"POST","authenticity_token="+encodeURIComponent(token));
  },"POST","authenticity_token="+encodeURIComponent(token));
@@ -2518,7 +2521,7 @@ PullRequestEController.prototype.execute=function(){
 		 Utils.XHR("/"+user+"/"+repo+"/edit/master/"+DeltaUtils.DeltaXMLName,function(res){
 		 var commit = jQuery(res).find("input[name='commit']").attr("value");
 		 Utils.XHR("/"+user+"/"+repo+"/tree-save/master/"+DeltaUtils.DeltaXMLName,function(res){
-		 window.location.href="/"+user+"/"+repo;
+		// window.location.href="/"+user+"/"+repo;
 		 },"POST","authenticity_token="+encodeURIComponent(token)+"&commit="+commit+"&filename="+DeltaUtils.DeltaXMLName+"&new_filename="+DeltaUtils.DeltaXMLName+"&pr=&content_changed=true&value="+ DeltaUtils.updateDelta(baseXML, deltaXML,diff)+"&message=&placeholder_message=&description="); //call to DeltaUtils.updateDelta!! Implement it   DeltaUtils.updateDelta(baseXML, deltaXML,diff)
 		 },"POST","authenticity_token="+encodeURIComponent(token));
 		 },"POST","authenticity_token="+encodeURIComponent(token));
@@ -2808,12 +2811,13 @@ IssueEController.prototype.execute=function(act){ //compose product and create a
 
 	
 		if(act=="add"){
-			window.window.console.log("in issueEcontroller!!!!!");
+			window.console.log("in issueEcontroller!!!!!");
 			var obj=this;
 			var install=new ForwardView();
 			install.setViewData({click:function(){obj.execute("run");}});
 			var render=install.render();
 			GitHub.injectIntoIssue(render);
+			window.console.log("amaituta!!");
 		}else if(act=="run"){
 
 			window.console.log("in eider Forward propagation");
@@ -3009,7 +3013,8 @@ DeltaUtils.enactForwardPropagation=function(ghUser,ghRepo,fordwardFeature, isNew
 	var author=GitHub.getCurrentAuthor(); 
 	var repo=GitHub.getCurrentRepository();
 				           					
-
+    // DeltaUtils.sleep(8000);
+	 window.console.log("enacting forward propagation for user: "+ghRepo.user.login);
 	//step 1: Comprobar que existe el product.config
 			ghRepo.fetch(function (err, res){
 	          if(err) { window.console.log("ERROR ghRepo.fetch"); }
@@ -3440,6 +3445,8 @@ DeltaUtils.readProductConfig=function(Forks,parent,configString,kind,kont,newFea
 										configString+=("<br>");
 								
 										window.console.log(configString);
+										UI.Dialog.show_ForksOfRepository (configString, Forks, newFeature, parent,1);//borratu ezazu nahi eskero Eider
+										//lerro hau jarri behar izan dut pantailatxoa ikusteko
 			   							
 									}	
 							}
@@ -3552,7 +3559,13 @@ DeltaUtils.createConfiguratorForPropagation=function(kind,parent,newFeature,fork
 
 }
 
+
+var multiPropagationCount=0;
+var multiPropagationTimeOut="undefined";
+var Forks, newFeaure;
 DeltaUtils.selectedCheckForks=function(docu, Forks, newFeature){
+	Forks=Forks;
+	newFeature=newFeature;
 	window.console.log("in selectedCheckForks");
 	var user=GitHub.getUserName(); 
 	var ghUser=new Gh3.User(user);
@@ -3576,30 +3589,42 @@ DeltaUtils.selectedCheckForks=function(docu, Forks, newFeature){
 			}
 
 		}
-		window.console.log("selected forks: "+forkSelected);
+		/*window.console.log("selected forks: "+forkSelected);
 		DeltaUtils.enactForwardPropagation(ghUser,Forks[0],newFeature,true);
 		
+		DeltaUtils.sleep(10000);
 		DeltaUtils.newSeedConfig="";
 		DeltaUtils.enactForwardPropagation(ghUser,Forks[1],newFeature,true);
-
+*/
 		
-		//var kont=0;
-		//DeltaUtils.forwardRecursive(Forks, newFeature, kont);
- 
+		
+		multiPropagationCount=0;
+		//EIDER HEMEN
+		 multiPropagationTimeOut=window.setInterval(function(){
+			 DeltaUtils.forwardRecursive(Forks, newFeature, multiPropagationCount);
+		 },15000);
+			
 }
 
-DeltaUtils.forwardRecursive=function(Forks, newFeature, kont){
-	window.console.log("RECURSIVE KONT:"+ kont);
+DeltaUtils.forwardRecursive=function(Forks, newFeature, multiPropagationCount){
+	window.console.log("RECURSIVE KONT:"+ multiPropagationCount);
 	var user=GitHub.getUserName(); 
 	var ghUser=new Gh3.User(user);
-	window.console.log("Kont"+ kont);
-	window.console.log("Lengh"+ Forks.length);
-	if(kont < Forks.length){
-		window.console.log("Deia fork "+ Forks[kont]);
-		DeltaUtils.enactForwardPropagation(ghUser,Forks[kont],newFeature,true);
-		kont=kont+1;
-		DeltaUtils.forwardRecursive(Forks, newFeature, kont);
+	window.console.log("Kont"+ multiPropagationCount);
+	window.console.log("Lengh "+ Forks.length);
+	if(multiPropagationCount < Forks.length){
+		window.console.log("Deia fork "+ Forks[multiPropagationCount].user.login);
+		DeltaUtils.enactForwardPropagation(ghUser,Forks[multiPropagationCount],newFeature,true);
+		multiPropagationCount=multiPropagationCount+1;
 		
+		//multiPropagationTimeOut=window.setInterval(function(Forks, newFeature, multiPropagationCount){
+			//DeltaUtils.forwardRecursive(Forks, newFeature, multiPropagationCount);
+		//},4000);
+		
+	}
+	else {
+		window.clearInterval(multiPropagationTimeOut);
+		window.alert("finished propagating changes!");
 	}
 
 
@@ -3992,7 +4017,7 @@ DeltaUtils.enactProductComposition=function(listBranches,ghRepo,ghAuthor){//list
 }
 
 DeltaUtils.getUserAccessToken=function(){
-	return "877f51e5b60ac4fa652c21788d2b2d29a12f4556"; //Eider Token: "877f51e5b60ac4fa652c21788d2b2d29a12f4556";
+	return "0f3b88a402363ec830c718fde29307468e070f0c"; //Eider Token: "877f51e5b60ac4fa652c21788d2b2d29a12f4556";
 }
 DeltaUtils.getAssanaApiToken=function(){
 	return "2kDOdTDX.8lAUnLWS0V6UIPizPdQhMeI";
@@ -4009,6 +4034,7 @@ DeltaUtils.currentBranch="master";
 DeltaUtils.productForkTimeOut="undefined";
 DeltaUtils.postProductTimeOut="undefined";
 DeltaUtils.forwardPropagationTimeOut="undefined";
+
 
 DeltaUtils.sleep=function(millis){
   var date = new Date();
@@ -4142,7 +4168,7 @@ DeltaUtils.postNewProduct=function(branchName, user,repo,token){//post en master
 	var createBranches,createPullRequest=false;
 	var ghUser=new Gh3.User(user);
 	var ghUserRepo=new Gh3.Repository(repo,ghUser);
-	DeltaUtils.sleep(1000);
+	//DeltaUtils.sleep(1000);
 	ghUserRepo.fetch(function (err, res) {
 		window.console.log(ghUserRepo);
 		if(err) { window.console.log("ERROR ghRepo.fetch");}
@@ -4218,6 +4244,7 @@ DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileCont
 
 
 DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fileContent,createBranches,createPullRequest,newOrUpdateMessage){
+	var author=GitHub.getCurrentAuthor();
 	Utils.XHR("/"+user+"/"+repo+"/tree/"+branchName,function(res){
 		Utils.XHR("/"+user+"/"+repo+"/new/"+branchName,function(res){
 			Utils.XHR("/"+user+"/"+repo+"/create/"+branchName+"/"+file,function(res){
@@ -4234,7 +4261,10 @@ DeltaUtils.postFile=function(user,repo,branchName,fileName,file,commit,token,fil
 							ghRepo.fetch(function(err,res){
 								ghRepo.fetchPullRequest(function(err,res){
 									var pull=ghRepo.getPullRequests()[0];
-									window.location.href="/"+user+"/"+repo+"/pulls";
+									console.log("in post file las post and create pull request!");
+									if(author!=user)
+										window.console.log("REDIRECT!!!");//window.location.href="/"+user+"/"+repo+"/pulls";
+									else window.console.log("user is the same as author");
 								/*	if(pull!="undefined")
 										window.location.href="/"+user+"/"+repo+"/pull/"+pull.number;
 									else window.location.href="/"+user+"/"+repo+"/pulls/";*/

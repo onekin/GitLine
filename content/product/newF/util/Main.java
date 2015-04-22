@@ -1,9 +1,8 @@
-package util; 
+package util;
 
-public   class  Main {
+public class Main{
 	
-	
-	public static void main  (String[] args){
+	public static void main(String[] args){
 		Stack st=new Stack();
 		
 		for (int i=0;i<100; i++){
@@ -16,6 +15,5 @@ public   class  Main {
 			
 		
 	}
-
-
+	
 }

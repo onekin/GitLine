@@ -1,11 +1,11 @@
 package util; 
 
 import java.util.LinkedList; 
-
+//nueva linea local
 public   class  Stack {
 	
 	//linea arriba
-	private LinkedList<Object> data = new LinkedList<Object>();
+	private LinkedList<Object> data  = new LinkedList<Object>();
 
 	
 	private void  push__wrappee__base  (Object obj) {
@@ -13,10 +13,8 @@ public   class  Stack {
 	}
 
 	
-	
-	public void push(Object obj) {
-		push__wrappee__base(obj);
-		count++;
+	public void push  (Object obj) {
+		data.addFirst(obj);
 	}
 
 	
@@ -25,15 +23,8 @@ public   class  Stack {
 	}
 
 	
-	
-	public Object pop() {
-		if(count > 0) {
-			count--;
-			return pop__wrappee__base(); // calling the overriden method
-		}
-		else{
-			return null;
-		}
+	public Object pop  () {
+		return data.removeFirst();
 	}
 
 	

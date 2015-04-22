@@ -65,6 +65,7 @@ githubdeltas_xmlhttpRequester.prototype.chromeStartRequest=function(safeUrl, det
 // method by the same name which is a property of 'details' in the content
 // window's security context.
 githubdeltas_xmlhttpRequester.prototype.setupRequestEvent =
+
 function(unsafeContentWin, req, event, details) {
 	if (details[event]) {
 		req[event] = function() {

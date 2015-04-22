@@ -13,7 +13,8 @@ public class Stack {
 			count--;
 			return original(); // calling the overriden method
 		}
-		else
+		else{
 			return null;
+		}
 	}
 }

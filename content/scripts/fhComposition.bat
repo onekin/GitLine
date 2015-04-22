@@ -1,0 +1,1 @@
+javaw -jar %3 --expression %1

@@ -3011,7 +3011,7 @@ window.console.log("API DEIA PROBA ");
 			var ghAuthorRepo= new Gh3.Repository(auxRepo, ghAuthor);
 	    	//1: access repository
 			ghAuthorRepo.fetch(function (err, res) {
-	          if(err) { window.console.log("ERROR 3 ghRepo.fetch"); }
+	          if(err) { window.console.log("ERROR 3112 ghRepo.fetch"); }
 				//2:fetch repository all branches
 				ghAuthorRepo.fetchBranches(function (err, res) {
 					var master=ghAuthorRepo.getBranchByName("master");//3: get master branh
@@ -3767,21 +3767,24 @@ InstallEController.prototype.execute=function(act){
 	    	var ghUser = new Gh3.User(user);
 			window.console.log(ghRepo);
 
-	    	var manual=window.prompt("manual or assited or splot?","splot");
+	    	//var manual=window.prompt("manual or assited or splot?","splot");
 
 			
-			if(manual=="manual"){
+		/*	if(manual=="manual"){
 				/*step 1: Ask for product configuration equation*/
-				var productFolders=window.prompt("Enter Core Assets to instantiate"," ");
+			/*	var productFolders=window.prompt("Enter Core Assets to instantiate"," ");
 				window.console.log(productFolders);
 				var coreAssetIds=productFolders.toString().split(" ");
 				window.console.log("coreAssetIds:"+coreAssetIds);
 				DeltaUtils.enactProductFork(ghUser, ghRepo, coreAssetIds);
-			}
-			else if(manual=="splot"){
+			}*/
+			//else if(manual=="splot"){
 				//window.open('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
 				//GM_openInTab(window.document, 'http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
-				UI.Dialog.show_gitLine_splot_dialog();
+				
+				//fetch first the splot-configurator-url file-and read the content to load the configurator in a IFRAME
+				UI.Dialog.show_gitLine_splot_dialog("http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150408_1980832584.xml#", null,null);//call function to enact ProductFork operation
+				
 				/*var splotFrame = window.document.createElement("IFRAME");
 				//splotFrame.setAttribute("name", "splot");
 				splotFrame.setAttribute("src", "http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml");
@@ -3790,7 +3793,7 @@ InstallEController.prototype.execute=function(act){
 				splotFrame
    				window.document.body.appendChild(splotFrame);*/
    				
-			}
+			//}
    	}
 
    	
@@ -4026,7 +4029,7 @@ var commit1;
 */
 
 DeltaUtils.getUserAccessToken=function(){
-	return "3a27e4e0cacc583cc3ccf2ee67f9759068620ae8"; //GitHub API Access T
+	return ""; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models
@@ -4759,6 +4762,15 @@ Utils.XHR=function(url,f,method,params){
 }
 
 
+DeltaUtils.checkConfigurationReady=function(splotIFrame){
+
+	window.console.log()
+
+
+
+}
+
+
 //Capturing event for compare range change
 //Ajax deletes "Fordward Propagation button"
 
@@ -4853,8 +4865,8 @@ UI.opaque_layer ={
 
 UI.Dialog = {
 
-		fontStyle : "font-size: 12px; font-family: Arial, Helvetica, sans-serif;",
-		buttonStyle : "font-size: 12px; font-family: Arial, Helvetica, sans-serif; background: YellowGreen; color: White; margin: 5px; padding: 2px 4px; border: none; border-radius: 3px;",
+		fontStyle : "font-size: 16px; font-family: Arial, Helvetica, sans-serif;",
+		buttonStyle : "font-size: 16px; font-family: Arial, Helvetica, sans-serif; background: YellowGreen; color: White; margin: 5px; padding: 2px 4px; border: none; border-radius: 3px;",
 	
 		create_dialog : function(elems){			
 			
@@ -4872,7 +4884,7 @@ UI.Dialog = {
 			else{
 				var main_div = document.createElement("div");
 				main_div.setAttribute("id", "prompt_wf");
-				main_div.setAttribute("style", "position: fixed; max-width: 800px; z-index: 700; left: 50%; margin-left: -100px; top: 100px; background: white url() bottom right no-repeat; padding: 27px; border: 10px solid white; border-radius: 5px; text-align: center;"
+				main_div.setAttribute("style", "position: fixed; max-width: 1000px; z-index: 7000; left: 50%; margin-left: -200px; top: 100px; background: white url() bottom right no-repeat; padding: 27px; border: 10px solid white; border-radius: 5px; text-align: center;"
 												+ "font-size: 12px;");
 											
 				document.body.appendChild(main_div);
@@ -4932,145 +4944,19 @@ UI.Dialog = {
 		* @param {function} yes_callback
 		* @param {function} no_callback
 		**/
-		show_insertFeatureInterfaze : function(txt, phase, allFeatures,kind){
-			//var document = document;
 		
-			var p = document.createElement("p");
-			p.innerHTML = txt;
-			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
-			
-			var yes_btn = document.createElement("input");
-			yes_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
-			yes_btn.setAttribute("value", "Acept");
-			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
-		
-			yes_btn.addEventListener("click", function(e){			
-				//delete prompt
-				DeltaUtils.selectedInsert(p,phase,allFeatures,kind);
-				UI.Dialog.remove_dialog();
-			
-				yes_callback();
-			});
-	
-			var no_btn = document.createElement("input");
-			no_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_no");
-			no_btn.setAttribute("value", "Cancel");
-			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
-			
-			no_btn.addEventListener("click", function(e){			
-				//delete prompt
-				UI.Dialog.remove_dialog();
-		
-				no_callback();
-			});
-			
-			var elements = [p, yes_btn, no_btn];
-	
-			//create dialog with created elements
-			UI.Dialog.create_dialog(elements);
-		},
 
-		show_issueInterface : function(txt){
-			//var document = document;
-			window.console.log("issueinterface");
-			var p = document.createElement("p");
-			p.innerHTML = txt;
-			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
-			
-			var yes_btn = document.createElement("input");
-			yes_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
-			yes_btn.setAttribute("value", "Acept");
-			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
-		
-			yes_btn.addEventListener("click", function(e){			
-				
-				DeltaUtils.selectedCheckIssue(p);
-				UI.Dialog.remove_dialog();
-			
-				yes_callback();
-			});
-	
-			var no_btn = document.createElement("input");
-			no_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_no");
-			no_btn.setAttribute("value", "Cancel");
-			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
-			
-			no_btn.addEventListener("click", function(e){			
-				//delete prompt
-				UI.Dialog.remove_dialog();
-		
-				no_callback();
-			});
-			
-			var elements = [p, yes_btn, no_btn];
-	
-			//create dialog with created elements
-			UI.Dialog.create_dialog(elements);
-		},
-
-
-		show_ForksOfRepository : function(txt, Forks, newFeature,parent, option){
-			//var document = document;
-		
-			var p = document.createElement("p");
-			p.innerHTML = txt;
-			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
-			
-			
-			var yes_btn = document.createElement("input");
-			yes_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
-			yes_btn.setAttribute("value", "Acept");
-			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
-		
-			yes_btn.addEventListener("click", function(e){			
-				//delete prompt
-				window.console.log("UI dialog Forward progagation for selected forks");
-				DeltaUtils.selectedCheckForks(p, Forks, newFeature);
-				UI.Dialog.remove_dialog();
-			
-				yes_callback();
-			});
-		
-	
-			var no_btn = document.createElement("input");
-			no_btn.setAttribute("type", "button");
-			yes_btn.setAttribute("id", "general_FFD_dialog_no");
-			no_btn.setAttribute("value", "Cancel");
-			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
-			
-			no_btn.addEventListener("click", function(e){			
-				//delete prompt
-				UI.Dialog.remove_dialog();
-		
-				no_callback();
-			});
-			window.console.log("in interface"+option);
-			if(option==1){
-
-				var elements = [p, yes_btn, no_btn];
-			}else{
-				var elements = [p,  no_btn];
-			}
-			
-			
-	
-			//create dialog with created elements
-			UI.Dialog.create_dialog(elements);
-		},
-				
 		show_gitLine_splot_dialog : function(txt, yes_callback, no_callback){
 			//var document = document;
 		
 			var p = document.createElement("IFRAME");
+			p.setAttribute("id", "splotFrame");
+			p.setAttribute("src", txt);
+   			p.setAttribute("width","900");
+   		    p.setAttribute("height","600");
+   		    p.setAttribute("contenteditable","true"); 
 
-			p.setAttribute("src", "http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml");
-   				p.setAttribute("width","900");
-   				p.setAttribute("height","600");
+
 
 //			p.innerHTML = txt;
 		//	p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
@@ -5078,26 +4964,66 @@ UI.Dialog = {
 			var yes_btn = document.createElement("input");
 			yes_btn.setAttribute("type", "button");
 			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
-			yes_btn.setAttribute("value", "Create Repository");
+			yes_btn.setAttribute("value", "Create  Product Repository");
+			//yes_btn.setAttribute('disabled','disabled');
 			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
-		
+			//window.console.log(p.contentWindow.document);
+
 			yes_btn.addEventListener("click", function(e){			
 				//delete prompt
-				UI.Dialog.remove_dialog();
-			
-				yes_callback();
+				window.console.log("to display");
+
+				window.console.log(p.innerHTML);
+				window.console.log(p.contentDocument);
+				window.console.log(document);
+				var splotWindow= window.frames[0];
+
+				window.console.log(splotWindow);
+				var win = p.contentWindow;
+
+				window.console.log("2");
+				window.console.log(win);
+				
+				//var doc = p.contentDocument? p.contentDocument: p.contentWindow.document;
+				window.console.log("3");
+				// reference to form named 'demoForm' in iframe
+				//var elem = doc.getElementById('configuration-done-element');
+				//window.console.log(elem);
+				window.console.log("4");
+
+					///´-------------
+				window.console.log(splotWindow);
+				window.console.log(splotWindow.document);
+
+				var dokumentua = window.frames[0].document.getElementsByClassName("selectedFeature")[0];//.innerHTML;
+				window.console.log("dokumentua");
+				window.console.log(dokumentua);
+
+				var listSelectedFeatures=document.getElementsByClassName("selectedFeature");
+				var doneButton=document.getElementById("configuration-done-element");
+				
+				window.console.log(listSelectedFeatures);
+				window.console.log(doneButton);
+
+				if(doneButton==null){
+					UI.show_message("You are not done configuring the product",null);
+					return;
+				}
+				else{
+					//UI.Dialog.remove_dialog();
+					//yes_callback(listSelectedFeatures);
+				}
 			});
 	
 			var no_btn = document.createElement("input");
 			no_btn.setAttribute("type", "button");
 			yes_btn.setAttribute("id", "general_FFD_dialog_no");
-			no_btn.setAttribute("value", "No");
+			no_btn.setAttribute("value", "Cancel");
 			no_btn.setAttribute("style", UI.Dialog.buttonStyle);
 			
 			no_btn.addEventListener("click", function(e){			
 				//delete prompt
 				UI.Dialog.remove_dialog();
-		
 				no_callback();
 			});
 			

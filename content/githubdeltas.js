@@ -15,838 +15,6 @@ return d||(f=$b[b],$b[b]=e,e=null!=c(a,b,d)?b.toLowerCase():null,$b[b]=f),e}});v
 jQuery.noConflict();
 
 
-//GitHub michel library
-
-/*!
- * @overview  Github.js
- *
- * @copyright (c) 2013 Michael Aufreiter, Development Seed
- *            Github.js is freely distributable.
- *
- * @license   Licensed under MIT license
- *
- *            For all details and documentation:
- *            http://substance.io/michael/github
- */
-
-(function() {
-  'use strict';
-  
-  // Initial Setup
-  // -------------
-
-  var XMLHttpRequest,  _;
-  /* istanbul ignore else  */
-  if (typeof exports !== 'undefined') {
-      XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
-      _ = require('underscore');
-      var btoa = require('btoa'); //jshint ignore:line
-  } else { 
-      _ = window._; 
-  }
-  
-  //prefer native XMLHttpRequest always
-  /* istanbul ignore if  */
-  if (typeof window !== 'undefined' && typeof window.XMLHttpRequest !== 'undefined'){
-      XMLHttpRequest = window.XMLHttpRequest;
-  }
-
-
-
-  var Github = function(options) {
-    var API_URL = options.apiUrl || 'https://api.github.com';
-
-    // HTTP Request Abstraction
-    // =======
-    //
-    // I'm not proud of this and neither should you be if you were responsible for the XMLHttpRequest spec.
-
-    function _request(method, path, data, cb, raw, sync) {
-      function getURL() {
-        var url = path.indexOf('//') >= 0 ? path : API_URL + path;
-        return url + ((/\?/).test(url) ? '&' : '?') + (new Date()).getTime();
-      }
-
-      var xhr = new XMLHttpRequest();
-
-
-      xhr.open(method, getURL(), !sync);
-      if (!sync) {
-        xhr.onreadystatechange = function () {
-          if (this.readyState === 4) {
-            if (this.status >= 200 && this.status < 300 || this.status === 304) {
-              cb(null, raw ? this.responseText : this.responseText ? JSON.parse(this.responseText) : true, this);
-            } else {
-              cb({path: path, request: this, error: this.status});
-            }
-          }
-        };
-      }
-
-      if (!raw) {
-        xhr.dataType = 'json';
-        xhr.setRequestHeader('Accept','application/vnd.github.v3+json');
-      } else {
-        xhr.setRequestHeader('Accept','application/vnd.github.v3.raw+json');
-      }
-
-      xhr.setRequestHeader('Content-Type','application/json;charset=UTF-8');
-      if ((options.token) || (options.username && options.password)) {
-        var authorization = options.token ? 'token ' + options.token : 'Basic ' + btoa(options.username + ':' + options.password);
-        xhr.setRequestHeader('Authorization', authorization);
-      }
-      if (data) {
-        xhr.send(JSON.stringify(data));
-      } else {
-        xhr.send();
-      }
-      if (sync) {
-        return xhr.response;
-      }
-    }
-
-    function _requestAllPages(path, cb) {
-      var results = [];
-      (function iterate() {
-        _request('GET', path, null, function(err, res, xhr) {
-          if (err) {
-            return cb(err);
-          }
-
-          results.push.apply(results, res);
-
-          var links = (xhr.getResponseHeader('link') || '').split(/\s*,\s*/g),
-              next = _.find(links, function(link) { return /rel="next"/.test(link); });
-
-          if (next) {
-            next = (/<(.*)>/.exec(next) || [])[1];
-          }
-
-          if (!next) {
-            cb(err, results);
-          } else {
-            path = next;
-            iterate();
-          }
-        });
-      })();
-    }
-
-
-    // User API
-    // =======
-
-    Github.User = function() {
-      this.repos = function(cb) {
-        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-        _requestAllPages('/user/repos?type=all&per_page=1000&sort=updated', function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // List user organizations
-      // -------
-
-      this.orgs = function(cb) {
-        _request("GET", '/user/orgs', null, function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // List authenticated user's gists
-      // -------
-
-      this.gists = function(cb) {
-        _request("GET", '/gists', null, function(err, res) {
-          cb(err,res);
-        });
-      };
-
-      // List authenticated user's unread notifications
-      // -------
-
-      this.notifications = function(cb) {
-        _request("GET", '/notifications', null, function(err, res) {
-          cb(err,res);
-        });
-      };
-
-      // Show user information
-      // -------
-
-      this.show = function(username, cb) {
-        var command = username ? '/users/' + username : '/user';
-
-        _request('GET', command, null, function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // List user repositories
-      // -------
-
-      this.userRepos = function(username, cb) {
-        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-        _requestAllPages('/users/' + username + '/repos?type=all&per_page=1000&sort=updated', function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // List a user's gists
-      // -------
-
-      this.userGists = function(username, cb) {
-        _request('GET', '/users/' + username + '/gists', null, function(err, res) {
-          cb(err,res);
-        });
-      };
-
-      // List organization repositories
-      // -------
-
-      this.orgRepos = function(orgname, cb) {
-        // Github does not always honor the 1000 limit so we want to iterate over the data set.
-        _requestAllPages('/orgs/' + orgname + '/repos?type=all&&page_num=1000&sort=updated&direction=desc', function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // Follow user
-      // -------
-
-      this.follow = function(username, cb) {
-        _request('PUT', '/user/following/' + username, null, function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // Unfollow user
-      // -------
-
-      this.unfollow = function(username, cb) {
-        _request('DELETE', '/user/following/' + username, null, function(err, res) {
-          cb(err, res);
-        });
-      };
-
-      // Create a repo
-      // -------
-      this.createRepo = function(options, cb) {
-        _request('POST', '/user/repos', options, cb);
-      };
-
-    };
-
-    // Repository API
-    // =======
-
-    Github.Repository = function(options) {
-      var repo = options.name;
-      var user = options.user;
-
-      var that = this;
-      var repoPath = '/repos/' + user + '/' + repo;
-
-      var currentTree = {
-        'branch': null,
-        'sha': null
-      };
-
-
-      // Delete a repo
-      // --------
-
-      this.deleteRepo = function(cb) {
-        _request('DELETE', repoPath, options, cb);
-      };
-
-      // Uses the cache if branch has not been changed
-      // -------
-
-      function updateTree(branch, cb) {
-        if (branch === currentTree.branch && currentTree.sha) {
-          return cb(null, currentTree.sha);
-        }
-        
-        that.getRef('heads/' + branch, function(err, sha) {
-          currentTree.branch = branch;
-          currentTree.sha = sha;
-          cb(err, sha);
-        });
-      }
-
-      // Get a particular reference
-      // -------
-
-      this.getRef = function(ref, cb) {
-        _request('GET', repoPath + '/git/refs/' + ref, null, function(err, res) {
-          if (err) {
-            return cb(err);
-          }
-          
-          cb(null, res.object.sha);
-        });
-      };
-
-      // Create a new reference
-      // --------
-      //
-      // {
-      //   "ref": "refs/heads/my-new-branch-name",
-      //   "sha": "827efc6d56897b048c772eb4087f854f46256132"
-      // }
-
-      this.createRef = function(options, cb) {
-        _request('POST', repoPath + '/git/refs', options, cb);
-      };
-
-      // Delete a reference
-      // --------
-      //
-      // repo.deleteRef('heads/gh-pages')
-      // repo.deleteRef('tags/v1.0')
-
-      this.deleteRef = function(ref, cb) {
-        _request('DELETE', repoPath + '/git/refs/' + ref, options, cb);
-      };
-
-      // Create a repo
-      // -------
-
-      this.createRepo = function(options, cb) {
-        _request('POST', '/user/repos', options, cb);
-      };
-
-      // Delete a repo
-      // --------
-
-      this.deleteRepo = function(cb) {
-        _request('DELETE', repoPath, options, cb);
-      };
-
-      // List all tags of a repository
-      // -------
-
-      this.listTags = function(cb) {
-        _request('GET', repoPath + '/tags', null, function(err, tags) {
-          if (err) {
-            return cb(err);
-          }
-          
-          cb(null, tags);
-        });
-      };
-
-      // List all pull requests of a respository
-      // -------
-
-      this.listPulls = function(state, cb) {
-        _request('GET', repoPath + "/pulls" + (state ? '?state=' + state : ''), null, function(err, pulls) {
-          if (err) return cb(err);
-          cb(null, pulls);
-        });
-      };
-
-      // Gets details for a specific pull request
-      // -------
-
-      this.getPull = function(number, cb) {
-        _request("GET", repoPath + "/pulls/" + number, null, function(err, pull) {
-          if (err) return cb(err);
-          cb(null, pull);
-        });
-      };
-
-      // Retrieve the changes made between base and head
-      // -------
-
-      this.compare = function(base, head, cb) {
-        _request("GET", repoPath + "/compare/" + base + "..." + head, null, function(err, diff) {
-          if (err) return cb(err);
-          cb(null, diff);
-        });
-      };
-
-      // List all branches of a repository
-      // -------
-
-      this.listBranches = function(cb) {
-        _request("GET", repoPath + "/git/refs/heads", null, function(err, heads) {
-          if (err) return cb(err);
-          cb(null, _.map(heads, function(head) { return _.last(head.ref.split('/')); }));
-        });
-      };
-
-      // Retrieve the contents of a blob
-      // -------
-
-      this.getBlob = function(sha, cb) {
-        _request("GET", repoPath + "/git/blobs/" + sha, null, cb, 'raw');
-      };
-
-      // For a given file path, get the corresponding sha (blob for files, tree for dirs)
-      // -------
-
-      this.getCommit = function(branch, sha, cb) {
-        _request("GET", repoPath + "/git/commits/"+sha, null, function(err, commit) {
-          if (err) return cb(err);
-          cb(null, commit);
-        });
-      };
-
-      // For a given file path, get the corresponding sha (blob for files, tree for dirs)
-      // -------
-
-      this.getSha = function(branch, path, cb) {
-        if (!path || path === "") return that.getRef("heads/"+branch, cb);
-        _request("GET", repoPath + "/contents/"+path, {ref: branch}, function(err, pathContent) {
-          if (err) return cb(err);
-          cb(null, pathContent.sha);
-        });
-      };
-
-      // Retrieve the tree a commit points to
-      // -------
-
-      this.getTree = function(tree, cb) {
-        _request("GET", repoPath + "/git/trees/"+tree, null, function(err, res) {
-          if (err) return cb(err);
-          cb(null, res.tree);
-        });
-      };
-
-      // Post a new blob object, getting a blob SHA back
-      // -------
-
-      this.postBlob = function(content, cb) {
-        if (typeof(content) === "string") {
-          content = {
-            "content": content,
-            "encoding": "utf-8"
-          };
-        } else {
-          	content = {
-              "content": btoa(String.fromCharCode.apply(null, new Uint8Array(content))),
-              "encoding": "base64"
-            };
-          }
-
-        _request("POST", repoPath + "/git/blobs", content, function(err, res) {
-          if (err) return cb(err);
-          cb(null, res.sha);
-        });
-      };
-
-      // Update an existing tree adding a new blob object getting a tree SHA back
-      // -------
-
-      this.updateTree = function(baseTree, path, blob, cb) {
-        var data = {
-          "base_tree": baseTree,
-          "tree": [
-            {
-              "path": path,
-              "mode": "100644",
-              "type": "blob",
-              "sha": blob
-            }
-          ]
-        };
-        _request("POST", repoPath + "/git/trees", data, function(err, res) {
-          if (err) return cb(err);
-          cb(null, res.sha);
-        });
-      };
-
-      // Post a new tree object having a file path pointer replaced
-      // with a new blob SHA getting a tree SHA back
-      // -------
-
-      this.postTree = function(tree, cb) {
-        _request("POST", repoPath + "/git/trees", { "tree": tree }, function(err, res) {
-          if (err) return cb(err);
-          cb(null, res.sha);
-        });
-      };
-
-      // Create a new commit object with the current commit SHA as the parent
-      // and the new tree SHA, getting a commit SHA back
-      // -------
-
-      this.commit = function(parent, tree, message, cb) {
-        var user = new Github.User();
-        user.show(null, function(err, userData){
-          if (err) return cb(err);
-          var data = {
-            "message": message,
-            "author": {
-              "name": options.user,
-              "email": userData.email
-            },
-            "parents": [
-              parent
-            ],
-            "tree": tree
-          };
-          _request("POST", repoPath + "/git/commits", data, function(err, res) {
-            if (err) return cb(err);
-            currentTree.sha = res.sha; // update latest commit
-            cb(null, res.sha);
-          });
-        });
-      };
-
-      // Update the reference of your head to point to the new commit SHA
-      // -------
-
-      this.updateHead = function(head, commit, cb) {
-        _request("PATCH", repoPath + "/git/refs/heads/" + head, { "sha": commit }, function(err) {
-          cb(err);
-        });
-      };
-
-      // Show repository information
-      // -------
-
-      this.show = function(cb) {
-        _request("GET", repoPath, null, cb);
-      };
-
-      // Get contents
-      // --------
-
-      this.contents = function(ref, path, cb) {
-        _request("GET", repoPath + "/contents" + (path ? "/" + path : ""), { ref: ref }, cb);
-      };
-
-      // Fork repository
-      // -------
-
-      this.fork = function(cb) {
-        _request("POST", repoPath + "/forks", null, cb);
-      };
-
-      // Branch repository
-      // --------
-
-      this.branch = function(oldBranch,newBranch,cb) {
-        if(arguments.length === 2 && typeof arguments[1] === "function") {
-          cb = newBranch;
-          newBranch = oldBranch;
-          oldBranch = "master";
-        }
-        this.getRef("heads/" + oldBranch, function(err,ref) {
-          if(err && cb) return cb(err);
-          that.createRef({
-            ref: "refs/heads/" + newBranch,
-            sha: ref
-          },cb);
-        });
-      };
-
-      // Create pull request
-      // --------
-
-      this.createPullRequest = function(options, cb) {
-        _request("POST", repoPath + "/pulls", options, cb);
-      };
-
-      // List hooks
-      // --------
-
-      this.listHooks = function(cb) {
-        _request("GET", repoPath + "/hooks", null, cb);
-      };
-
-      // Get a hook
-      // --------
-
-      this.getHook = function(id, cb) {
-        _request("GET", repoPath + "/hooks/" + id, null, cb);
-      };
-
-      // Create a hook
-      // --------
-
-      this.createHook = function(options, cb) {
-        _request("POST", repoPath + "/hooks", options, cb);
-      };
-
-      // Edit a hook
-      // --------
-
-      this.editHook = function(id, options, cb) {
-        _request("PATCH", repoPath + "/hooks/" + id, options, cb);
-      };
-
-      // Delete a hook
-      // --------
-
-      this.deleteHook = function(id, cb) {
-        _request("DELETE", repoPath + "/hooks/" + id, null, cb);
-      };
-
-      // Read file at given path
-      // -------
-
-      this.read = function(branch, path, cb) {
-        _request("GET", repoPath + "/contents/"+path, {ref: branch}, function(err, obj) {
-          if (err && err.error === 404) return cb("not found", null, null);
-
-          if (err) return cb(err);
-          cb(null, obj);
-        }, true);
-      };
-
-
-      // Remove a file
-      // -------
-
-      this.remove = function(branch, path, cb) {
-        that.getSha(branch, path, function(err, sha) {
-          if (err) return cb(err);
-          _request("DELETE", repoPath + "/contents/" + path, {
-            message: path + " is removed",
-            sha: sha,
-            branch: branch
-          }, cb);
-        });
-      };
-
-      // Delete a file from the tree
-      // -------
-
-      this.delete = function(branch, path, cb) {
-        that.getSha(branch, path, function(err, sha) {
-          if (!sha) return cb("not found", null);
-          var delPath = repoPath + "/contents/" + path;
-          var params = {
-            "message": "Deleted " + path,
-            "sha": sha
-          };
-          delPath += "?message=" + encodeURIComponent(params.message);
-          delPath += "&sha=" + encodeURIComponent(params.sha);
-          delPath += '&branch=' + encodeURIComponent(branch);
-          _request("DELETE", delPath, null, cb);
-        });
-      };
-
-      // Move a file to a new location
-      // -------
-
-      this.move = function(branch, path, newPath, cb) {
-        updateTree(branch, function(err, latestCommit) {
-          that.getTree(latestCommit+"?recursive=true", function(err, tree) {
-            // Update Tree
-            _.each(tree, function(ref) {
-              if (ref.path === path) ref.path = newPath;
-              if (ref.type === "tree") delete ref.sha;
-            });
-
-            that.postTree(tree, function(err, rootTree) {
-              that.commit(latestCommit, rootTree, 'Deleted '+path , function(err, commit) {
-                that.updateHead(branch, commit, function(err) {
-                  cb(err);
-                });
-              });
-            });
-          });
-        });
-      };
-
-      // Write file contents to a given branch and path
-      // -------
-
-      this.write = function(branch, path, content, message, cb) {
-        that.getSha(branch, path, function(err, sha) {
-          if (err && err.error !== 404) return cb(err);
-          _request("PUT", repoPath + "/contents/" + path, {
-            message: message,
-            content: btoa(content),
-            branch: branch,
-            sha: sha
-          }, cb);
-        });
-      };
-
-      // List commits on a repository. Takes an object of optional paramaters:
-      // sha: SHA or branch to start listing commits from
-      // path: Only commits containing this file path will be returned
-      // since: ISO 8601 date - only commits after this date will be returned
-      // until: ISO 8601 date - only commits before this date will be returned
-      // -------
-
-      this.getCommits = function(options, cb) {
-          options = options || {};
-          var url = repoPath + "/commits";
-          var params = [];
-          if (options.sha) {
-              params.push("sha=" + encodeURIComponent(options.sha));
-          }
-          if (options.path) {
-              params.push("path=" + encodeURIComponent(options.path));
-          }
-          if (options.since) {
-              var since = options.since;
-              if (since.constructor === Date) {
-                  since = since.toISOString();
-              }
-              params.push("since=" + encodeURIComponent(since));
-          }
-          if (options.until) {
-              var until = options.until;
-              if (until.constructor === Date) {
-                  until = until.toISOString();
-              }
-              params.push("until=" + encodeURIComponent(until));
-          }
-          if (options.page) {
-              params.push("page=" + options.page);
-          }
-          if (options.perpage) {
-              params.push("per_page=" + options.perpage);
-          }
-          if (params.length > 0) {
-              url += "?" + params.join("&");
-          }
-          _request("GET", url, null, cb);
-      };
-    };
-
-    // Gists API
-    // =======
-
-    Github.Gist = function(options) {
-      var id = options.id;
-      var gistPath = "/gists/"+id;
-
-      // Read the gist
-      // --------
-
-      this.read = function(cb) {
-        _request("GET", gistPath, null, function(err, gist) {
-          cb(err, gist);
-        });
-      };
-
-      // Create the gist
-      // --------
-      // {
-      //  "description": "the description for this gist",
-      //    "public": true,
-      //    "files": {
-      //      "file1.txt": {
-      //        "content": "String file contents"
-      //      }
-      //    }
-      // }
-
-      this.create = function(options, cb){
-        _request("POST","/gists", options, cb);
-      };
-
-      // Delete the gist
-      // --------
-
-      this.delete = function(cb) {
-        _request("DELETE", gistPath, null, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Fork a gist
-      // --------
-
-      this.fork = function(cb) {
-        _request("POST", gistPath+"/fork", null, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Update a gist with the new stuff
-      // --------
-
-      this.update = function(options, cb) {
-        _request("PATCH", gistPath, options, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Star a gist
-      // --------
-
-      this.star = function(cb) {
-        _request("PUT", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Untar a gist
-      // --------
-
-      this.unstar = function(cb) {
-        _request("DELETE", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Check if a gist is starred
-      // --------
-
-      this.isStarred = function(cb) {
-        _request("GET", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      };
-    };
-
-    // Issues API
-    // ==========
-
-    Github.Issue = function(options) {
-      var path = "/repos/" + options.user + "/" + options.repo + "/issues";
-
-      this.list = function(options, cb) {
-        var query = [];
-        for (var key in options) {
-          if (options.hasOwnProperty(key)) {
-            query.push(encodeURIComponent(key) + "=" + encodeURIComponent(options[key]));
-          }
-        }
-        _requestAllPages(path + '?' + query.join("&"), cb);
-      };
-    };
-
-    // Top Level API
-    // -------
-
-    this.getIssues = function(user, repo) {
-      return new Github.Issue({user: user, repo: repo});
-    };
-
-    this.getRepo = function(user, repo) {
-      return new Github.Repository({user: user, name: repo});
-    };
-
-    this.getUser = function() {
-      return new Github.User();
-    };
-
-    this.getGist = function(id) {
-      return new Github.Gist({id: id});
-    };
-  };
-
-  /* istanbul ignore else  */
-  if (typeof exports !== 'undefined') {
-    module.exports = Github;
-  } else {
-    window.Github = Github;
-  }
-}).call(this);
-
-
-
 /**********************************************************************/
 /**********************************************************************/
 /*******   GitHub API v3   splot
@@ -1446,14 +614,20 @@ jQuery.noConflict();
 		constructor : function (contentItem, ghUser, repositoryName, branchName) {
 			Gh3.Dir.__super__.constructor.call(this, contentItem, ghUser, repositoryName, branchName);
 		},
+
 		fetchContents : function (callback) {
 			var that = this;
 			that.contents = [];
+			that.sha;
 
 			Gh3.Helper.callHttpApi({
 				service : "repos/"+that.user.login+"/"+that.repositoryName+"/contents/"+that.path,
 				data : {ref: that.branchName },
 				success : function(res) {
+					that.sha=res.sha;
+					window.console.log("HOLAAAAAA");
+					window.console.log(res);
+					window.console.log(that.sha);
 					_.each(res.data, function (item) {
 						if (item.type == "file") that.contents.push(new Gh3.File(item, that.user, that.repositoryName, that.branchName));
 						if (item.type == "dir") that.contents.push(new Gh3.Dir(item, that.user, that.repositoryName, that.branchName));
@@ -1466,6 +640,7 @@ jQuery.noConflict();
 			});
 
 		},
+
 		reverseContents : function () {
 			this.contents.reverse();
 		},
@@ -1477,6 +652,7 @@ jQuery.noConflict();
 			}
 		},
 		getContents : function() { return this.contents; },
+		
 		getFileByName : function (name) {
 			return _.find(this.contents, function (item) {
 				return item.name == name && item.type == "file";
@@ -2234,7 +1410,7 @@ var GitHubWrapper=function(){
 
 
  //added by me:Leti 					//*[@class='minibutton select-menu-button js-menu-target']//*[@class='js-select-button']	
- this.nodes.currentBranch={node:null,listeners:{},xpath:"/html/body/div/div[2]/div[2]/div/div[2]/div[4]/div/span/span[2]", supplements:[],regexp:/([^ \n]+)/};
+ this.nodes.currentBranch={node:null,listeners:{},xpath:"//*[@class='js-select-button css-truncate-target']", supplements:[],regexp:/([^ \n]+)/};
  
  this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//span[@class='css-truncate-target']",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
@@ -2963,13 +2139,28 @@ if (GitHub.getForkedFrom()!=null)
 		var install=new InstallEController();
 		window.console.log("adding product fork");
   		install.execute("add");
+  	}
 
-  		var updatePropagation= new InsertFeatureEController();
+  	var docTile= document.title;
+	var str=docTile.split("at ");
+	
+	window.console.log(currentBranch);
+
+	if(currentBranch=="update.updates"){
+		var updatePropagation= new InsertFeatureEController();
   		updatePropagation.execute("add");
-
-  		var feedBackPropagation = new BackwardPropagationEController();
+	}
+	var cust=currentBranch.split(".")[0];
+	if (cust=="custom"){
+		var feedBackPropagation = new BackwardPropagationEController();
   		feedBackPropagation.execute("add");
-  	}//solo mostar los botones cuando el AE está viendo un repositorio que no es suyo	
+	}
+  		
+
+  		
+
+
+  	//solo mostar los botones cuando el AE está viendo un repositorio que no es suyo	
 
 ///*** michael library test ***/
  /*
@@ -3730,11 +2921,10 @@ InsertFeatureEController.prototype.execute=function(act){
 		}else if(act=="run"){
 
 			window.console.log("in InsertFeatureEController");
-			DeltaUtils.interfaceOfInsertFeature(1);
+			DeltaUtils.interfaceOfUpdatePropagation(null);
    		}
 
  };
-
 
 //Product Fork controller
 InstallEController.prototype.execute=function(act){ 
@@ -3768,7 +2958,6 @@ InstallEController.prototype.execute=function(act){
 			window.console.log(ghRepo);
 
 	    	//var manual=window.prompt("manual or assited or splot?","splot");
-
 			
 		/*	if(manual=="manual"){
 				/*step 1: Ask for product configuration equation*/
@@ -3783,15 +2972,11 @@ InstallEController.prototype.execute=function(act){
 				//GM_openInTab(window.document, 'http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
 				
 				//fetch first the splot-configurator-url file-and read the content to load the configurator in a IFRAME
-				UI.Dialog.show_gitLine_splot_dialog("http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150408_1980832584.xml#", null,null);//call function to enact ProductFork operation
 				
-				/*var splotFrame = window.document.createElement("IFRAME");
-				//splotFrame.setAttribute("name", "splot");
-				splotFrame.setAttribute("src", "http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml");
-   				window.console.log(window.document);
-   				splotFrame.style.border = "thick solid black";
-				splotFrame
-   				window.document.body.appendChild(splotFrame);*/
+				UI.Dialog.show_gitLine_splot_dialog("http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150408_1980832584.xml#", ghUser,ghRepo, null,null);//call function to enact ProductFork operation
+				
+				window.console.log("before");
+
    				
 			//}
    	}
@@ -3803,13 +2988,17 @@ InstallEController.prototype.execute=function(act){
 var DeltaUtils={};
 
 
-
 DeltaUtils.enactProductFork=function(ghUser, ghRepo, coreAssetIds){//coreAssetIds is an array
 //Step 1: Precondition, check configuration equation correspond to folder names in master.baseline
 window.console.log("enactProductFork");
+window.console.log(ghUser);
+window.console.log(ghRepo);
+window.console.log(coreAssetIds);
+
 	ghRepo.fetch(function(err,re){
 		ghRepo.fetchBranches(function(err,res){
 			var master=ghRepo.getBranchByName(DeltaUtils.getCoreRepoBaselineBranchName());
+			window.console.log(master);
 			master.fetchContents(function(err,res){
 					for(var i=0; i<coreAssetIds.length;i++){
 						if(! master.getDirByName(coreAssetIds[i])){ //si no hay folder error
@@ -3982,9 +3171,9 @@ DeltaUtils.setBranchingModelProductRepository=function(repo,user,token){
 												var year = d.getFullYear();
 												var output =  (day<10 ? '0' : '') + day + '-' + (month<10 ? '0' : '') + month + '-' + d.getFullYear();
 												window.console.log("Output: "+output);
-												Utils.XHR("/"+user+"/"+repo+"/settings",function(res){
-													//window.location.href="/"+user+"/"+repo;
-												},"POST","authenticity_token="+encodeURIComponent(token)+"&name="+repo+"Product"+output);
+												//Utils.XHR("/"+user+"/"+repo+"/settings",function(res){
+													window.location.href="/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoDevelopBranchName();
+												//},"POST","authenticity_token="+encodeURIComponent(token)+"&name="+repo+"Product"+output);
 											},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete");	//2: delete all branches except master.baseline
 										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfigContent)+"&placeholder_message=product configuration File");					
 									},"POST","authenticity_token="+encodeURIComponent(token));
@@ -3997,37 +3186,108 @@ DeltaUtils.setBranchingModelProductRepository=function(repo,user,token){
 	});
 };
 
+DeltaUtils.updatePropagationTimeOut="undefined";
 
-/*
-DeltaUtils.deleteDirectories=function(dir,user, repo, token, branchName){
-window.console.log("en deleteDirectories dirs for "+dir.name);
-//window.console.log(dir);
-var commit1;
-	dir.fetchContents(function (err, res) {
-		if(err) { throw "outch ..." }
-		dir.eachContent(function (content) {
-		if (content.type=="file")
-			Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+content.path,function(res){
-				Utils.XHR("/"+user+"/"+repo+"/delete/"+branchName+"/"+content.path,function(res){
-					 commit1=jQuery(res).find("input[name='commit']").attr("value");
-					 var comm=commit1;
+DeltaUtils.interfaceOfUpdatePropagation=function(integ){
+	window.console.log("interfaceOfUpdatePropagation");
+	var user=GitHub.getUserName(); 
+	var repo=GitHub.getCurrentRepository();
+	var author,coreRepo;
+	if (GitHub.getForkedFrom()!=null){
+		author=GitHub.getForkedFrom().split("/")[0];
+		coreRepo=GitHub.getForkedFrom().split("/")[1];
+	}
+  	window.console.log(author);
+  	window.console.log(coreRepo);
+  	window.console.log(repo);
+  	window.console.log(user);
 
-					Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+content.path,function(res){
-				    	window.console.log("deleting: "+content.path);
-				    	window.console.log("COMMIT1 VALUE:"+ commit1);
-				    	window.console.log("COMM VALUE:"+ comm);
-				    },"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete&commit="+comm+"&placeholder_message=remove file"+"&same_repo=1&commit_choice=direct&target_branch="+DeltaUtils.getProductRepoDevelopBranchName());									
-			    },"POST","authenticity_token="+encodeURIComponent(token));	
-			},"GET");
-		else{//it's a dir
-			var dir_aux=dir.getDirByName(content.name);
-			DeltaUtils.deleteDirectories(dir_aux, user, repo, token, branchName);
-		}
+ window.console.log(author);
+	var ghAuthor= new Gh3.User(author);
+	var ghRepoAssets= new Gh3.Repository(coreRepo, ghAuthor);
+	var ghUser= new Gh3.User(user);
+	var ghRepoProduct= new Gh3.Repository(repo,ghUser);
+
+	var hrefs=[];
+	
+	var configString= "You are enacting Update propagation." ;
+		configString+="<div align='center'>";
+		configString+=("<p> Summary of the changes: </p>");
+		configString+=("<table border='1'><tr><th>CoreAsset</th><th>Click to see diff in a new tab</th></tr>");
+
+	ghRepoAssets.fetch(function(err,res){
+		ghRepoAssets.fetchBranches(function(err,res){
+			var baseline= ghRepoAssets.getBranchByName(DeltaUtils.getCoreRepoBaselineBranchName());
+			baseline.fetchContents(function(err,res){
+				ghRepoProduct.fetch(function(err,res){
+					ghRepoProduct.fetchBranches(function(err,res){
+						var updates= ghRepoProduct.getBranchByName(DeltaUtils.getProductRepoUpdateBranchName());
+						updates.fetchContents(function(err,res){
+							var configFile=updates.getFileByName(DeltaUtils.getProductConfigName());
+							configFile.fetchContent(function(err,res){
+								var productSync=configFile.getRawContent();
+								if (productSync!=updates.sha){
+									window.console.log("There are updates!");
+									var listOfCoreAssetsToUpdate=[];
+									var listOfContents=updates.contents;
+									window.console.log(listOfContents);
+									DeltaUtils.getCoreAssetsToUpdate(listOfContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo);
+									window.console.log(11111);
+									if(DeltaUtils.updatePropagationTimeOut!="undefined")//clear timeout
+										window.clearTimeout(DeltaUtils.updatePropagationTimeOut);
+									window.console.log(31231312313);
+									DeltaUtils.updatePropagationTimeOut=window.setTimeout(function (){//(re)set timeout
+										//UI.Dialog.show_wf_yesno_dialog(configString, DeltaUtils.enactUpdatePropagation(listOfCoreAssetsToUpdate), null);
+										window.console.log("enacting......");
+										DeltaUtils.showUpdatePropagationDetails(listOfCoreAssetsToUpdate);
+									},3000);
+								}
+								else
+									alert("No updates available!");
+							});
+						});
+					});
+				});
+			});
+			
 		});
-    }); 
+	});
 };
-*/
 
+DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo){
+ try{
+ 	var content=branchContents.pop();
+	window.console.log(content);
+	if (content.type=='dir'){
+		var original=baseline.getDirByName(content.name); 
+		window.console.log(2);
+		if(original.sha!=content.sha){
+			window.console.log("There are new updates for core asset: "+content.name);
+			listOfCoreAssetsToUpdate.push(content.name);
+			//	  hrefs.push("https://github.com/"+author+"/"+coreRepo+"/commits/"+DeltaUtils.getCoreRepoBaselineBranchName()+"?path="+content.name);
+			configString+="<tr><td>"+content.name+"</td><td><a href=https://github.com/"+author+"/"+coreRepo+"/commits/"+DeltaUtils.getCoreRepoBaselineBranchName()+"?path="+content.name+">"+"Commits"+"</a></td></tr>";
+			window.console.log(2);
+		//UI.Dialog.show_wf_yesno_dialog(configString, DeltaUtils.enactUpdatePropagation(listOfCoreAssetsToUpdate), null);
+		}
+	}
+
+	if(branchContents.length!=0)
+		DeltaUtils.getCoreAssetsToUpdate(branchContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo);
+ }catch(e){
+ 	window.console.log(e);
+ }
+	
+};
+
+DeltaUtils.showUpdatePropagationDetails=function(listOfCoreAssetsToUpdate){
+	
+	window.console.log("ENACTED");
+	window.console.log(listOfCoreAssetsToUpdate);
+};
+
+DeltaUtils.goToLink=function(link){
+	window.open(link);
+};
 DeltaUtils.getUserAccessToken=function(){
 	return ""; //GitHub API Access Token
 };
@@ -4811,6 +4071,10 @@ var MutationObserver = window.MutationObserver || window.WebKitMutationObserver 
   });
 */
 
+
+DeltaUtils.splotTimeOut="undefined";
+
+
 UI = {};
 
 UI.opaque_layer ={
@@ -4946,73 +4210,44 @@ UI.Dialog = {
 		**/
 		
 
-		show_gitLine_splot_dialog : function(txt, yes_callback, no_callback){
+		show_gitLine_splot_dialog : function(txt,ghUser,ghRepo, yes_callback, no_callback){
 			//var document = document;
 		
 			var p = document.createElement("IFRAME");
+
 			p.setAttribute("id", "splotFrame");
 			p.setAttribute("src", txt);
    			p.setAttribute("width","900");
    		    p.setAttribute("height","600");
-   		    p.setAttribute("contenteditable","true"); 
-
-
-
-//			p.innerHTML = txt;
-		//	p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 20px; text-align: center;");
+   		  //  p.setAttribute("contenteditable","true"); 
+   		    //p.setAttribute("contenteditable","true"); 
+   		    //p.setAttribute("type", "content-targetable");
+   		    p.setAttribute("type", "content-accessible");
+   		    p.setAttribute("sandbox", "allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation");
 			
 			var yes_btn = document.createElement("input");
 			yes_btn.setAttribute("type", "button");
 			yes_btn.setAttribute("id", "general_FFD_dialog_yes");
 			yes_btn.setAttribute("value", "Create  Product Repository");
-			//yes_btn.setAttribute('disabled','disabled');
 			yes_btn.setAttribute("style", UI.Dialog.buttonStyle);
-			//window.console.log(p.contentWindow.document);
+	
 
+			//EVENT LISTENER!
 			yes_btn.addEventListener("click", function(e){			
-				//delete prompt
-				window.console.log("to display");
-
-				window.console.log(p.innerHTML);
-				window.console.log(p.contentDocument);
-				window.console.log(document);
-				var splotWindow= window.frames[0];
-
-				window.console.log(splotWindow);
-				var win = p.contentWindow;
-
-				window.console.log("2");
-				window.console.log(win);
 				
-				//var doc = p.contentDocument? p.contentDocument: p.contentWindow.document;
-				window.console.log("3");
-				// reference to form named 'demoForm' in iframe
-				//var elem = doc.getElementById('configuration-done-element');
-				//window.console.log(elem);
-				window.console.log("4");
-
-					///´-------------
-				window.console.log(splotWindow);
-				window.console.log(splotWindow.document);
-
-				var dokumentua = window.frames[0].document.getElementsByClassName("selectedFeature")[0];//.innerHTML;
-				window.console.log("dokumentua");
-				window.console.log(dokumentua);
-
-				var listSelectedFeatures=document.getElementsByClassName("selectedFeature");
-				var doneButton=document.getElementById("configuration-done-element");
 				
-				window.console.log(listSelectedFeatures);
-				window.console.log(doneButton);
+				var cores=show_gitLine_splot_dialog_compiler(p);
 
-				if(doneButton==null){
-					UI.show_message("You are not done configuring the product",null);
-					return;
-				}
-				else{
+				DeltaUtils.splotTimeOut=window.setTimeout(function (){
+					window.console.log("antes");
+					var coreAssetIds=cores.toString().split(" ");
+					window.console.log("coreAssetIds:"+coreAssetIds);
+					DeltaUtils.enactProductFork(ghUser, ghRepo, coreAssetIds);
 					//UI.Dialog.remove_dialog();
-					//yes_callback(listSelectedFeatures);
-				}
+					
+				},2000);
+
+			
 			});
 	
 			var no_btn = document.createElement("input");
@@ -5051,7 +4286,7 @@ UI.Dialog = {
 			yes_btn.addEventListener("click", function(e){			
 				//delete prompt
 				UI.Dialog.remove_dialog();
-			
+			    window.console.log("show_wf_yesno_dialog");
 				yes_callback();
 			});
 	

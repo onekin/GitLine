@@ -2,7 +2,7 @@
 xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>scxmlGitDelta@onekin.org</em:id>
-		<em:name>scxmlGitDelta</em:name>
+		<em:name>GitLine</em:name>
 		<em:version>1.0</em:version>
 		<em:description>Delta composition for SCXML</em:description>
 		<em:creator>Creator Leticia Montalvillo. Onekin Research Group</em:creator>
@@ -12,7 +12,7 @@ xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 		  	<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>			
 				<em:minVersion>2.0</em:minVersion>
-				<em:maxVersion>19.*</em:maxVersion>
+				<em:maxVersion>34.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 	</Description>

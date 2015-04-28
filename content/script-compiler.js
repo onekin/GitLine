@@ -11,7 +11,76 @@ var githubdeltas_gmCompiler={
 
 //////My scripts
 
+create_dialog : function(elems){			
+			
+		
+			//look for opaque layer
+			//UI.opaque_layer.show(document);
+		
+			//if dialog already exists, change its content
+		alert(5);
+			if(document.getElementById("prompt_wf")){
+				main_div = document.getElementById("prompt_wf");
+				main_div.innerHTML = "";
+			}
+		
+			//else create div
+			else{
+				alert(6);
+				var main_div = document.createElement("div");
+				alert(61);
+				main_div.setAttribute("id", "prompt_wf");
+				alert(62);
+				main_div.setAttribute("style", "position: fixed; max-width: 1000px; z-index: 7000; left: 50%; margin-left: -200px; top: 100px; background: white url() bottom right no-repeat; padding: 27px; border: 10px solid white; border-radius: 5px; text-align: center;"
+												+ "font-size: 12px;");
+											
+				alert(63);
+				alert(document);
+				alert(document.contentDocument);
+				document.contentDocument.body.appendChild(main_div);
+				alert(7);
+			}
+		
+			for(var i = 0; i < elems.length; i++){
+				main_div.appendChild(elems[i]);
+				alert(8);
+			}
+alert(9);
+			var div_width = document.getElementById("prompt_wf").offsetWidth;
+			var margin_left = (parseInt(div_width)/2)*-1;
+		
+			document.getElementById("prompt_wf").style.marginLeft = margin_left+"px";
+		alert(10);
+		},
 
+
+	show_gitLine_splot_dialog_compiler : function(p){
+			//show_gitLine_splot_dialog_compiler
+		//	alert(p);
+			var iframedoc=p.contentDocument||p.contentWindow.document;
+		//	alert(iframedoc);
+			
+			var doneButton=iframedoc.getElementById("configuration-done-element");
+			//alert(doneButton);
+			if (doneButton=="undefined") {
+				alert("You are not done configuring");
+				return null;
+			}
+
+			var i=0;
+			var listOfSelectedFeatures=iframedoc.getElementsByClassName("selectedFeature");
+			//alert(listOfSelectedFeatures);
+			var coreAssetNames="undefined";
+			for(i=0;i<listOfSelectedFeatures.length;i++){
+				if (coreAssetNames=="undefined")
+					coreAssetNames=listOfSelectedFeatures[i].innerHTML;
+				else coreAssetNames+=" "+ listOfSelectedFeatures[i].innerHTML;
+			}
+			//alert(coreAssetNames);
+			return coreAssetNames;
+          	//alert(iframedoc.getElementsByClassName("selectedFeature")[0].innerHTML);
+          	  
+		},
 
 getProfilePath: function(){
 
@@ -576,31 +645,7 @@ addMandatoryFeature: function(featureModel, featurechange, featurename){
 	}
 },
 
-/*
-callShellScript: function(){
-	try{
-		//console.log("In call shell script");
-		var shell=Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
-		var ProfilePath=githubdeltas_gmCompiler.getProfilePath();
-		shell.initWithPath(ProfilePath+ "/extensions/scxmlGitDelta@onekin.org/content/files/ComposerMac.sh");
-		//console.log ("Shell: "+shell);
-		
-		var proc = Components.classes["@mozilla.org/process/util;1"].createInstance(Components.interfaces.nsIProcess);
-		proc.init(shell);
 
-		var projectHome= ProfilePath+"/extensions/scxmlGitDelta@onekin.org/content/files";
-		var xakHome = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/xak";
-		var xakJar = ProfilePath+"/extensions/scxmlGitDelta@onekin.org/xak/lib/xak.jar"; 
-		
-		var parameters =[xakHome, xakJar, projectHome];//project home
-		
-		proc.run(true, parameters, parameters.length);
-		
-	}catch (err){
-		console.log("ERROR:"+err.message);
-		alert("ERROR callShellScript!:"+err.message);
-		}
-},*/
 saveToDisk: function(fileContent,fileName,branchFolder){//saveToDisk(configFileContent,"features.config","config");
 	
 	//if(branchFolder=='config') alert("Config: FN:"+fileName+"    FC:"+fileContent+"   BF:"+branchFolder);
@@ -800,13 +845,14 @@ isGreasemonkeyable: function(url) {
 	var scheme=Components.classes["@mozilla.org/network/io-service;1"]
 		.getService(Components.interfaces.nsIIOService)
 		.extractScheme(url);
+		//alert((scheme == "http" || scheme == "https" || scheme == "file") );
 	return (
-		(scheme == "http" || scheme == "https" || scheme == "file") &&
-		!/hiddenWindow\.html$/.test(url)
+		(scheme == "http" || scheme == "https" || scheme == "file") 
+		// && !/hiddenWindow\.html$/.test(url)
 	);
 },
 
-contentLoad: function(e) {
+contentLoad: function(e) { //pages github.com and http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=
 	var unsafeWin=e.target.defaultView;
 	if (unsafeWin.wrappedJSObject) unsafeWin=unsafeWin.wrappedJSObject;
 
@@ -815,9 +861,11 @@ contentLoad: function(e) {
 
 	if (
 		githubdeltas_gmCompiler.isGreasemonkeyable(href)
-		&& ( /^https:\/\/github\.com\/.*$/i.test(href) )
+		&& ( (/^https:\/\/github\.com\/.*$/i.test(href)) || (href.contains('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action')) ) 
 		&& true
 	) {
+	//	alert("git: "+(/^https:\/\/github\.com\/.*$/i.test(href)));
+	//	alert("waterloo: "+ href.contains('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action'));
 		var script=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/githubdeltas.js');
 		//var script2=githubdeltas_gmCompiler.getUrlContents('chrome://scxmlGitDelta/content/gh3.js');
 		
@@ -825,6 +873,7 @@ contentLoad: function(e) {
 		//githubdeltas_gmCompiler.injectScript(script2, href, unsafeWin);
 		githubdeltas_gmCompiler.injectScript(script, href, unsafeWin);
 	}
+	//else alert(href + "\nnot greaseamonleable ");
 },
 
 injectScript: function(script, url, unsafeContentWin) {
@@ -890,12 +939,17 @@ injectScript: function(script, url, unsafeContentWin) {
 	sandbox.SearchFilesInLocalFolder=githubdeltas_gmCompiler.hitch(this, "searchFilesInLocalFolder");
 	sandbox.ReadFilesFromLocal=githubdeltas_gmCompiler.hitch(this, "readFilesFromLocal");
 
+	sandbox.show_gitLine_splot_dialog_compiler=githubdeltas_gmCompiler.hitch(this, "show_gitLine_splot_dialog_compiler");
+	
 	
 
 	sandbox.GM_openInTab=githubdeltas_gmCompiler.hitch(this, "openInTab", unsafeContentWin);
 	sandbox.GM_xmlhttpRequest=githubdeltas_gmCompiler.hitch(
 		xmlhttpRequester, "contentStartRequest"
 	);
+
+
+
 	//unsupported
 	sandbox.GM_registerMenuCommand=function(){};
 	sandbox.GM_log=function(){};

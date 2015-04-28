@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><feature-model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.tdg-seville.info/benavides/featuremodelling/feature-model.xsd">
+	<feature name="base">
+	<binaryRelation name="BR-1">
+		<cardinality max="1" min="0"/>
+		<solitaryFeature name="underFlow">
+			
+		</solitaryFeature>
+	</binaryRelation>
+	<binaryRelation name="R-base"><cardinality max="1" min="0"/><solitaryFeature name="overFlow"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="0"/><solitaryFeature name="proba"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="proba1"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="test1"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="final"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="countdown"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="newF"/></binaryRelation><binaryRelation name="R-base"><cardinality max="1" min="1"/><solitaryFeature name="oooo"/></binaryRelation></feature>
+</feature-model>

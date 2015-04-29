@@ -2984,7 +2984,7 @@ DeltaUtils.createPullRequestForUpdatePropagation=function(user,repo,token){
 	},"GET");
 };
 
-DeltaUtils.filesToFeedback=[];
+
 DeltaUtils.checkedBranches=[];
 DeltaUtils.linearCommitsDevelop=[];
 DeltaUtils.customAllCommits=[];
@@ -3012,7 +3012,7 @@ DeltaUtils.enactFeedbackPropagation=function(){
 					
 					DeltaUtils.linearCommitsDevelop=[];
 					
-					DeltaUtils.linearCommitsDevelop.push(developAllCommits[0]);
+					DeltaUtils.linearCommitsDevelop.push(developAllCommits[0].sha);
 					window.console.log(DeltaUtils.customAllCommits.length);
 					DeltaUtils.getLinearCommitsForABranch(develop,developAllCommits[0]);
 				});
@@ -3027,13 +3027,13 @@ DeltaUtils.getLinearCommitsForABranch=function(develop,theCommit){
 //		window.console.log(theCommit.parents[0].sha);
 		var newCommit=develop.getCommitBySha(theCommit.parents[0].sha);//parent 0 allways follows the branch
 		//window.console.log(newCommit);
-		DeltaUtils.linearCommitsDevelop.push(newCommit);
+		DeltaUtils.linearCommitsDevelop.push(newCommit.sha);
 		if(newCommit.parents[0])
 			DeltaUtils.getLinearCommitsForABranch(develop,newCommit);
 		else {
-			window.console.log("no more parents!!");
-			window.console.log(DeltaUtils.linearCommitsDevelop.length);
-			window.console.log(DeltaUtils.customAllCommits.length);
+			//window.console.log("no more parents!!");
+			//window.console.log(DeltaUtils.linearCommitsDevelop.length);
+			//window.console.log(DeltaUtils.customAllCommits.length);
 			if(DeltaUtils.customAllCommits!="undefined")
 				DeltaUtils.cherryPickForCustom(DeltaUtils.linearCommitsDevelop);
 		}
@@ -3047,57 +3047,43 @@ DeltaUtils.timeOutCherryPick="undefined";
 
 DeltaUtils.cherryPickForCustom=function(linearCommitsDevelop){
 	window.console.log(" in cherryPickForCustom");
-	window.console.log(linearCommitsDevelop.length);
-	var cherryPicked=[];
+	//window.console.log(DeltaUtils.customAllCommits);
+	//window.console.log(linearCommitsDevelop);
+	
 	//cherryPicked.push(DeltaUtils.customAllCommits[0]);//el primero siempre es diferente
 	
 	try{
 		var i=0;
-		var j=0;
-		var inserted=false;
+		var cherryPicked=[];
+		// si hace match de dos seguidos ya los demas commits son iguales = heuristicos
+		window.console.log(DeltaUtils.customAllCommits[0]);
 		for(i=0;i<DeltaUtils.customAllCommits.length-1;i++){
-			var cust=DeltaUtils.customAllCommits[i];
-			inserted=false;
-			for(j=0;j<linearCommitsDevelop.length-1;j++){
-				var dev=linearCommitsDevelop[j];
-				window.console.log(cust.sha+" AND "+dev.sha);
-				if(cust.sha!=dev.sha){
-					if(inserted==false){
-						cherryPicked.push(cust);
-						inserted=true;
-						window.console.log("inserted "+cust);
-					}
-				}
-		/*	if(DeltaUtils.timeOutCherryPick!="undefined")//clear timeout
-				window.clearTimeout(DeltaUtils.timeOutCherryPick);
-						
-				DeltaUtils.timeOutCherryPick=window.setTimeout(function (){//(re)set timeout
-				window.console.log("timeOutCherryPick");
+			if(jQuery.inArray(DeltaUtils.customAllCommits[i].sha,linearCommitsDevelop)==-1){
+				window.console.log("Only in custom: "+DeltaUtils.customAllCommits[i].sha);
+				cherryPicked.push(DeltaUtils.customAllCommits[i]);
+			}
+			else{//en el momento que no hay match
+				cherryPicked.push(DeltaUtils.customAllCommits[i]);
+				window.console.log("Only in custom: "+DeltaUtils.customAllCommits[i].sha);
 				window.console.log(cherryPicked);
-				},2000);	*/
+				DeltaUtils.getChangedFilesFromBranch(cherryPicked[0],cherryPicked[cherryPicked.length-1]);
+				break;
 			}
 		}
-		/*_.each(DeltaUtils.customAllCommits,function(cust){
-			  DeltaUtils.inserted=false;
-			  _.each(linearCommitsDevelop,function(dev){// if(jQuery.inArray(cust.sha,linearCommitsDevelop.sha)==-1){
-				if(dev.sha!=cust.sha){
-					if (DeltaUtils.inserted==false){
-					   cherryPicked.push(cust);
-					   window.console.log(dev.sha+" == "+cust.sha);
-					   DeltaUtils.inserted=true;
-					}
-				}
-			});
-
-		});*/
-
 	}catch(e){
 		window.console.log(e);
 	}
 };
 
+
+DeltaUtils.filesToFeedback=[];
+DeltaUtils.getChangedFilesFromBranch=function(c1,c2){//compare files between two commits
+//compare two commits to know what files changed
+};
+
+
 DeltaUtils.getUserAccessToken=function(){
-	return "32c7bd65b0616ac95835b95d7603f9e2562e0df6"; //GitHub API Access Token
+	return ""; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

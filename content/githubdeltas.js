@@ -3344,7 +3344,7 @@ window.console.log("in getChangedFilesOnCustomAsset");
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "YOUR_TOKEN_HERE"; //GitHub API Access Token
+	return "YOUR_TOKE_HERE"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

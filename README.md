@@ -1,5 +1,5 @@
 # GitLine
-GitLine project for SPLE on top of Git SCM
+GitLine project for SPLE on top of Git SCM. Project Page: http://letimome.github.io/GitLine.
 
 
 This is an Extension for Firefox (37.0), which renders GitHub for SPLE. Operations supported are: Product Fork, Update Propagation and Feedback Propagation.

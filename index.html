@@ -29,27 +29,52 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h3>
-<a id="welcome-to-gitline-project-page" class="anchor" href="#welcome-to-gitline-project-page" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitLine project page.</h3>
+<a id="welcome-to-gitline-project-page" class="anchor" href="#welcome-to-gitline-project-page" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitLine Project Page.</h3>
 
-<p>GitLine project is an Extension for Firefox (37.0), which renders GitHub for SPLs. It offers Product Builder with the followwing operations: </p>
+<p>GitLine layers GitHub pages with additional buttons for <strong>ProductFork</strong>, <strong>UpdatePropagation</strong> and <strong>FeedBackPropagation</strong>. Using Web Augmentation techniques, these buttons enact the namesake operations, i.e. repositories are accessed
+through GitHub's APIs, and extra iFrames are popped-up, should additional interactions with the user be needed.</p>
 
-<ul>
-<li>Product Fork: create a Product Repository from a Core Asset Repository.</li>
-<li>Update Propagation: enables to update instantiated assets from Core Asset Repository</li>
-<li>Feedback Propagation: enables to propagate product specific assets back to Core Asset Respository.</li>
-</ul>
+<h3>
+<a id="product-fork" class="anchor" href="#product-fork" aria-hidden="true"><span class="octicon octicon-link"></span></a>Product Fork</h3>
 
-<p>To install the extension do:</p>
+<p>Product derivation is performed upon CoreAsset repositories, along a given configuration.
+Figure below depicts VODPlayer-CoreAssets repository,available at <a href="https://github.com/letimome/VODPlayer-CoreAssets">https://github.com/letimome/VODPlayer-CoreAssets</a>. Readers can click on this URL. However, this will only recover a plain GitHub HTML page. Enhancing GitHub pages with SPL-specific VCS operations is achieved through the GitLine browser extension. A browser extension extends the functionality of a Web browser. Specifically, GitLine layers GitHub pages with additional buttons for ProductFork, UpdatePropagation and FeedBackPropagation. UsingWeb Augmentation techniques, these buttons enact the namesake operations, i.e. repositories are accessed through GitHub's APIs, and extra iFrames are popped-up, should additional interactions with the user be needed. </p>
+
+<p>Drop icons are used to highlight certain facts. Double-lined drops denote GitLine layered content. Drop A points to the owner and repository name: letimome and VODPlayer-CoreAssets, respectively. Drop B points to the current branch. Drop C points to the core assets. On top of this rendering, GitLine layers additional content: a new
+button (drop D). On clicking, a panel shows up which delivers an IFrame which holds the result of invoking a web-accessible feature configurator: S.P.L.O.T (drop E). The panel is automatically generated from the VODPlayer feature model which, in the current implementation, needs to be previously loaded at S.P.L.O.T. Users are now guided by S.P.L.O.T in setting the configuration. Once the conguration is over, click 'Create Product Repository' button which resorts to GitHub's API to automatically create a GitHub repository. Its name follows the pattern:  (e.g. VODPlayer-Product-05ABR2015 ). This repository is already initialized with a BigBang branch, Update branch and a Develop branch. The latter holds the selected core assets. Now, application engineers are ready to start.</p>
+
+<p><img src="https://github.com/letimome/GitLine/gh-pahes/images/productFork.pdf" alt="Product Fork Operation"></p>
+
+<h3>
+<a id="update-propagation" class="anchor" href="#update-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Update Propagation</h3>
+
+<p>Update propagation is performed by application engineers upon a Product repository. Figure below depictsVODPlayer-
+Product-05ABR2015, i.e. the Product repository obtained in the previous sub-section and available at <a href="https://github">https://github</a>.
+com/lemome88/VODPlayer-Product-05ABR2015. Let's assume that core assets evolved since we instantiated them, e.g, there is a new version for ChooseMovie asset. Application engineers to acknowledge this, first need to checkout update.updates branch. Figure below (left) depicts this scenario. Drop B points to the current branch. Drop A points to the Update Propagation button. On clicking, a pop-up displays the summary of changes to be pulled (drop C): a list of rows with the name of the updated core asset (e.g. ChooseMovie), and a link to the Core-Asset-repository's commits describing those changes (New commits"). Following these links brings product engineers to the Core Asset realm by opening a new browser tab, where the ChooseMovie asset evolution is shown in a diff panel (not shown in the Figure), so that product engineers can make an informed decision about whether to pull these changes back to the Product repository. If so decided, developers go back to the Product repository (Figure below (left), and click the Yes button (drop D). The ChooseMovie newer version is pushed to the Update branch (e.g. update:updates). Application engineers are notified through a new pull request (drop E) to merge
+update:updates into develop:productAssets. Developers can now open the pull request to retrieve the changes (drop F).
+A new page shows up with the differences: diff (develop:productAssets, update:updates). If changes are accepted, application engineers merge the branches. Otherwise, the pull request is closed, and the Product repository sticks with the
+old asset versions.</p>
+
+<p><img src="https://github.com/letimome/GitLine/gh-pahes/images/updateProp.pdf" alt="Update Propagation Operation"></p>
+
+<h3>
+<a id="feedback-propagation" class="anchor" href="#feedback-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Feedback Propagation</h3>
+
+<p>FeedBack propagation is performed over a Product repository. Figure below (left) depicts VODPlayer-Product-05ABR2015 repository, which holds a customization (i.e., customCA4 ) for core asset PlayMovie. Application engineers to promote changes done in customCA4 (i.e. new version for CA4 ) should first checkout a custom branch. Figure
+below (left) depicts this scenario. Drop B points to the current branch. Drop A points to the new FeedBack Propagation button. On clicking, a pop-up lists all Custom branches that the Product repository holds (drop C). Users can now select the desired customization (e.g. customCA4 branch), and press the Yes button (drop D). Behind the scenes, a new Feedback branch is created (i.e, feedbackCA4 ), and the Core-Asset repository receives a pull request coming from the Product repository (drop E in Figure below (right)). When this request is opened, domain engineers are invited to merge the newly created VODPlayer-Product's FeedBack branch (i.e., feedback:customCA4 ) into VODPlayer-CoreAssets' Develop branch (i.e., develop: coreAssets). Drop F points to the diff view of the changes proposed by this pull request. At this point, domain engineers should decide whether the customization is useful to the whole product line. If so, domain engineers would need to refactor the customized core assets. </p>
+
+<p><img src="https://github.com/letimome/GitLine/gh-pahes/images/feedbackProp.pdf" alt="Feedback Propagation Operation"></p>
+
+<h3>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h3>
+
+<p>GitLine works for Firefox 37.0. To install the extension do:</p>
 
 <ol>
 <li>Copy this repository to Firefox extensions folder in your computer</li>
-<li>Get a GitHub Access Token <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/">https://help.github.com/articles/creating-an-access-token-for-command-line-use/</a>, and paste it in function DeltaUtils.getUserAccessToken inside file content/githubdelta.js.</li>
-<li>
-<p>In Firefox URL bar type "about:config". Set the following values to false:</p>
-
-<p>security.csp.enable=false</p>
-
-<p>security.mixed-content.block_active_content=false</p>
+<li>Get a GitHub Access Token <a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/">https://help.github.com/articles/creating-an-access-token-for-command-line-use/</a>, and paste it in function <code>DeltaUtils.getUserAccessToken</code> in file <code>content/githubdelta.js</code>.</li>
+<li>In Firefox URL bar type "about:config". Set the following values to false:
+<code>security.csp.enable=false</code>; <code>security.mixed-content.block_active_content=false</code>
 </li>
 </ol>
 

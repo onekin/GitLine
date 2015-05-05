@@ -54,7 +54,7 @@ update:updates into develop:productAssets. Developers can now open the pull requ
 A new page shows up with the differences: diff (develop:productAssets, update:updates). If changes are accepted, application engineers merge the branches. Otherwise, the pull request is closed, and the Product repository sticks with the
 old asset versions.</p>
 
-<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/updateProp.jpg" alt="Update Propagation Operation"></p>
+<p><img src="https://github.com/letimome/GitLine/tree/gh-pages/images/updateProp.jpg" alt="Update Propagation Operation"></p>
 
 <h3>
 <a id="feedback-propagation" class="anchor" href="#feedback-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Feedback Propagation</h3>
@@ -62,7 +62,7 @@ old asset versions.</p>
 <p>FeedBack propagation is performed over a Product repository. Figure below (left) depicts VODPlayer-Product-05ABR2015 repository, which holds a customization (i.e., customCA4 ) for core asset PlayMovie. Application engineers to promote changes done in customCA4 (i.e. new version for CA4 ) should first checkout a custom branch. Figure
 below (left) depicts this scenario. Drop B points to the current branch. Drop A points to the new FeedBack Propagation button. On clicking, a pop-up lists all Custom branches that the Product repository holds (drop C). Users can now select the desired customization (e.g. customCA4 branch), and press the Yes button (drop D). Behind the scenes, a new Feedback branch is created (i.e, feedbackCA4 ), and the Core-Asset repository receives a pull request coming from the Product repository (drop E in Figure below (right)). When this request is opened, domain engineers are invited to merge the newly created VODPlayer-Product's FeedBack branch (i.e., feedback:customCA4 ) into VODPlayer-CoreAssets' Develop branch (i.e., develop: coreAssets). Drop F points to the diff view of the changes proposed by this pull request. At this point, domain engineers should decide whether the customization is useful to the whole product line. If so, domain engineers would need to refactor the customized core assets. </p>
 
-<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/feedbackProp.jpg" alt="Feedback Propagation Operation"></p>
+<p><img src="https://github.com/letimome/GitLine/tree/gh-pages/images/feedbackProp.jpg" alt="Feedback Propagation Operation"></p>
 
 <h3>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h3>

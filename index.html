@@ -1,34 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
+    <meta charset="UTF-8">
     <title>Gitline by letimome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Gitline</h1>
-        <h2>GitLine project for SPLE on top of Git SCM</h2>
-        <a href="https://github.com/letimome/GitLine" class="button"><small>View project on</small> GitHub</a>
-      </div>
-    </header>
+    <section class="page-header">
+      <h1 class="project-name">Gitline</h1>
+      <h2 class="project-tagline">GitLine project for SPLE on top of Git SCM</h2>
+      <a href="https://github.com/letimome/GitLine" class="btn">View on GitHub</a>
+      <a href="https://github.com/letimome/GitLine/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/letimome/GitLine/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h3>
+    <section class="main-content">
+      <h3>
 <a id="welcome-to-gitline-project-page" class="anchor" href="#welcome-to-gitline-project-page" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitLine Project Page.</h3>
 
 <p>GitLine layers GitHub pages with additional buttons for <strong>ProductFork</strong>, <strong>UpdatePropagation</strong> and <strong>FeedBackPropagation</strong>. Using Web Augmentation techniques, these buttons enact the namesake operations, i.e. repositories are accessed
@@ -41,9 +32,9 @@ through GitHub's APIs, and extra iFrames are popped-up, should additional intera
 Figure below depicts VODPlayer-CoreAssets repository,available at <a href="https://github.com/letimome/VODPlayer-CoreAssets">https://github.com/letimome/VODPlayer-CoreAssets</a>. Readers can click on this URL. However, this will only recover a plain GitHub HTML page. Enhancing GitHub pages with SPL-specific VCS operations is achieved through the GitLine browser extension. A browser extension extends the functionality of a Web browser. Specifically, GitLine layers GitHub pages with additional buttons for ProductFork, UpdatePropagation and FeedBackPropagation. UsingWeb Augmentation techniques, these buttons enact the namesake operations, i.e. repositories are accessed through GitHub's APIs, and extra iFrames are popped-up, should additional interactions with the user be needed. </p>
 
 <p>Drop icons are used to highlight certain facts. Double-lined drops denote GitLine layered content. Drop A points to the owner and repository name: letimome and VODPlayer-CoreAssets, respectively. Drop B points to the current branch. Drop C points to the core assets. On top of this rendering, GitLine layers additional content: a new
-button (drop D). On clicking, a panel shows up which delivers an IFrame which holds the result of invoking a web-accessible feature configurator: S.P.L.O.T (drop E). The panel is automatically generated from the VODPlayer feature model which, in the current implementation, needs to be previously loaded at S.P.L.O.T. Users are now guided by S.P.L.O.T in setting the configuration. Once the conguration is over, click 'Create Product Repository' button which resorts to GitHub's API to automatically create a GitHub repository. Its name follows the pattern:  (e.g. VODPlayer-Product-05ABR2015 ). This repository is already initialized with a BigBang branch, Update branch and a Develop branch. The latter holds the selected core assets. Now, application engineers are ready to start.</p>
+button (drop D). On clicking, a panel shows up which delivers an IFrame which holds the result of invoking a web-accessible feature configurator: S.P.L.O.T <a href="http://www.splot-research.org/">http://www.splot-research.org/</a> (drop E). The panel is automatically generated from the VODPlayer feature model which, in the current implementation, needs to be previously loaded at S.P.L.O.T. Users are now guided by S.P.L.O.T in setting the configuration. Once the conguration is over, click 'Create Product Repository' button which resorts to GitHub's API to automatically create a GitHub repository. Its name follows the pattern:  (e.g. VODPlayer-Product-05ABR2015 ). This repository is already initialized with a BigBang branch, Update branch and a Develop branch. The latter holds the selected core assets. Now, application engineers are ready to start.</p>
 
-<p><img src="https://github.com/letimome/GitLine/blob/gh-pages/images/productFork.jpeg" alt="Product Fork Operation"></p>
+<p><img src="https://github.com/letimome/GitLine/blob/gh-pages/images/productFork.jpg" alt="Product Fork Operation"></p>
 
 <h3>
 <a id="update-propagation" class="anchor" href="#update-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Update Propagation</h3>
@@ -55,7 +46,7 @@ update:updates into develop:productAssets. Developers can now open the pull requ
 A new page shows up with the differences: diff (develop:productAssets, update:updates). If changes are accepted, application engineers merge the branches. Otherwise, the pull request is closed, and the Product repository sticks with the
 old asset versions.</p>
 
-<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/updateProp.jpeg" alt="Update Propagation Operation"></p>
+<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/updateProp.jpg" alt="Update Propagation Operation"></p>
 
 <h3>
 <a id="feedback-propagation" class="anchor" href="#feedback-propagation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Feedback Propagation</h3>
@@ -63,7 +54,7 @@ old asset versions.</p>
 <p>FeedBack propagation is performed over a Product repository. Figure below (left) depicts VODPlayer-Product-05ABR2015 repository, which holds a customization (i.e., customCA4 ) for core asset PlayMovie. Application engineers to promote changes done in customCA4 (i.e. new version for CA4 ) should first checkout a custom branch. Figure
 below (left) depicts this scenario. Drop B points to the current branch. Drop A points to the new FeedBack Propagation button. On clicking, a pop-up lists all Custom branches that the Product repository holds (drop C). Users can now select the desired customization (e.g. customCA4 branch), and press the Yes button (drop D). Behind the scenes, a new Feedback branch is created (i.e, feedbackCA4 ), and the Core-Asset repository receives a pull request coming from the Product repository (drop E in Figure below (right)). When this request is opened, domain engineers are invited to merge the newly created VODPlayer-Product's FeedBack branch (i.e., feedback:customCA4 ) into VODPlayer-CoreAssets' Develop branch (i.e., develop: coreAssets). Drop F points to the diff view of the changes proposed by this pull request. At this point, domain engineers should decide whether the customization is useful to the whole product line. If so, domain engineers would need to refactor the customized core assets. </p>
 
-<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/feedbackProp.jpeg" alt="Feedback Propagation Operation"></p>
+<p><img src="https://github.com/letimome/GitLine/tree/gh-pahes/images/feedbackProp.jpg" alt="Feedback Propagation Operation"></p>
 
 <h3>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h3>
@@ -82,25 +73,16 @@ below (left) depicts this scenario. Drop B points to the current branch. Drop A 
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Should you have problems or questions contact <a href="mailto:leticia.montalvillo@ehu.es">leticia.montalvillo@ehu.es</a></p>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/letimome/GitLine/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/letimome/GitLine/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/letimome/GitLine">Gitline</a> is maintained by <a href="https://github.com/letimome">letimome</a>.</span>
 
-          <p class="repo-owner"><a href="https://github.com/letimome/GitLine"></a> is maintained by <a href="https://github.com/letimome">letimome</a>.</p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
+    </section>
 
   
   </body>
 </html>
+

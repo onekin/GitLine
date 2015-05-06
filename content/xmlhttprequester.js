@@ -16,10 +16,12 @@ githubdeltas_xmlhttpRequester.prototype.contentStartRequest = function(details) 
 	// a fancy getter that checks the number of times it has been accessed,
 	// returning a dangerous URL the time that we actually use it.
 	var url = details.url;
-
+	//alert("contentStartRequest");
+	//alert(url);
 	// make sure that we have an actual string so that we can't be fooled with
 	// tricky toString() implementations.
 	if (typeof url != "string") {
+		//alert("error url");
 		throw new Error("Invalid url: url must be of type string");
 	}
 
@@ -46,19 +48,21 @@ githubdeltas_xmlhttpRequester.prototype.contentStartRequest = function(details) 
 githubdeltas_xmlhttpRequester.prototype.chromeStartRequest=function(safeUrl, details) {
 	var req = new this.chromeWindow.XMLHttpRequest();
 
+	//alert("sp1");
 	this.setupRequestEvent(this.unsafeContentWin, req, "onload", details);
 	this.setupRequestEvent(this.unsafeContentWin, req, "onerror", details);
 	this.setupRequestEvent(this.unsafeContentWin, req, "onreadystatechange", details);
-
+//alert("sp2");
 	req.open(details.method, safeUrl);
-
+//alert("sp3");
 	if (details.headers) {
 		for (var prop in details.headers) {
 			req.setRequestHeader(prop, details.headers[prop]);
 		}
 	}
-
+	//alert("sp4");
 	req.send(details.data);
+	//alert("sp5");
 }
 
 // arranges for the specified 'event' on xmlhttprequest 'req' to call the

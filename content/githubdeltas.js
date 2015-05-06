@@ -783,7 +783,9 @@ jQuery.noConflict();
 				success : function(res) {
 						that.file= new Gh3.File(res.data, that.user, that.repositoryName, that.name);
 						window.console.log("el file 3");
-						if (callback) callback(null, that);
+						window.console.log(that.file);
+						if (callback) 
+							callback(null, that);
 
 				},
 				error : function (res) {
@@ -1471,7 +1473,7 @@ this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-nu
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.pullId={node:null,listeners:{},xpath:"//*[@type='text/x-diff']/@href",supplements:[],regexp:/([0-9]+)\.diff$/};  
  this.nodes.forkButton={node:null,listeners:{},xpath:"//a[contains(@class,'fork-button')]",supplements:[],regexp:/([^ \n]+)/};  
- //this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='merge-branch-form-actions']//button[@type='submit']",supplements:[]}; 		;;//*[@class='select-menu-item-text']"			
+ this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='merge-branch-form-actions']//button[@type='submit']",supplements:[]}; 		;;//*[@class='select-menu-item-text']"			
  									 
 //changing branch semantics
  this.nodes.branchButton={node:null,listeners:{},xpath:"//*[contains(@class,'js-create-branch')]//*[@class='select-menu-item-text']",supplements:[]}; //form[contains(@class,'js-create-branch')]
@@ -1484,9 +1486,9 @@ this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-nu
  this.nodes.newBranchValue;
  this.nodes.parentBranchValue;
 
- this.nodes.compareBase={node:null, listeners:{},xpath:"/html/body/div/div[3]/div[3]/div/div[2]/div/div/div/span/span[2]",supplements:[], regexp:/([^ \n]+)/};
+ this.nodes.compareBase={node:null, listeners:{},xpath:"/html/body/div[1]/div[3]/div[3]/div[1]/div[2]/div/div[2]/div[1]/div[3]/div[2]/span[1]/span",supplements:[], regexp:/([^ \n]+)/};
 												 // //span[@class='branch-name'][2]/span[2]  
- this.nodes.compareHead={node:null, listeners:{},xpath:"/html/body/div[1]/div[3]/div[3]/div[1]/div[2]/div[1]/div[1]/div/span[4]/span[2]",supplements:[],regexp:/([^ \n]+)/};
+ this.nodes.compareHead={node:null, listeners:{},xpath:"/html/body/div[1]/div[3]/div[3]/div[1]/div[2]/div/div[2]/div[1]/div[3]/div[2]/span[2]/span",supplements:[],regexp:/([^ \n]+)/};
  //forked from <meta name="octolytics-dimension-repository_parent_nwo"
  this.nodes.forkedFrom={node:null, listeners:{},xpath:"//meta[@name='octolytics-dimension-repository_parent_nwo']/@content",supplements:[],regexp:/([^ \n]+)/};
 
@@ -1510,7 +1512,7 @@ this.nodes.actions={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']
 						   return object;
 						 	}
 						   }; 
-			//Update Propagation			   
+//Update Propagation			   
 this.nodes.insertFeature={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
                      template: function(){
                          var object={};
@@ -1536,118 +1538,23 @@ this.nodes.backward={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions'
 						   return object;
 						 	}
 						   };	
-						   						   //este es el boton de SPLOT
-this.nodes.createRepositoryFromSPLOT={nodes:[],listeners:{},xpath:"//*[@class='nihilo']/div",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						   tabTemplate.innerHTML='<div><a rel="createProduct"  title="createProduct" class="button"><span class="text">Create GitHub Repository</span></a></div>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-
-						    return newTab.querySelector("div");
-						     };
-						   return object;
-						 	}
-						   };
-
+						   						  
 this.nodes.pullRequestList={node:null, listeners:{},xpath:"//*[@class='chromed-list-browser pulls-list']",supplements:[]};	
 this.nodes.newPullRequestButton={node:null, listeners:{},xpath:"//div[@class='issues-list-options']/a[@class='minibutton primary add-button']",supplements:[]};						   
 
-	 //js-range-editor is-collapsed is-cross-repo			//div[@class='js-details-container compare-pr ']/*"
-/*this.nodes.compareSummary={nodes:[],listeners:{},xpath:"//div[contains(@class,'js-range-editor is-collapsed ')]/*",supplements:[],                 
+this.nodes.diffViewButton={nodes:[],listeners:{},xpath:"//div[@class='file-actions']/span[@class='show-file-notes']",supplements:[],                 
                      template: function(){
                          var object={};
 						 object.executeTemplate=function(parameter){
+						 	window.console.log(parameter);
 						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="compare-pr-placeholder"><button class="button primary left" type="button">Pull Updates</button><a class="help-link right tooltipped tooltipped-w is-jump-link" aria-label="Updates: Features evolved" target="_blank" href=""><span class="octicon octicon-question"></span></a><p> This diff view shows feature evolution. \nPropagate the changes to your repository clicking "Pull Updates" button.</p><div>';
+						     tabTemplate.innerHTML='<div><a class="btn btn-sm"  style=" color:white; background-image: linear-gradient(black, black); " aria-label="View the diff between develop and updates">Diff Across Branches</a></div>';
 						    var newTab=tabTemplate.content.cloneNode(true);
 						    return newTab.querySelector("div");
 						     };
 						   return object;
 						 	}
-						   };*/
-
-
-// this.nodes.issuePropagation
-
-
-
-//EIG:Botoia
-/*this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//ul[@class='pagehead-actions']/li",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<li><div><a rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></a></li>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-
-						    return newTab.querySelector("li");
-						     };
-						   return object;
-						 	}
-						   }; */
-
-/*
-this.nodes.issuePropagation={nodes:[],listeners:{},xpath:"//div[@class='form-actions']/div",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div><button rel="assemble"  title="Assemble" class="minibutton" href=""><span class="text">ForwardPropagation</span></button>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-
-						    return newTab.querySelector("div");
-						     };
-						   return object;
-						 	}
-						   };*/
-
-
-//chromed-list-browser pulls-list
-
-/*
-this.nodes.toAsanaButton={nodes:[],listeners:{},xpath:"//div[@class='js-buttons button-wrap']/*",supplements:[],                 
-                     template: function(){
-                     	//window.console.log("en template")
-                         var object={};
-						 object.executeTemplate=function(parameter){
-						    var tabTemplate=document.createElement("template");
-						    tabTemplate.innerHTML='<div class="select-menu label-select-menu js-issue-list-label-select-menu js-issue-mass-assign js-menu-container js-select-menu" data-multiple=""><a class="minibutton js-menu-target  js-mass-assign-button disabled">Post to Asana</a></div>';
-						    var newTab=tabTemplate.content.cloneNode(true);
-						    return newTab.querySelector("div");
-
-						 };
-						 return object;
-					}
-};*/
-
-/*
-this.nodes.showFeatureUpdates={nodes:[],listeners:{},xpath:"//*[@class='issues-listing']/*",supplements:[],                 
-                     template: function(){
-                         var object={};
-						 object.executeTemplate=function(parameter){//parameter es feature list!!
-						    var tabTemplate=document.createElement("template");
-							window.console.log("Executing template with config:"+parameter[0]);
-						   // var features= DeltaUtils.getUpdatedFeatures();
-						    var list=parameter[0].split("\n");
-						    var user=parameter[1];
-						    var author=parameter[2];
-						    var commitMessages=parameter[3];
-						    var line;
-						    var html="<div class='chromed-list-browser pulls-list'><ul class='list-group pulls-list-group js-navigation-container js-active-navigation-container'>";
-						    for(var i=0;i<list.length-1;i++){
-						    	line=list[i].split(" ");
-						    	html+='<li class="list-group-item js-list-browser-item clearfix js-navigation-item read navigation-focus"><div><h4 class="list-group-item-name"><span class="type-icon octicon octicon-git-pull-request open " title="Show changes"></span><a class="js-navigation-open" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'">New Updates for Feature '+line[0]+ '</a></h4><a class="" href="compare/'+author+':'+line[1]+'...'+author+':'+line[0]+'"></a><p>'+commitMessages+'</p></div></li>';
-						    }
-						    html+="</div>";
-						    tabTemplate.innerHTML=html;
-						    var newTab=tabTemplate.content.cloneNode(true);
-						    return newTab.querySelector("div");
-						     };
-						   return object;
-						 	}
-						   };*/
+						   };	
 };
 
 
@@ -1668,6 +1575,8 @@ GitHubWrapper.prototype._populateObj=function(){
    if(node.nodes!=null){
     nod=[];
 	var i=0;
+	window.console.log(node.xpath);
+	window.console.log(tempNod);
 	for(i=0;i<tempNod.snapshotLength;i++){
      nod[i]=tempNod.snapshotItem(i);
  	 if(node.regexp!=null){	 
@@ -1720,18 +1629,30 @@ GitHubWrapper.prototype._addChild=function(node,toAdd){
 };										//node= this.nodes.toasaba, toAdd=
 GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
  var n=node.nodes;
- /*window.console.log("N: "+n);
+ window.console.log("N: "+n);
  window.console.log(node)
  window.console.log("to add: " +toAdd);
  window.console.log(toAdd);
-*/
- if(position==null){position=n.length;} 
+ window.console.log(position);
+
+ if(position==null){//if position not specified
+ 	position=n.length;
+ }
+
  if(n!=null&&toAdd!=null&&position<=n.length){
   if(position==n.length){
  // 	window.console.log("N: "+n);
-   var last=n[position-1];
-   last.parentNode.appendChild(toAdd);          
+   var nd;
+   for(var i=0;i<position;i++){
+   	nd=n[i];
+   	nd.parentNode.appendChild(toAdd);   
+
+   }
+   //var last=n[position-1];
+   //last.parentNode.appendChild(toAdd);   
+
   }else{
+  	window.console.log("REF NODE");
    var refNode=n[position];
    refNode.parentNode.insertBefore(toAdd,refNode);        
   }
@@ -1788,7 +1709,7 @@ GitHubWrapper.prototype.getIssueTemplate=function(){
  return this.nodes.issuePropagation.template();
 };
 
-//EIG: insertFeature botoia
+
 GitHubWrapper.prototype.injectIntoInsertFeature=function(node,position){
 this._addSibling(this.nodes.insertFeature,node,position);
 window.console.log("inInject");
@@ -1803,6 +1724,31 @@ GitHubWrapper.prototype.getInsertFeatureTemplate=function(){
 	window.console.log("inTemplate");
  return this.nodes.insertFeature.template();
 };
+
+//----Diff view ---
+GitHubWrapper.prototype.injectIntoDiffViewButton=function(node,position){
+window.console.log("adding diffViewButton");
+window.console.log(node);//this is where is going to be added
+window.console.log(position);
+this._addSibling(this.nodes.diffViewButton,node,position);
+
+};
+
+GitHubWrapper.prototype.getDiffViewButton=function(){
+window.console.log("diffViewButton b");
+ return this.nodes.diffViewButton.nodes;
+};
+
+GitHubWrapper.prototype.getDiffViewButtonElement=function(){
+window.console.log("diffViewButton b");
+ return this.nodes.diffViewButton;
+};
+
+GitHubWrapper.prototype.getDiffViewButtonTemplate=function(){
+	window.console.log("inTemplate");
+ return this.nodes.diffViewButton.template();
+};
+
 
 GitHubWrapper.prototype.injectIntoAsana=function(node,position){
 	//window.console.log("in injectIntoAsana ");
@@ -2053,6 +1999,39 @@ return tab;
 };
 
 
+//------Diff button
+var DiffViewButtonView=function(){
+this.click=null;
+};
+DiffViewButtonView.prototype.setViewData=function(params){
+this.click=params.click;
+};
+DiffViewButtonView.prototype.render=function(){//el que aplica el x path para ver donde insertar
+
+var obj=this;
+var tabTemplate=GitHub.getDiffViewButtonTemplate();
+
+window.console.log("tabTemplate");
+window.console.log(tabTemplate);
+
+var tab=GitHub.applyTemplate(tabTemplate,null);
+
+	var len=tab.getElementsByTagName("a").length;
+	window.console.log(tab.getElementsByTagName("a"));
+
+	window.console.log(len);
+
+tab.getElementsByTagName("a")[0].addEventListener("click",function(ev){
+ window.console.log("324242423");
+ ev.preventDefault();
+ ev.stopPropagation();
+ obj.click(ev);
+ 
+},true);
+ window.console.log("111111");
+return tab;
+};
+//---------
 var toAsanaView=function(){
 this.click=null;
 };
@@ -2174,22 +2153,23 @@ LoadEController.prototype.execute=function(){
 
  
 var fo;
-if (GitHub.getForkedFrom()!=null)
- fo=GitHub.getForkedFrom().split("/")[0];
+//if (GitHub.getForkedFrom()!="undefined")
+//fo=GitHub.getForkedFrom().split("/")[0];
 //window.console.log("Fo: "+fo);
  var actions=GitHub.getActions();  //product fork
+ 
+
+
+
+
  window.console.log(user);
  window.console.log(repo);
  window.console.log(actions);
- window.console.log(fo);
+ //window.console.log(fo);
  window.console.log(author);
 
 
- 	if(user!=author){
-		var install=new InstallEController();
-		window.console.log("adding product fork");
-  		install.execute("add");
-  	}
+ 	
 
   	var docTile= document.title;
 	var str=docTile.split("at ");
@@ -2200,61 +2180,29 @@ if (GitHub.getForkedFrom()!=null)
 		var updatePropagation= new InsertFeatureEController();
   		updatePropagation.execute("add");
 	}
-	var cust=currentBranch.split(".")[0];
+	var cust="undefined";
+
+	if (currentBranch){
+		cust=currentBranch.split(".")[0];
+		window.console.log(cust);
+	}
+	 
 	if (cust=="custom"){
 		var feedBackPropagation = new BackwardPropagationEController();
   		feedBackPropagation.execute("add");
 	}
-  		
-  	//solo mostar los botones cuando el AE está viendo un repositorio que no es suyo	
-
-///*** michael library test ***/
- /*
- 	var github = new Github({
-	  username: "",
-	  password: "",
-	  auth: "basic"
-	});
-
-    window.console.log(github);
-	var pruebaRepo=github.getRepo('lemome88','branches');
-	window.console.log(pruebaRepo);
-	
-	//pruebaRepo.deleteRef('heads(branch-1');
-	pruebaRepo.getSha('master', 'README.md', function(err, sha) {
-		var refSpec = {
- 	 		"ref": "refs/heads/my-new-branch-name",
- 	 		"sha": sha
-		};
-		window.console.log("dasdadadasdsad"+sha);
-		pruebaRepo.createRef(refSpec, function(err) {});
-
-
-	});
-	//pruebaRepo.remove('master', 'README.md', function(err) {});
-   // pruebaRepo.show(function(err, pruebaRepo) {});
-   pruebaRepo.branch("master", "newB", function(err) {
-    	window.console.log(err);
-    });*/
- 
- //DeltaUtils.setBranchingModelProductRepository(repo,user,token);
-
-	/****API PROBA */
-window.console.log("TEST to know if your Token work OK");
-			var auxRepo="stack-spl";
-			var auxAuthor="lemome88";
 			
-			var ghAuthor= new Gh3.User(auxAuthor);
-			var ghAuthorRepo= new Gh3.Repository(auxRepo, ghAuthor);
+			var ghAuthor= new Gh3.User(author);
+			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 	    	//1: access repository
 			ghAuthorRepo.fetch(function (err, res) {
 	          if(err) { window.console.log("ERROR 3112 ghRepo.fetch"); }
 				//2:fetch repository all branches
 				ghAuthorRepo.fetchBranches(function (err, res) {
-					var master=ghAuthorRepo.getBranchByName("master");//3: get master branch
+					var master=ghAuthorRepo.getBranchByName("master.baseline");//3: get master branch
 					master.fetchContents(function (err, res) {//4: get contents (folders and files) for master branch
 			          if(err) { throw "outch ..." }
-			          var featureModelFile = master.getFileByName("product.config");//5: get model.xml file
+			          var featureModelFile = master.getFileByName("splot-configurator-url");//5: get model.xml file
 			      	  if(featureModelFile==null){
 			      	  //	window.console.log("Could not reach model.xml file in master branch!\n.");
 			      	  	return;
@@ -2263,12 +2211,30 @@ window.console.log("TEST to know if your Token work OK");
 			      	  	//Step 2: leer contenido del product config
 			      	  	featureModelFile.fetchContent(function (err, res) {//6:fetch file content
 			      	  		window.console.log(featureModelFile.getRawContent());//7: gte raw content and display in console
-			      	  		window.console.log("YOUR TOKEN WORKS OK!");
+			      	  		window.console.log("It's a Core Asset Repository.");
+							if(user!=author ){
+								var install=new InstallEController();
+								window.console.log("adding product fork");
+						  		install.execute("add");
+						  	}
 			      	  	});
 			      	  }
 			      	});
 			    });
 			});
+window.console.log("5555");
+
+var difff= GitHub.getDiffViewButton();
+							  window.console.log(difff);
+							 if(diff!="undefined"){
+							 	window.console.log("difff not null");
+							 	var diffView=  new DiffViewEController();
+								window.console.log("adding product fork");
+								diffView.execute("add");
+								window.console.log("DDDDDDDDDD");
+								window.console.log(difff);
+							 }
+							 
 
 }; 
 	
@@ -2324,7 +2290,6 @@ BackwardPropagationEController.prototype.execute=function(act){
 				});
 			});
 		});
-
 	}
 };
 
@@ -2341,12 +2306,94 @@ ForwardPropagationEController.prototype.execute=function(act){
 
 };
 
-var InstallEController=function(){
- if (InstallEController.prototype._singletonInstance) {
-  return InstallEController.prototype._singletonInstance;
+/////Diff view 
+
+
+var DiffViewEController=function(){
+
+ if (DiffViewEController.prototype._singletonInstance) {
+  return DiffViewEController.prototype._singletonInstance;
  }
- InstallEController.prototype._singletonInstance = this;        
+ DiffViewEController.prototype._singletonInstance = this;        
 };
+
+DiffViewEController.prototype.execute=function(act){
+
+	window.console.log("DiffViewEController");
+	var docTile= document.title;
+	
+	
+	if(act=="add"){
+		window.console.log("DiffViewEController!!!!!!!!!!!");
+		var obj=this;
+		var ViewButton=new DiffViewButtonView();
+		ViewButton.setViewData({click:function(){obj.execute("run");}});
+		var render=ViewButton.render();
+		window.console.log("render");
+		window.console.log(render);
+		var diffs= GitHub.getDiffViewButton();
+		//for (var i=0; i<diffs.length;i++){
+			
+				GitHub.injectIntoDiffViewButton(render);
+		//	window.console.log("SIIIIIIIII");
+		//}
+		   
+
+	}else if(act=="run"){
+		
+		window.console.log("Running!!");
+		var user=GitHub.getUserName(); 
+		var repo=GitHub.getCurrentRepository();
+		var token=GitHub.getAuthenticityToken(); 	
+	    
+	    var ghUser = new Gh3.User(user);
+	    var ghRepo = new Gh3.Repository(repo, ghUser);//core asset repo
+
+	    var diffBox=GitHub.getDiffViewButtonElement();
+	    
+	    window.console.log(diffBox.nodes);
+	    window.console.log(diffBox.nodes[0].parentNode.parentNode.getAttribute("data-path"));
+	    var filePath= diffBox.nodes[0].parentNode.parentNode.getAttribute("data-path");
+
+	    var compareBase=GitHub.getCompareBase();
+	     window.console.log(compareBase);
+	    var compareHead= GitHub.getCompareHead();
+	     window.console.log(compareHead);
+
+	    ghRepo.fetch(function(err,res){
+	    	ghRepo.fetchBranches(function(err,res){
+	    		var base = ghRepo.getBranchByName(compareBase);
+	    		var head = ghRepo.getBranchByName(compareHead);
+	    		base.fetchContents(function(err,res){
+	    			base.fetchFileWithPath(filePath,function(err,res){
+	    				var baseFile=base.getFileByPath();
+	    				baseFile.fetchContent(function(err,res){
+	    					var baseContent= baseFile.getRawContent();
+	    					head.fetchContents(function(err,res){
+			    				head.fetchFileWithPath(filePath,function(err,res){
+			    					var headFile= head.getFileByPath();
+			    					headFile.fetchContent(function(err,res){
+			    						var headContent=headFile.getRawContent();	
+			    							var details = JSON.stringify({ "expiry": "day","left": baseContent ,"right": headContent});
+			    							window.console.log(details);
+			    							XHR("https://diffchecker-api-production.herokuapp.com/diffs",function(res,err){//
+			    								window.console.log(err);
+			    								window.console.log(res);
+			    								var urlExt="https://www.diffchecker.com/"+(res.split(",")[0].split(":")[1].split('"')[1]);
+			    							    window.open(urlExt);
+											},"POST",details);
+
+			    					});
+			    				});
+	    					});
+	    				});
+	    			});
+	    		});
+	    	});
+		});
+	}
+};
+
 
 var InsertFeatureEController=function(){
  if (InsertFeatureEController.prototype._singletonInstance) {
@@ -2355,6 +2402,7 @@ var InsertFeatureEController=function(){
  InsertFeatureEController.prototype._singletonInstance = this;        
 };
 
+/*
 InsertFeatureEController.prototype.execute=function(act){
 
 	window.console.log("InsertFeatureEController");
@@ -2375,7 +2423,7 @@ InsertFeatureEController.prototype.execute=function(act){
 
 
 	}
-};
+};*/
 
 
 //Update Propagation Controller
@@ -2397,6 +2445,14 @@ InsertFeatureEController.prototype.execute=function(act){
 
  };
 
+
+
+var InstallEController=function(){
+ if (InstallEController.prototype._singletonInstance) {
+  return InstallEController.prototype._singletonInstance;
+ }
+ InstallEController.prototype._singletonInstance = this;        
+};
 //Product Fork controller
 InstallEController.prototype.execute=function(act){ 
 
@@ -2447,8 +2503,6 @@ InstallEController.prototype.execute=function(act){
 				UI.Dialog.show_gitLine_splot_dialog("http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150408_1980832584.xml#", ghUser,ghRepo, null,null);//call function to enact ProductFork operation
 				
 				window.console.log("before");
-
-   				
 			//}
    	} 	
 };
@@ -2537,7 +2591,7 @@ DeltaUtils.deleteFoldersForProductRepositoryFork=function(repo,ghUser,token,core
 			ghRep.fetchBranches(function(err,res){
 					window.console.log("branches in repo: "+ghRep.getBranches().length);
 					window.console.log(ghRep.getBranches());
-					if(ghRep.getBranches().length==2){
+					//if(ghRep.getBranches().length==2){
 					  	var develop=ghRep.getBranchByName(DeltaUtils.getProductRepoDevelopBranchName());
 							develop.fetchContents(function(err,res){// 4: delete all folders from develop in coreAssetIds
 								develop.eachContent(function(content){
@@ -2561,7 +2615,7 @@ DeltaUtils.deleteFoldersForProductRepositoryFork=function(repo,ghUser,token,core
 									},3000);
 								});
 							});
-					}
+					//}
 				});
 			});
 };
@@ -2635,17 +2689,22 @@ DeltaUtils.setBranchingModelProductRepository=function(repo,user,token){
 										Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){
 											window.console.log("123131");
 											Utils.XHR("/"+user+"/"+repo+"/branches/"+DeltaUtils.getCoreRepoBaselineBranchName(),function(res){
-												window.console.log("123131");
-												var splName=repo.split("-")[0];
-												var d = new Date();
-												var month = d.getMonth()+1;
-												var day = d.getDate();
-												var year = d.getFullYear();
-												var output =  (day<10 ? '0' : '') + day + '-' + (month<10 ? '0' : '') + month + '-' + d.getFullYear();
-												window.console.log("Output: "+output);
-												Utils.XHR("/"+user+"/"+repo+"/settings/rename",function(res){
-													window.location.href="/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoDevelopBranchName();
-												},"POST","name="+splName+"-Product-"+output+"&authenticity_token="+encodeURIComponent(token));
+												Utils.XHR("/"+user+"/"+repo+"/new/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){
+														commit = jQuery(res).find("input[name='commit']").attr("value");
+														Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){
+															window.console.log("123131");
+															var splName=repo.split("-")[0];
+															var d = new Date();
+															var month = d.getMonth()+1;
+															var day = d.getDate();
+															var year = d.getFullYear();
+															var output =  (day<10 ? '0' : '') + day + '-' + (month<10 ? '0' : '') + month + '-' + d.getFullYear();
+															window.console.log("Output: "+output);
+															Utils.XHR("/"+user+"/"+repo+"/settings/rename",function(res){
+																window.location.href="/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoDevelopBranchName();
+															},"POST","name="+splName+"-Product-"+output+"&authenticity_token="+encodeURIComponent(token));
+														},"POST","authenticity_token="+encodeURIComponent(token)+"&filename=README.md&new_filename=README.md"+"&commit="+commit+"&value="+DeltaUtils.getReadmeContent()+"&placeholder_message=Readme File");					
+													},"POST","authenticity_token="+encodeURIComponent(token));
 											},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete");	//2: delete all branches except master.baseline
 										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfigContent)+"&placeholder_message=product configuration File");					
 									
@@ -2750,7 +2809,11 @@ DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdat
 					window.console.log("enacting......");
 					DeltaUtils.showUpdatePropagationDetails(listOfCoreAssetsToUpdate,(configString));
 				},900);
-		}else window.console.log("No updates for: "+ content.name);
+		}else {
+			window.console.log("No updates for: "+ content.name);
+			if(branchContents.length==0 && listOfCoreAssetsToUpdate.length==0)
+				UI.Dialog.show_messageOK("No updates Available!","data:image/jpg;base64,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");
+		}
 	}
 	if(branchContents.length!=0){
 		DeltaUtils.getCoreAssetsToUpdate(branchContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo);
@@ -2777,6 +2840,9 @@ DeltaUtils.showUpdatePropagationDetails=function(listOfCoreAssetsToUpdate,config
 DeltaUtils.enactUpdatePropagation=function(listOfCoreAssetsToUpdate,user,author){
 	window.console.log("enactUpdatePropagation");
 	window.console.log(listOfCoreAssetsToUpdate);
+
+	if (listOfCoreAssetsToUpdate.length==0)
+		UI.Dialog.show_wf_yesno_dialog("No updates available");
 
 	var user=GitHub.getUserName(); 
 	var productRepoName=GitHub.getCurrentRepository();
@@ -3292,66 +3358,36 @@ DeltaUtils.createPullRequestForFeedback=function(user,appEng,productRepoName,fee
 
 };
 
-/*
-DeltaUtils.interateComparisonOfAssets=function(customAssets,initialAssets){//compare files between two commits contents
-	window.console.log("in interateComparisonOfAssets");
-	var customAsset=customAssets.pop();
-	window.console.log(customAsset);
-	
-	if(customAsset.type=="dir"){
-		window.console.log("dir");
-		var originalAsset= initialAssets.getDirByName(customAsset.name);
-		
-		window.console.log(originalAsset);
-		if(originalAsset.sha!=customAsset.sha)
-			DeltaUtils.getChangedFilesOnCustomAsset(originalAsset, customAsset);
-	}
-	else{}//its a file
-	if(customAssets.length>0)
-		DeltaUtils.interateComparisonOfAssets(customAssets,initialAssets);
-	//else window.console.log(listOfFilesToFeedback);
+
+
+DeltaUtils.getReadmeContent=function(){
+	window.console.log("getReadmeContent");
+	 var content="GitLine Support for Product Builders"+"\n=========\n";
+	 content+="\nGitLine layers GitHub pages with additional buttons though for SPL development:\n\n<b>ProductFork</b> derives a Product Repository from a Core Asset Repository\n\n<b>UpdatePropagation</b> Updates core assets instantiated during Product Fork Operation and\n\n<b>FeedbackPropagation</b> proposes product specific changes to Core Asset Repositories. Using Web Augmentation techniques, these buttons enact the namesake operations, i.e. repositories are accessed through GitHub's APIs, and extra iFrames are popped-up, should additional interactions with the user be needed\n";
+
+	content+="Repository Branching model \n---------\n";
+	content+="Our branching model for Product repositories rests on seven branch types to account for three purposes: development, delivery and propagation.\n";
+	content+="\n\n<b>For development</b>: BigBang, Develop and Custom branches. Product Repository is initialized with BigBang and develop branches. Users should create Custom branches off Develop when additional assets customization is needed.\n ";
+	  content+="\n\tBigBang is a long-lived branch, which keeps localized the baseline from which the product was derived.This branch remains untouched, during the repository life time. This is so, to enable feedback propagation process (see later).\n";
+	  content+="\n\tDevelop branch is a long-lived branch which holds the mainline for product asset development. It is also known as 'integration branch'\n";
+	  content+="\n\tCustom branches, obtained off Develop branches, are used for product speciffics: core assets can be adapted while brand new assets can be introduced. When a customization is considered finished, Custom branches are merged back into Develop branch. Although good practices would advocate to delete Custom branches after merging them back to the mainline, our model maintains these branches alive for feedback purposes.\n";
+	content+="\n\n<b>For Delivery</b>: Release and Master branches. Users should create these branches when necessary.\n";
+	  content+="\n\tRelease branches are short-lived branches, which upon a consistent set of product assets under a Develop branch, are created for obtaining an executable product with the help of assembly tools. When this product is ready for GA Release, it would be merged to the Master branch and tagged accordingly.\n";
+	  content+="\n\tMaster is a long-lived branch containing product releases ready to be delivered to customers.\n";
+	content+="\n\n<b>For Propagation</b>: Update and FeedBack branches. These branches are automatically generated by GitLine. Users should not 'modify' its contents \n";
+	  content+="\n\tUpdate branch: holds the product's core assets separated from the product mainline (i.e. develop branch). Upon a new baseline release in the CoreAsset repository, product engineers might request an update propagation and easily spot differences using GitHubs diff tooling. This branch is automatically generated when the Product Repository is created.\n";
+	  content+="\n\tFeedback branches support promotion of meaningful product customizations into core assets. By meaningful is meant a customization that makes sense as a unit. This might imply collecting code scattered throughout several Custom branches. These branches are automatically generated by GitLine upon 'Feedback Propagation' operation enactment.\n";
+    content+="Note that branch names follow the pattern 'branch-type'.'branch-name'. E.g., update.updates.\n";
+	content+="\n\n Operations For propagation\n---------\n";
+	//content+="ProductFork takes a CoreRepository as input, and delivers a ProductRepository, along a given configuration. GitLine renders GitHub wirh 'ProductFork' button. On clicking, an IFrame shows up which which holds the result of invoking a web-accessible feature configurator: S.P.L.O.T. Users are now guided by S.P.L.O.T in setting the configuration\n";
+	content+="\n\n<b>Update propagation</b> is performed by application engineers upon a Product Repository. Engineers should checkout update branch, to see 'Update Propagation' button. On clicking, a pop-up displays a table with the summary of changes to be pulled: a list of rows with the name of the updated core asset, and a link to the Core-Asset-repository's commits describing those changes (New commits). Following these links brings product engineers to the Core Asset realm by opening a new browser tab, where the asset evolution is shown in a diff panel. If accepted Application engineers are notiffied through a new pull request to merge update branch into develop branch.\n";
+	content+="\n\n<b>FeedBack propagation</b> is performed over a Product repository. Engineers should checkout anny custom branch to see 'Feedback Propagation' button. On clicking, a pop-up lists all Custom branches that the Product repository holds. Users can now select the desired customization. When enacted, behind the scenes, a new Feedback branch is created, and the Core Asset repository receives a pull request coming from the product repository to merge the changes located in the newly created feedback branch.\n";
+	return content;
 };
-
-DeltaUtils.getChangedFilesOnCustomAsset=function(originalAsset,customAsset){
-window.console.log("in getChangedFilesOnCustomAsset");
-	customAsset.fetchContents(function(err,res){
-		if(err) { throw "outch ..." }
-		customAsset.eachContent(function(content){
-			if (content.type=="file"){//it's a file
-				originalAsset.fetchContents(function(err,res){
-					var file=originalAsset.getFileByName(content.name);
-					window.console.log(file+" is file");
-					if (!file || (file.sha!=content.sha) ){//si es un file nuevo o si ha cambiado
-						DeltaUtils.listOfFilesToFeedback.push(content.path);//el path del original-core Repo
-					}
-				});
-			}	
-			else{//it's a dir
-				if (content.type=="dir"){
-					originalAsset.fetchContents(function(err,res){
-						var aux_orig=originalAsset.getDirByName(content.name);
-						var aux_dir=content;
-						if (aux_orig.sha!=aux_dir.sha){
-							DeltaUtils.getChangedFilesOnCustomAsset(aux_orig,aux_dir);
-							//window.console.log("aux-orig is different "+aux_orig);
-						}
-					});
-				}
-			}
-			if(DeltaUtils.feedbackFilesTimeOut!="undefined")//clear timeout
-				window.clearTimeout(DeltaUtils.feedbackFilesTimeOut);
-				DeltaUtils.feedbackFilesTimeOut=window.setTimeout(function (){//(re)set timeout
-					window.console.log(listOfFilesToFeedback);
-				},2000);
-		});
-	});
-};*/
-
-
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "YOUR_TOKEN_HERE"; //GitHub API Access Token
+	return "YOUR ACCESS TOKEN"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models
@@ -3398,159 +3434,6 @@ DeltaUtils.sleep=function(millis){
 
 
 
-/*
-DeltaUtils.fetchMessagesForFeature=function(branch,sinceCommit){
-	window.console.log("retrieving commit messages for feature: "+branch.name);
-	var user=GitHub.getUserName(); 
-	var repo=GitHub.getCurrentRepository();
-	var forked=GitHub.getForkedFrom().split("/");
-	var author=forked[0]; 
-	branch.fetchCommits(function (err, res) {				         					 	  												
-		//window.console.log("commits for branch"+ res.name);//res=branch
-		//window.console.log(res.getCommits());
-		var com=res.getCommits()[0];//.getLastCommit();//res.getCommitBySha(bsha); branch.getLastCommit()
-		window.console.log("commit for "+branch.name);
-		//window.console.log(com);
-		var j=1;
-		var msg="";
-		//msg="<div id='commits_bucket' class='tab-content'><thead><tr><th class='timeline-commits-header' colspan='4'><span class='octicon octicon-calendar'></span>"+branch.name+"</th></thead><tbody>";
-		msg='<h3 class="commit-group-heading">'+'Feature '+branch.name+' new commits</h3>';
-		msg=msg+'<ol class="commit-group">';
-		while(sinceCommit!=com.sha){//get all commits messages for a feature
-			window.console.log("com");
-			window.console.log(com);
-			window.console.log("Message:");
-			window.console.log(com.message);
-			//original
-			//msg=msg+"<h5>Update "+j+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
-		
-			msg=msg+'<li class="commit commit-group-item js-navigation-item js-details-container">';
-			msg=msg+'<img class="gravatar" width="36" height="36" src="https://2.gravatar.com/avatar/405f5d2af7dd000b91c22a5920dcc565?d=https%3A%2F%2Fassets-cdn.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png&r=x&s=140" alt="">';
-			msg=msg+'<p class="commit-title js-pjax-commit-title">';
-			msg=msg+'<a class="message" title="'+com.message+'" data-pjax="true" href="/'+user+'/'+repo+'/commit/'+com.sha+'">'+com.message+'</a></p>';
-			msg=msg+'<div class="commit-meta"><div class="authorship">';
-			msg=msg+'<span class="author-name"><a rel="contributor" href="/'+author+'"> '+author+' </a></span> authored <time is="relative-time" datetime="'+com.date+'" title="'+com.date+'">'+com.date+'</time></div></div>';
-			msg=msg+'</li>';
-
-			com=branch.getCommitBySha(com.parents[0].sha);
-			window.console.log("new commit:"+com.sha);//res.getCommitBySha(com.parents[0].sha);
-			window.console.log(branch.name+"  message "+j+" "+msg);
-			j++;	
-		}
-		var params;
-		var render;
-		msg=msg+'</ol>';
-		var featureUp=new ShowFeatureUpdatesView();
-		featureUp.setViewData({click:function(){obj.execute("run");}});
-		params=[branch.name+" "+sinceCommit+"\n",user,author,msg];
-		render=featureUp.render(params);//pasarle parametros al render
-		GitHub.injectIntoShowFeatureUpdates(render);
-	});
-
-}
-
-DeltaUtils.getProductShadowBranchName=function(){
-	var name="shadowProduct";
-	return name;
-}
-
-DeltaUtils.getUpdateMessagesFromBanch=function(b,bsha,tope,iteration,len,commitMessages,user,author,featuresChanged){
-	var nb=b;
-	nb.fetchCommits(function (err, res) {				         					 	  		
-		window.console.log("Lengh "+len+" and loop number: "+iteration);
-		window.console.log(nb);
-		window.console.log(nb.getCommits());
-		var com=nb.getCommitBySha(bsha);
-		window.console.log("com: "+com);
-		var i=1;
-		var msg;
-		while(tope!=com.sha){//get all commits messages for a feature
-			window.console.log("Message:");
-			window.console.log(com.message);
-			msg=msg+"<h5>Update "+i+" from date "+com.date+" autored by "+com.author.login+":</h5>"+com.message+"<br>";
-			com=nb.getCommitBySha(com.parents[0].sha);
-			i++;
-		}
-		return msg;
-
-	});
-}
-*/
-
-
-/*)
-
-
-
-DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg,cb){
-	window.console.log(" start in Edit File");
-	window.console.log("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName);
-	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
-		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
-			Utils.XHR("/"+user+"/"+repo+"/tree-save/"+branchName+"/"+fileName,function(res){
-			  cb();//callback
-			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
-		},"POST","authenticity_token="+encodeURIComponent(token));
-	},"GET");
-	window.console.log(" end in Edit File");
-}
-/*DeltaUtils.editFile=function(user,repo,branchName,fileName,commit,token,fileContent,editMsg){
-	window.console.log(" start in Edit File");
-	window.console.log("User"+user );
-	window.console.log("Repo"+repo );
-	window.console.log("branchname"+branchName );
-	window.console.log("filename"+fileName);
-	window.console.log("commit"+commit);
-	window.console.log("token"+token );
-	window.console.log("fileContent"+fileContent);
-	Utils.XHR("/"+user+"/"+repo+"/blob/"+branchName+"/"+fileName,function(res){
-		Utils.XHR("/"+user+"/"+repo+"/edit/"+branchName+"/"+fileName,function(res){
-			Utils.XHR("/"+user+"/"+repo+"/tree-save/"+branchName+"/"+fileName,function(res){
-
-			},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+fileName+"&message="+editMsg+"&commit="+commit+"&value="+encodeURIComponent(fileContent)+"&placeholder_message="+editMsg);					
-		},"POST","authenticity_token="+encodeURIComponent(token));
-	},"GET");
-	window.console.log(" start in Edit File");
-}
-
-*/
-
-/*
-DeltaUtils.createIssue=function(newName,body,checkedOption,kind){
-
-	var title="New_"+kind+"_feature_of_"+checkedOption+"_("+newName+")";
-	window.console.log(title);
-	var user=GitHub.getUserName(); 
-	var repo=GitHub.getCurrentRepository(); 
-	var token=GitHub.getAuthenticityToken();
-	window.console.log("createIsue "+title);
-	window.console.log(user+repo+token);
-	Utils.XHR("/"+user+"/"+repo+"/issues/new",function(res){
-		Utils.XHR("/"+user+"/"+repo+"/issues",function(res){
-		},"POST","authenticity_token="+encodeURIComponent(token)+"&issue[title]="+title+"&issue[body]="+body);	
-	},"GET");
-	window.console.log("finish issue");
-}
-
-DeltaUtils.editIssue=function(number){
-
-	
-	window.console.log("Issue number to edit: "+number);
-	var user=GitHub.getUserName(); 
-	var repo=GitHub.getCurrentRepository(); 
-	var token=GitHub.getAuthenticityToken();
-	window.console.log(user+repo+token);
-	Utils.XHR("/"+user+"/"+repo+"/issues/"+number,function(res){
-		window.console.log("lehenengo utils");
-		Utils.XHR("/"+user+"/"+repo+"/issue_comments",function(res){
-		},"POST","authenticity_token="+encodeURIComponent(token)+"&comment_and_close=1&issue="+number+"&comment[body]=");	
-	},"GET");
-	window.console.log("finish issue");
-}
-*/
-
-
-
 
 Utils={};
 
@@ -3594,8 +3477,8 @@ Utils.XHR=function(url,f,method,params){
         debugger;
         f(xhr.responseText,xhr);//apply
     } else {
-      console.error("error on XHR onload : "+xhr.status+"\n"+url+"\n"+params);
-      console.error(xhr.statusText);
+       window.console.error("error on XHR onload : "+xhr.status+"\n"+url+"\n"+params);
+       window.console.error(xhr.statusText);
     }
   }
  };
@@ -3610,19 +3493,10 @@ Utils.XHR=function(url,f,method,params){
   f(null,xhr);
   window.console.log("XHR ONERROR for method "+ method+" url "+url+" and params" +params);
   window.console.log(e);
-  console.error(xhr.statusText);
+   window.console.error(xhr.statusText);
  };
 
  xhr.send(params);     
-
-}
-
-
-DeltaUtils.checkConfigurationReady=function(splotIFrame){
-
-	window.console.log()
-
-
 
 }
 
@@ -3728,7 +3602,7 @@ UI.Dialog = {
 		fontStyle : "font-size: 16px; font-family: Arial, Helvetica, sans-serif;",
 		buttonStyle : "font-size: 16px; font-family: Arial, Helvetica, sans-serif; background: YellowGreen; color: White; margin: 5px; padding: 2px 4px; border: none; border-radius: 3px;",
 	
-		create_dialog : function(elems){			
+		create_dialog : function(elems, prompt_id){			
 		
 			//look for opaque layer
 			UI.opaque_layer.show(document);
@@ -3779,7 +3653,7 @@ UI.Dialog = {
 			var documentc = document;
 			var p = documentc.createElement("p");
 			p.innerHTML = txt;
-			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 10px; height:220px; text-align: center; background: url('"+img+"') center 20px no-repeat ;");
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 10px; height:220px; text-align: center; background: url('"+img+"') center 40px no-repeat ;");
 		
 			var elements = [p];
 		
@@ -3794,6 +3668,45 @@ UI.Dialog = {
 			}
 	
 			//create dialog with created elements
+			UI.Dialog.create_dialog(elements);
+		},
+
+		show_text_OK : function(txt, img){
+			
+		},
+
+		show_messageOK : function(txt, img){
+			var documentc = document;
+			var p = documentc.createElement("p");
+			p.innerHTML = txt;
+			p.setAttribute("style", UI.Dialog.fontStyle+"display: block; margin: 0 0 10px; height:220px; width:300px; text-align: center; background: url('"+img+"') center 40px no-repeat ;");
+		
+			var elements = [p];
+		
+			if(img){
+				var im = documentc.createElement("img");
+				//im.setAttribute("title", "Webfeeder message image");
+				//im.setAttribute("alt", "Webfeeder message image");
+				//im.setAttribute("src", img);
+				im.setAttribute("style", "display: inline; margin: 10px;");
+			
+				elements.push(im);
+			}
+	
+			//create dialog with created elements
+			var ok_btn = document.createElement("input");
+			ok_btn.setAttribute("type", "button");
+			ok_btn.setAttribute("id", "general_FFD_dialog_yes");
+			ok_btn.setAttribute("value", "Ok");
+			ok_btn.setAttribute("style", UI.Dialog.buttonStyle);
+
+			ok_btn.addEventListener("click", function(e){			
+				UI.Dialog.remove_dialog();
+			});
+
+
+			elements.push(ok_btn);
+
 			UI.Dialog.create_dialog(elements);
 		},
 	
@@ -3834,12 +3747,17 @@ UI.Dialog = {
 				var cores=show_gitLine_splot_dialog_compiler(p);
 
 				DeltaUtils.splotTimeOut=window.setTimeout(function (){
-					window.console.log("antes");
-					var coreAssetIds=cores.toString().split(" ");
-					window.console.log("coreAssetIds:"+coreAssetIds);
-					DeltaUtils.enactProductFork(ghUser, ghRepo, coreAssetIds);
-					//UI.Dialog.remove_dialog();
-					
+					window.console.log("CORES is:"+cores);
+					if(cores==null){//not done configuring
+						UI.Dialog.show_text_OK("You are not done configuring!");
+					}
+					else{
+						window.console.log("antes");
+						var coreAssetIds=cores.toString().split(" ");
+						window.console.log("coreAssetIds:"+coreAssetIds);
+						DeltaUtils.enactProductFork(ghUser, ghRepo, coreAssetIds);
+						//UI.Dialog.remove_dialog();
+					}
 				},2000);
 
 			
@@ -3957,7 +3875,7 @@ UI.Dialog = {
 			UI.Dialog.create_dialog(elements);
 		},
 
-		show_wf_yesno_dialog : function(txt, yes_callback, no_callback){
+		show_wf_yesno_dialog : function(txt, yes_callback, no_callback, img){
 			//var document = document;
 			
 			//window.console.log("dentro");

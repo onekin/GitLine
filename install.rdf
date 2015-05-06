@@ -4,7 +4,7 @@ xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 		<em:id>scxmlGitDelta@onekin.org</em:id>
 		<em:name>GitLine</em:name>
 		<em:version>1.0</em:version>
-		<em:description>Delta composition for SCXML</em:description>
+		<em:description>Operations for Product Builders</em:description>
 		<em:creator>Creator Leticia Montalvillo. Onekin Research Group</em:creator>
 		<em:contributor>Greasemonkey Compiler by Anthony Lieuallen;</em:contributor><em:contributor>http://arantius.com/</em:contributor>
 		<em:homepageURL></em:homepageURL>	

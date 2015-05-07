@@ -817,14 +817,14 @@ cleanProjectFolder: function(){
 
 XHR: function(url,f,method,params){
  var xhr = new XMLHttpRequest();
-alert("XHR");
+//alert("XHR");
 
  if(method=="DELETE"){
  //	window.console.log("method delete "+url+"   "+params);
  	xhr.open("DELETE", url, true);
  	if(params!=null){
- 		alert(params);
-       //  xhr.setRequestHeader("X-CSRF-Token",params);
+ 		//alert(params);
+         xhr.setRequestHeader("X-CSRF-Token",params);
        //  xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
         // xhr.setRequestHeader("Pragma","no-cache");
  	}
@@ -832,7 +832,7 @@ alert("XHR");
  else{
 	 		
 	 		if((method=="POST") ||(method=="PUT")){ //it's a post
-	 			alert("post");
+	 			//alert("post");
 	 			xhr.open(method,url,true);
 	 			 xhr.setRequestHeader("Content-type", "application/json");
 	 			

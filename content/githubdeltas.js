@@ -1637,6 +1637,9 @@ GitHubWrapper.prototype._addSibling=function(node,toAdd,position){
 
  if(position==null){//if position not specified
  	position=n.length;
+ 	window.console.log("Adding sibling for ");
+ 	 window.console.log(node);
+
  }
 
  if(n!=null&&toAdd!=null&&position<=n.length){
@@ -1730,7 +1733,7 @@ GitHubWrapper.prototype.injectIntoDiffViewButton=function(node,position){
 window.console.log("adding diffViewButton");
 window.console.log(node);//this is where is going to be added
 window.console.log(position);
-this._addSibling(this.nodes.diffViewButton,node,position);
+this._addSibling(this.nodes.diffViewButton,node,0);
 
 };
 
@@ -3387,7 +3390,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "YOUR ACCESS TOKEN"; //GitHub API Access Token
+	return "YOUR TOKEN"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

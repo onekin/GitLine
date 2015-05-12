@@ -3394,7 +3394,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "f8c40aa0876825996b3cc300fe136c83ef126a0f"; //GitHub API Access Token
+	return "YOUR_TOKEN"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

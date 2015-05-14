@@ -18,7 +18,7 @@ create_dialog : function(elems){
 			//UI.opaque_layer.show(document);
 		
 			//if dialog already exists, change its content
-		alert(5);
+		//alert(5);
 			if(document.getElementById("prompt_wf")){
 				main_div = document.getElementById("prompt_wf");
 				main_div.innerHTML = "";
@@ -26,44 +26,44 @@ create_dialog : function(elems){
 		
 			//else create div
 			else{
-				alert(6);
+				//alert(6);
 				var main_div = document.createElement("div");
-				alert(61);
+				//alert(61);
 				main_div.setAttribute("id", "prompt_wf");
-				alert(62);
+				//alert(62);
 				main_div.setAttribute("style", "position: fixed; max-width: 1000px; z-index: 7000; left: 50%; margin-left: -200px; top: 100px; background: white url() bottom right no-repeat; padding: 27px; border: 10px solid white; border-radius: 5px; text-align: center;"
 												+ "font-size: 12px;");
 											
-				alert(63);
-				alert(document);
-				alert(document.contentDocument);
+				//alert(63);
+				//alert(document);
+				//alert(document.contentDocument);
 				document.contentDocument.body.appendChild(main_div);
-				alert(7);
+				//alert(7);
 			}
 		
 			for(var i = 0; i < elems.length; i++){
 				main_div.appendChild(elems[i]);
-				alert(8);
+				//alert(8);
 			}
-alert(9);
+//alert(9);
 			var div_width = document.getElementById("prompt_wf").offsetWidth;
 			var margin_left = (parseInt(div_width)/2)*-1;
 		
 			document.getElementById("prompt_wf").style.marginLeft = margin_left+"px";
-		alert(10);
+		//alert(10);
 		},
 
 
 	show_gitLine_splot_dialog_compiler : function(p){
 			//show_gitLine_splot_dialog_compiler
-		//	alert(p);
+		//	//alert(p);
 			var iframedoc=p.contentDocument||p.contentWindow.document;
-		//	alert(iframedoc);
+		//	//alert(iframedoc);
 			
 			var doneButton=iframedoc.getElementById("configuration-done-element");
-			//alert(doneButton);
+			////alert(doneButton);
 			if (doneButton=="undefined") {
-				alert("You are not done configuring");
+				//alert("You are not done configuring");
 				return null;
 			}
 
@@ -814,6 +814,94 @@ cleanProjectFolder: function(){
 },
 
 
+
+XHR: function(url,f,method,params){
+ var xhr = new XMLHttpRequest();
+//alert("XHR");
+
+ if(method=="DELETE"){
+ //	window.console.log("method delete "+url+"   "+params);
+ 	xhr.open("DELETE", url, true);
+ 	if(params!=null){
+ 		//alert(params);
+         xhr.setRequestHeader("X-CSRF-Token",params);
+       //  xhr.setRequestHeader("X-Requested-With","XMLHttpRequest");
+        // xhr.setRequestHeader("Pragma","no-cache");
+ 	}
+ }
+ else{
+	 		
+	 		if((method=="POST") ||(method=="PUT")){ //it's a post
+	 			//alert("post");
+	 			xhr.open(method,url,true);
+	 			 xhr.setRequestHeader("Content-type", "application/json");
+	 			
+	 			 xhr.setRequestHeader("Accept","*/*");
+	 			 xhr.setRequestHeader("Connection","keep-alive");
+	
+	 		}
+		 	else{
+		 		//alert(1111);
+		 		xhr.open("GET", url, true);
+		 		//alert(22);
+		 		 //xhr.setRequestHeader("Pragma","no-cache");
+		 		 //xhr.setRequestHeader("x-requested-with","XMLHttpRequest");
+		 		 //xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+		 		 //xhr.setRequestHeader("Accept","text/html, */*; q=0.01");
+		 		 //xhr.setRequestHeader("Connection","keep-alive");
+		 		
+		 	}
+	 		
+	 		
+ } 
+ xhr.onload = function (e) {
+ 	//alert("onload");
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200 || xhr.status === 201) {
+        //debugger;
+        f(xhr.responseText,xhr);//apply
+    } else {
+       //alert("error on XHR onload : "+xhr.status+"\n"+url+"\n"+params);
+       //alert(xhr.statusText);
+    }
+  }
+ };
+/*  xhr.onreadystatechange = function() {
+  if(this.readyState == 2) {
+  	window.console.log("READYYYYYYYY!");
+    window.console.log(xhr.getAllResponseHeaders());
+  }
+};*/
+ xhr.onerror = function (e) {
+     //debugger;
+  f(null,xhr);
+  //alert("XHR ONERROR for method "+ method+" url "+url+" and params" +params);
+  //alert(e);
+  //alert(xhr.statusText);
+ };
+ //alert(33377);
+ //alert(params);
+ xhr.send(params);     
+//alert(33377);
+},
+
+
+
+callDiffChecker: function(unsafeContentWin, urlUrl,f, met,params){
+	
+	//window.alert(333);
+	var details="expiry=day&left=sadadas&right=dasdasdasdas";
+	//window.console.log(details);			    							
+	
+	XHR("https://diffchecker-api-production.herokuapp.com/diffs",function(res,err){//
+	//	window.console.log(err);
+	//	window.console.log(res);
+		var urlExt="https://www.diffchecker.com/"+(res.split(",")[0].split(":")[1].split('"')[1]);
+	//	window.open(urlExt);
+	},"POST",details);
+
+ },
+
 //////End of my scripts
 
 getUrlContents: function(aUrl){
@@ -927,6 +1015,8 @@ injectScript: function(script, url, unsafeContentWin) {
 	//mi variable para leer proposedProductFile.txt y featuresToDeselect.txt
 	sandbox.readFileForExplanation=githubdeltas_gmCompiler.hitch(this, "readFileForExplanation");
 	
+	
+	sandbox.callDiffChecker=githubdeltas_gmCompiler.hitch(this, "callDiffChecker");
 
 	//mi variable para leer proposedProductFile.txt y featuresToDeselect.txt
 	sandbox.addMandatoryFeature=githubdeltas_gmCompiler.hitch(this, "addMandatoryFeature");
@@ -941,6 +1031,8 @@ injectScript: function(script, url, unsafeContentWin) {
 
 	sandbox.show_gitLine_splot_dialog_compiler=githubdeltas_gmCompiler.hitch(this, "show_gitLine_splot_dialog_compiler");
 	
+
+	sandbox.XHR=githubdeltas_gmCompiler.hitch(this, "XHR");
 	
 
 	sandbox.GM_openInTab=githubdeltas_gmCompiler.hitch(this, "openInTab", unsafeContentWin);

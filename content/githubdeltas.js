@@ -2354,13 +2354,14 @@ DiffViewEController.prototype.execute=function(act){
 
 	    var diffBox=GitHub.getDiffViewButtonElement();
 	    
-	    window.console.log(diffBox.nodes);
+	    window.console.log("dasdadsad");
+	     window.console.log(diffBox.nodes);
 	    window.console.log(diffBox.nodes[0].parentNode.parentNode.getAttribute("data-path"));
 	    var filePath= diffBox.nodes[0].parentNode.parentNode.getAttribute("data-path");
 
-	    var compareBase=GitHub.getCompareBase();
+	    var compareBase= DeltaUtils.getProductRepoDevelopBranchName();
 	     window.console.log(compareBase);
-	    var compareHead= GitHub.getCompareHead();
+	    var compareHead= DeltaUtils.getProductRepoUpdateBranchName();
 	     window.console.log(compareHead);
 
 	    ghRepo.fetch(function(err,res){
@@ -2751,7 +2752,7 @@ DeltaUtils.interfaceOfUpdatePropagation=function(integ){
 	var configString= "You are enacting Update propagation." ;
 		configString+="<div align='center'>";
 		configString+=("<p> Summary of the changes: </p>");
-		configString+=("<table border='1'><tr><th>CoreAsset</th><th>Click to see diff in a new tab</th></tr>");
+		configString+=("<table border='1'><tr><th>CoreAsset</th><th>Right-Click to see diff view</th></tr>");
 
 	ghRepoAssets.fetch(function(err,res){
 		ghRepoAssets.fetchBranches(function(err,res){
@@ -2803,7 +2804,7 @@ DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdat
 			var cola= author+":"+DeltaUtils.productSync+"..."+author+":"+DeltaUtils.baselineSha;
 			window.console.log(cola);
 			var href="https://github.com/"+author+"/"+coreRepo+"/compare/"+cola;
-			configString+="<tr><td>"+content.name+"</td><td><a href="+(href.toString())+"?path="+content.name+">Commits"+"</a></td></tr>";
+			configString+="<tr><td>"+content.name+"</td><td><a href="+(href.toString())+"?path="+content.name+">Diff"+"</a></td></tr>";
 			window.console.log(configString);
 			if(DeltaUtils.updatePropagationTimeOut!="undefined")//clear timeout
 				window.clearTimeout(DeltaUtils.updatePropagationTimeOut);
@@ -3394,7 +3395,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "YOUR_TOKEN"; //GitHub API Access Token
+	return "YOUR TOKEN HERE"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

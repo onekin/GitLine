@@ -3,7 +3,8 @@
 GitLine project for SPLE on top of Git SCM. 
 Project Page at http://letimome.github.io/GitLine.
 
-<iframe src="https://player.vimeo.com/video/127812347" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="https://vimeo.com/127812347">GitLine</a> from <a href="https://vimeo.com/user40158106">Leticia Montalvillo</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+<iframe src="https://player.vimeo.com/video/127812347" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> 
+<p><a href="https://vimeo.com/127812347">Check GitLine Demo </a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 
 
 # Firefox Add-On

@@ -4,9 +4,7 @@
 GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functionality on top of GitHub. GitLine aids SPL product builders to create and sync assets between product builders repositories (a.k.a Product Repositories) and the assets builders' repository (a.k.a Core Assets Repository). Operations for product builders are: 
 
 1. Product Fork: creates a new GitHub Repository from a Core Asset Repository
-2. 
 2. Update Propagation: update assets in Product Repositories with the latest versions from the Core Asset Repository.
-3. 
 3. Feedback Propagation: propose a customization in Product Repository to be promoted as a core asset in the Core Asset Repository
 
 <p>Check the project <a href="http://letimome.github.io/GitLine">Page </a> for detailed description of GitLine.</p>

@@ -6,10 +6,11 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 2. Update Propagation: update assets in Product Repositories with the latest versions from the Core Asset Repository.
 3. Feedback Propagation: propose a customization in Product Repository to be promoted as a core asset in the Core Asset Repository
 
-<p>Check the project Page for detailed description of GitLine: http://letimome.github.io/GitLine.</p>
+<p>Check the project <a href="http://letimome.github.io/GitLine">Page </a> for detailed description of GitLine.</p>
 
 <iframe src="https://player.vimeo.com/video/127812347" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> 
-<p><a href="https://vimeo.com/127812347">Check GitLine Demo </a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+
+<p>Check GitLine<a href="https://vimeo.com/127812347">Demo </a> on <a href="https://vimeo.com">Vimeo</a>.</p>
 
 
 # To install GitLine

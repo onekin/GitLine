@@ -947,6 +947,7 @@ jQuery.noConflict();
 					if (callback) callback(null, that);
 				},
 				error : function (res) {
+					window.console.log("repos/"+that.user.login+"/"+that.name);
 					window.console.log("erorr in fetching repo api "+res);
 					window.console.log(res);
 					if (callback) callback(new Error(res.responseJSON.message),res);
@@ -1463,11 +1464,11 @@ var GitHubWrapper=function(){
 
  //added by me:Leti 					//*[@class='minibutton select-menu-button js-menu-target']//*[@class='js-select-button']	
  this.nodes.currentBranch={node:null,listeners:{},xpath:"//*[@class='js-select-button css-truncate-target']", supplements:[],regexp:/([^ \n]+)/};
- 
- this.nodes.userName={node:null,listeners:{},xpath:"//*[@id='user-links']//span[@class='css-truncate-target']",supplements:[],regexp:/([^ \n]+)/}; 
+//*[@class='dropdown-header header-nav-current-user css-truncate']/[@class='css-truncate-target']
+ this.nodes.userName={node:null,listeners:{},xpath:"//*[@name='user-login']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
- this.nodes.currentRepository={node:null,listeners:{},xpath:"//*[contains(@class,'js-current-repository')]",supplements:[],regexp:/([^ \n]+)/}; 
+ this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[1]/div[3]/div[2]/div/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
 this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-number']",supplements:[],regexp:/([^ \n]+)/}; 
  //this.nodes.issueTitle=
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
@@ -2164,7 +2165,7 @@ var fo;
 
 
 
-
+ window.console.log("holaaaa");
  window.console.log(user);
  window.console.log(repo);
  window.console.log(actions);
@@ -2198,8 +2199,13 @@ var fo;
 			var ghAuthor= new Gh3.User(author);
 			var ghAuthorRepo= new Gh3.Repository(repo, ghAuthor);
 	    	//1: access repository
+	    	window.console.log(repo); 
+	    	window.console.log(ghAuthorRepo); 
 			ghAuthorRepo.fetch(function (err, res) {
-	          if(err) { window.console.log("ERROR 3112 ghRepo.fetch"); }
+	          if(err) { 
+	          	window.console.log("ERROR 333 ghRepo.fetch"); 
+	          	window.console.log(err); 
+	          }
 				//2:fetch repository all branches
 				ghAuthorRepo.fetchBranches(function (err, res) {
 					var master=ghAuthorRepo.getBranchByName("master.baseline");//3: get master branch
@@ -3395,7 +3401,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "YOUR TOKEN HERE"; //GitHub API Access Token
+	return "0bbad2316c0ccd31b95d1ed6afe05292f3e30c15"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

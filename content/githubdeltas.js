@@ -1468,7 +1468,7 @@ var GitHubWrapper=function(){
  this.nodes.userName={node:null,listeners:{},xpath:"//*[@name='user-login']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
- this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[1]/div[3]/div[2]/div/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
+ this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[4]/div/div[1]/div/div/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
 this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-number']",supplements:[],regexp:/([^ \n]+)/}; 
  //this.nodes.issueTitle=
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
@@ -3401,7 +3401,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "36e10f31db0dc4ce0d91d89225a5b7b7e2266e02"; //GitHub API Access Token
+	return "access token"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

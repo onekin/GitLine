@@ -12,7 +12,7 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 
 <iframe src="https://player.vimeo.com/video/127812347" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> 
 
-<p>Check GitLine <a href="https://vimeo.com/127812347"> Demo </a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+<p>Check GitLine <a href="https://vimeo.com/127812347"> Demo </a> on Vimeo.</p>
 
 
 # To install GitLine
@@ -29,4 +29,4 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 # Publications
 
 <p>  Accepted publication in the SPLC'15 conference. 
-<a href="http://onekin.org/portal/content/tunning-github-spl-development-branching-model-and-repository-operations-product-engineers-0"> </a> Tunning Github for SPL Development: Branching Model and Repository Operations for Product Engineers </p>
+<a href="http://onekin.org/portal/content/tunning-github-spl-development-branching-model-and-repository-operations-product-engineers-0"></a> Tunning Github for SPL Development: Branching Model and Repository Operations for Product Engineers. </p>

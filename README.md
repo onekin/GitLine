@@ -28,5 +28,6 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 
 # Publications
 
-<p> Accepted publication in the  <a href=http://www.splc2015.net/> SPLC'15 conference </a>
-<a href="http://onekin.org/portal/content/tunning-github-spl-development-branching-model-and-repository-operations-product-engineers-0"> Tunning Github for SPL Development: Branching Model and Repository Operations for Product Engineers</a>. </p>
+<p> Accepted publication in the <a href=http://www.splc2015.net/> SPLC'15 conference. </a> 
+<br>Title: Tunning Github for SPL Development: Branching Model and Repository Operations for Product Engineers</a>
+<a href="http://onekin.org/portal/content/tunning-github-spl-development-branching-model-and-repository-operations-product-engineers-0"> Get the paper and presentation here. </p>

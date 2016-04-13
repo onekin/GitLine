@@ -26,6 +26,8 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 
     security.mixed-content.block_active_content=false
 
+If you have problems intalling, please open an issue here :)
+
 # Publications
 
 <p> Accepted publication in the <a href=http://www.splc2015.net/> SPLC'15 conference. </a> 

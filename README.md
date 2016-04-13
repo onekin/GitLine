@@ -18,7 +18,7 @@ GitLine is a Firefox Add-On (working on 37.0 version), which offers extra functi
 # To install GitLine
 
 
-1. Copy this repository to Firefox extensions folder in your computer. Name the folder "scxmlGitDelta" instead of "GitLine".
+1. Copy this repository to Firefox extensions folder in your computer. Name the folder "scxmlGitDelta@onekin.org" instead of "GitLine".
 2. Get a GitHub Access Token https://help.github.com/articles/creating-an-access-token-for-command-line-use/, and paste it in function DeltaUtils.getUserAccessToken inside file content/githubdeltas.js.
 3. In Firefox URL bar type "about:config". Set the following values to false:
 

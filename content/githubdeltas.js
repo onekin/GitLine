@@ -1470,8 +1470,8 @@ var GitHubWrapper=function(){
 
  this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[5]/div/div/div[1]/div[1]/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
 this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-number']",supplements:[],regexp:/([^ \n]+)/}; 
- //this.nodes.issueTitle=
- this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
+ //auth-token <input name="authenticity_token" type="hidden" value="...." /></div>
+ this.nodes.authenticityToken={node:null,listeners:{},xpath:"//input[@name='authenticity_token']/@value",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.pullId={node:null,listeners:{},xpath:"//*[@type='text/x-diff']/@href",supplements:[],regexp:/([0-9]+)\.diff$/};  
  this.nodes.forkButton={node:null,listeners:{},xpath:"//a[contains(@class,'fork-button')]",supplements:[],regexp:/([^ \n]+)/};  
  this.nodes.pullRequest={node:null,listeners:{},xpath:"//*[@class='merge-branch-form-actions']//button[@type='submit']",supplements:[]}; 		;;//*[@class='select-menu-item-text']"			
@@ -2492,26 +2492,20 @@ InstallEController.prototype.execute=function(act){
 			var ghAuthor = new Gh3.User(author);//domain engineer
 	    	var ghRepo = new Gh3.Repository(repo, ghAuthor);//core asset repo
 	    	var ghUser = new Gh3.User(user);
-			window.console.log(ghRepo);
-
-	    	//var manual=window.prompt("manual or assited or splot?","splot");
 			
-		/*	if(manual=="manual"){
+
+	    	var manual= window.prompt("Choose product config. Type 'manual' or 'splot'?","splot"); //Values: splot; or manual;
+			
+			if(manual=="manual"){
 				/*step 1: Ask for product configuration equation*/
-			/*	var productFolders=window.prompt("Enter Core Assets to instantiate"," ");
+				var productFolders=window.prompt("Enter Core Assets to instantiate (space separated)"," ");
 				window.console.log(productFolders);
 				var coreAssetIds=productFolders.toString().split(" ");
 				window.console.log("coreAssetIds:"+coreAssetIds);
 				DeltaUtils.enactProductFork(ghUser, ghRepo, coreAssetIds);
-			}*/
-			//else if(manual=="splot"){
-				//window.open('http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
-				//GM_openInTab(window.document, 'http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
-				
-				//fetch first the splot-configurator-url file-and read the content to load the configurator in a IFRAME
-			//}
-			
-					ghRepo.fetch(function(err,re){
+			}
+			else if(manual=="splot"){
+				ghRepo.fetch(function(err,re){
 						ghRepo.fetchBranches(function(err,res){
 						var master=ghRepo.getBranchByName(DeltaUtils.getCoreRepoBaselineBranchName());
 							master.fetchContents(function(err,res){
@@ -2525,12 +2519,7 @@ InstallEController.prototype.execute=function(act){
 							});
 						});
 					});
-					
-				
-				
-				
-				window.console.log("before");
-			
+			}
    	} 	
 };
 
@@ -2552,7 +2541,7 @@ window.console.log(coreAssetIds);
 			master.fetchContents(function(err,res){
 					for(var i=0; i<coreAssetIds.length;i++){
 						if(! master.getDirByName(coreAssetIds[i])){ //si no hay folder error
-							//window.alert("There is no core asset named:"+coreAssetIds[i]);
+							window.alert("There is no core asset named:"+coreAssetIds[i]+". \nAborting....");
 							return;
 						}
 						if(i==coreAssetIds.length-1) 
@@ -2671,7 +2660,7 @@ DeltaUtils.deleteCoreAssetsNotNeeded=function(listOfFilePaths,user,repo,token){
 		var ghRepo= new Gh3.Repository(repo,ghUser);	
 		ghRepo.fetch(function(err,res){
 			ghRepo.fetchBranches(function(err,res){
-				var develop=ghRepo.getBranchByName("develop.productAssets");
+				var develop=ghRepo.getBranchByName(DeltaUtils.getProductRepoDevelopBranchName());
 				window.console.log(develop);
 				var commit1=develop.sha;
 					window.console.log("Commit: "+commit1);
@@ -2698,48 +2687,51 @@ DeltaUtils.setBranchingModelProductRepository=function(repo,user,token){
 	ghProductRepo.fetch(function (err, res){
 		ghProductRepo.fetchBranches(function(err,res){
 			var master= ghProductRepo.getBranchByName(DeltaUtils.getCoreRepoBaselineBranchName());
-			Utils.XHR("/"+user+"/"+repo+"/settings",function(res){//set default branch
-				Utils.XHR("/"+user+"/"+repo+"/settings/update",function(res){//set default branch
+			Utils.XHR("/"+user+"/"+repo+"/settings",function(res){
+			Utils.XHR("/"+user+"/"+repo+"/settings/branches",function(res){//set default branch
+				//Utils.XHR("/"+user+"/"+repo+"/settings/update_default_branch",function(res){//set default branch. Arazoak hemen ditut!
 					Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//create bigbang branch off master.baselines
 					window.console.log(ghProductRepo);
 					window.console.log(master);
 						var productConfigContent= master.sha;//jQuery(res).find("input[name='commit']").attr("value");
 						Utils.XHR("/"+user+"/"+repo+"/branches",function(res){//create update updates off develop
-									//post product config
-								Utils.XHR("/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){    //POST product config
+								//post product config
+								//Utils.XHR("/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){    //POST product config
 									Utils.XHR("/"+user+"/"+repo+"/new/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){
-										var commit = jQuery(res).find("input[name='commit']").attr("value");
-										window.console.log(commit+ " && "+productConfigContent);
-										//window.console.log("123131");
-										
-										window.console.log(DeltaUtils.getProductConfigName());
-										Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){
-											window.console.log("123131");
-											Utils.XHR("/"+user+"/"+repo+"/branches/"+DeltaUtils.getCoreRepoBaselineBranchName(),function(res){
-												Utils.XHR("/"+user+"/"+repo+"/new/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){
-														commit = jQuery(res).find("input[name='commit']").attr("value");
-														Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){
-															window.console.log("123131");
-															var splName=repo.split("-")[0];
-															var d = new Date();
-															var month = d.getMonth()+1;
-															var day = d.getDate();
-															var year = d.getFullYear();
-															var output =  (day<10 ? '0' : '') + day + '-' + (month<10 ? '0' : '') + month + '-' + d.getFullYear();
-															window.console.log("Output: "+output);
-															Utils.XHR("/"+user+"/"+repo+"/settings/rename",function(res){
-																window.location.href="/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoDevelopBranchName();
-															},"POST","name="+splName+"-Product-"+output+"&authenticity_token="+encodeURIComponent(token));
-														},"POST","authenticity_token="+encodeURIComponent(token)+"&filename=README.md&new_filename=README.md"+"&commit="+commit+"&value="+DeltaUtils.getReadmeContent()+"&placeholder_message=Readme File");					
-													},"POST","authenticity_token="+encodeURIComponent(token));
-											},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete");	//2: delete all branches except master.baseline
-										},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfigContent)+"&placeholder_message=product configuration File");					
-									
+										//var commit = jQuery(res).find("input[name='commit']").attr("value");
+										ghProductRepo.fetch(function (err, res){
+											ghProductRepo.fetchBranches(function(err,res){
+												var updates= ghProductRepo.getBranchByName(DeltaUtils.getProductRepoUpdateBranchName());
+												var commit=updates.sha;
+												window.console.log(commit+ " && "+productConfigContent);
+												Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoUpdateBranchName(),function(res){
+													window.console.log("123131");
+													Utils.XHR("/"+user+"/"+repo+"/branches/"+DeltaUtils.getCoreRepoBaselineBranchName(),function(res){
+														Utils.XHR("/"+user+"/"+repo+"/new/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){	
+														 	Utils.XHR("/"+user+"/"+repo+"/create/"+DeltaUtils.getProductRepoDevelopBranchName(),function(res){
+																window.console.log("Procesing date");
+																var splName=repo.split("-")[0];
+																var d = new Date();
+																var month = d.getMonth()+1;
+																var day = d.getDate();
+																var year = d.getFullYear();
+																var output =  (day<10 ? '0' : '') + day + '-' + (month<10 ? '0' : '') + month + '-' + d.getFullYear();
+																window.console.log("Output: "+output);
+																Utils.XHR("/"+user+"/"+repo+"/settings/rename",function(res){
+																	window.location.href="/"+user+"/"+repo+"/tree/"+DeltaUtils.getProductRepoDevelopBranchName();
+																},"POST","new_name="+splName+"-Product-"+output+"&authenticity_token="+encodeURIComponent(token));
+															},"POST","authenticity_token="+encodeURIComponent(token)+"&filename=README.md&new_filename=README.md"+"&commit="+commit+"&value="+DeltaUtils.getReadmeContent()+"&placeholder_message=Readme File");				
+														},"POST","authenticity_token="+encodeURIComponent(token));
+													},"POST","authenticity_token="+encodeURIComponent(token)+"&_method=delete");	//2: delete all branches except master.baseline
+												},"POST","target_branch="+DeltaUtils.getProductRepoUpdateBranchName()+"&same_repo=1&commit-choice=direct&content_changed=true"+"&authenticity_token="+encodeURIComponent(token)+"&filename="+DeltaUtils.getProductConfigName()+"&new_filename="+DeltaUtils.getProductConfigName()+"&commit="+commit+"&value="+encodeURIComponent(productConfigContent)+"&placeholder_message=product configuration File");					
+											});
+										});
 									},"POST","authenticity_token="+encodeURIComponent(token));
-								},"GET");
+								//},"GET");
 						},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+DeltaUtils.getProductRepoDevelopBranchName()+"&name="+DeltaUtils.getProductRepoUpdateBranchName() +"&path=");	
 					},"POST","authenticity_token="+encodeURIComponent(token)+"&branch="+DeltaUtils.getCoreRepoBaselineBranchName()+"&name="+DeltaUtils.getProductRepoBigBangName() +"&path=");	
-				},"PUT","field=repository_default_branch&value="+encodeURIComponent(DeltaUtils.getProductRepoDevelopBranchName())+"&authenticity_token="+encodeURIComponent(token));
+				//},"POST","name="+encodeURIComponent(DeltaUtils.getProductRepoDevelopBranchName())+"&authenticity_token="+encodeURIComponent(token));
+			},"GET","authenticity_token="+encodeURIComponent(token));
 			},"GET","authenticity_token="+encodeURIComponent(token));
 		});
 	});
@@ -3434,7 +3426,7 @@ DeltaUtils.getProductRepoDevelopBranchName=function(){
 	return "develop.productAssets";
 };
 DeltaUtils.getProductRepoMasterBranchName=function(){
-	return "master.product";
+	return "master.baseline";
 };
 DeltaUtils.getProductRepoUpdateBranchName=function(){
 	return "update.updates";

@@ -1468,7 +1468,7 @@ var GitHubWrapper=function(){
  this.nodes.userName={node:null,listeners:{},xpath:"//*[@name='user-login']/@content",supplements:[],regexp:/([^ \n]+)/}; 
  this.nodes.currentAuthor={node:null,listeners:{},xpath:"//*[@class='author']",supplements:[],regexp:/([^ \n]+)/};
 
- this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[4]/div/div[1]/div/div/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
+ this.nodes.currentRepository={node:null,listeners:{},xpath:"/html/body/div[5]/div/div/div[1]/div[1]/h1/strong/a",supplements:[],regexp:/([^ \n]+)/}; 
 this.nodes.issueTitle={node:null,listeners:{},xpath:"//span[@class='gh-header-number']",supplements:[],regexp:/([^ \n]+)/}; 
  //this.nodes.issueTitle=
  this.nodes.authenticityToken={node:null,listeners:{},xpath:"//meta[@name='csrf-token']/@content",supplements:[],regexp:/([^ \n]+)/}; 
@@ -2509,11 +2509,28 @@ InstallEController.prototype.execute=function(act){
 				//GM_openInTab(window.document, 'http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150330_1729145680.xml');
 				
 				//fetch first the splot-configurator-url file-and read the content to load the configurator in a IFRAME
+			//}
+			
+					ghRepo.fetch(function(err,re){
+						ghRepo.fetchBranches(function(err,res){
+						var master=ghRepo.getBranchByName(DeltaUtils.getCoreRepoBaselineBranchName());
+							master.fetchContents(function(err,res){
+								var splot=master.getFileByName("splot-configurator-url");
+								splot.fetchContent(function(err,res){
+									if (splot!=null)
+										UI.Dialog.show_gitLine_splot_dialog(splot.getRawContent(), ghUser,ghRepo, null,null);//call function to enact ProductFork operation);		
+								});
+									
+											
+							});
+						});
+					});
+					
 				
-				UI.Dialog.show_gitLine_splot_dialog("http://gsd.uwaterloo.ca:8088/SPLOT/SplotConfigurationServlet?action=interactive_configuration_main&op=reset&userModels=&tmpModelPath=temp_models&selectedModels=model_20150408_1980832584.xml#", ghUser,ghRepo, null,null);//call function to enact ProductFork operation
+				
 				
 				window.console.log("before");
-			//}
+			
    	} 	
 };
 
@@ -3401,7 +3418,7 @@ DeltaUtils.getReadmeContent=function(){
 
 
 DeltaUtils.getUserAccessToken=function(){
-	return "access token"; //GitHub API Access Token
+	return "YOUR ACCCESS TOKEN"; //GitHub API Access Token
 };
 
 //CONSTANTS for branch Names: branching models

@@ -2740,7 +2740,8 @@ DeltaUtils.setBranchingModelProductRepository=function(repo,user,token){
 DeltaUtils.updatePropagationTimeOut="undefined";
 
 DeltaUtils.productSync="undefined";
-DeltaUtils.baselineSha="undefined"
+DeltaUtils.baselineSha="undefined";
+DeltaUtils.lastSyncDate="undefined";
 
 DeltaUtils.interfaceOfUpdatePropagation=function(integ){
 	window.console.log("interfaceOfUpdatePropagation");
@@ -2779,7 +2780,10 @@ DeltaUtils.interfaceOfUpdatePropagation=function(integ){
 						var updates= ghRepoProduct.getBranchByName(DeltaUtils.getProductRepoUpdateBranchName());
 						updates.fetchContents(function(err,res){
 							var configFile=updates.getFileByName(DeltaUtils.getProductConfigName());
-							configFile.fetchContent(function(err,res){
+							updates.fetchCommits(function(err,res){
+								configFile.fetchContent(function(err,res){
+								 DeltaUtils.lastSyncDate= updates.getCommits()[0].date;
+								
 								DeltaUtils.productSync=configFile.getRawContent().split("\n")[0];
 								window.console.log(DeltaUtils.productSync);
 								window.console.log(baseline.sha);
@@ -2788,11 +2792,15 @@ DeltaUtils.interfaceOfUpdatePropagation=function(integ){
 									var listOfCoreAssetsToUpdate=[];
 									window.console.log(updates);
 									var listOfContents=updates.getContents();
-									DeltaUtils.getCoreAssetsToUpdate(listOfContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo);
+									
+									DeltaUtils.getCoreAssetsToUpdate(listOfContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo,DeltaUtils.lastSyncDate);
 								}
 								else
 									UI.Dialog.show_wf_yesno_dialog("No updates available!",null,null);
 							});
+
+							});
+							
 						});
 					});
 				});
@@ -2803,8 +2811,9 @@ DeltaUtils.interfaceOfUpdatePropagation=function(integ){
 };
 
 //get the list of core assets to update
-DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo){
+DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdate,baseline,configString,author,coreRepo,lastSyncDate){
  try{
+
  	var content=branchContents.pop();
  	window.console.log(branchContents.length);
 	window.console.log(content);
@@ -2818,7 +2827,8 @@ DeltaUtils.getCoreAssetsToUpdate=function(branchContents,listOfCoreAssetsToUpdat
 		//	configString+="<tr><td>"+content.name+"</td><td><a href=https://github.com/"+author+"/"+coreRepo+"/commits/"+DeltaUtils.getCoreRepoBaselineBranchName()+"?path="+content.name+">"+"Commits"+"</a></td></tr>";
 			var cola= author+":"+DeltaUtils.productSync+"..."+author+":"+DeltaUtils.baselineSha;
 			window.console.log(cola);
-			var href="https://github.com/"+author+"/"+coreRepo+"/compare/"+cola;
+			//var href="https://github.com/"+author+"/"+coreRepo+"/compare/"+cola;
+			var href="https://github.com/"+author+"/"+coreRepo+"/commits?path="+content.name+"&since="+DeltaUtils.lastSyncDate;
 			configString+="<tr><td>"+content.name+"</td><td><a href="+(href.toString())+"?path="+content.name+">Diff"+"</a></td></tr>";
 			window.console.log(configString);
 			if(DeltaUtils.updatePropagationTimeOut!="undefined")//clear timeout
@@ -3347,7 +3357,7 @@ DeltaUtils.postCherryPickedFilesToFeedbackBranch=function(listOfFilesToFeedback,
 											if(listOfFilesToFeedback.length!=0)
 												DeltaUtils.postCherryPickedFilesToFeedbackBranch(listOfFilesToFeedback,feedbackName);
 											else {
-												DeltaUtils.createPullRequestForFeedback(author,user,productRepoName,feedbackName,coreRepoName,DeltaUtils.getCoreRepoBaselineBranchName());
+												DeltaUtils.createPullRequestForFeedback(author,user,productRepoName,feedbackName,coreRepoName,DeltaUtils.getCoreRepoDevelopBranchName());//DeltaUtils.getCoreRepoBaselineBranchName());
 											}
 								},"POST","authenticity_token="+encodeURIComponent(token)+"&filename="+file.filename+"&new_filename="+file.filename+"&commit="+commit+"&same_repo=1"+"&pr="+""+"&content_changed=true&value="+encodeURIComponent(fileContent)+"&message=New File Propagated!&commit_choice=direct&target_branch="+feedbackName+"&placeholder_message=New file&quick_pull=");
 							},"POST","authenticity_token="+encodeURIComponent(token));
